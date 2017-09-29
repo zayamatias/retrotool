@@ -2,6 +2,7 @@
 import sys
 import PIL.Image
 import PIL.ImageTk
+import tkinter
 from tkinter import *
 from tkinter import messagebox
 from tkinter import Canvas
@@ -14,6 +15,7 @@ import config
 class App:
     def __init__(self):
         self.root = Tk()
+        self.targetSystem = 0
         self.root.withdraw()
         self.pixels = []
         self.finalsprites = []
@@ -44,8 +46,35 @@ class App:
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=self.exit)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
+        self.filemenu = Menu(self.menubar, tearoff=0)
+        for system in config.systems:
+            self.filemenu.add_checkbutton(label=system, onvalue=config.systems.index(system), offvalue=False, variable=self.targetSystem)
+        self.menubar.add_cascade(label="Target System", menu=self.filemenu)
+        self.filemenu = Menu(self.menubar, tearoff=0)
+        self.filemenu.add_command(label="Show Sprites", command=lambda:retrofunctions.showsprites(self))
+        self.filemenu.add_command(label="Sprite Editor", command=lambda:retrofunctions.spriteditor(self))
+        self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
+
+
+        # DefineWindows
+"""        self.spwindow = tkinter.Tk().Toplevel(self)
+        self.spwindow.title("Sprite List")
+        self.spwindow.iconbitmap(config.iconfile)
+        self.spwindow.withdraw()"""
+
+
+
+
+
+
+
+
+
+
+
+        # Nothing gets executed after this statement!
         self.root.mainloop()
         
     def click (self,event):

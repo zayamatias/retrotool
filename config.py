@@ -19,6 +19,7 @@ msxpalette = [(62/msxcolordivider, 184/msxcolordivider,73/msxcolordivider),
 (183/msxcolordivider,102/msxcolordivider,181/msxcolordivider),
 (204/msxcolordivider,204/msxcolordivider,204/msxcolordivider),
 (255/msxcolordivider,255/msxcolordivider,255/msxcolordivider)]
-palettes = ["MSX",[msxpalette]]
+palettes = [("MSX",msxcolordivider,[msxpalette]),("MSX2",msxcolordivider,[msxpalette]),("MSX2+",msxcolordivider,[msxpalette])]
 systems = ["MSX","MSX2","MSX2+"]
-
+#syslimits => System name, max colors per sprite
+syslimits = [("MSX",1,16),("MSX2",3,16),("MSX2+",3,16)]

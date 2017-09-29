@@ -149,7 +149,18 @@ def openfile(app):
     app.scale.set(1)
     app.scale.pack()
     app.root.update()
+    getColors(app)
+    getPixels(app)
+    createTempSprites(app)
+    # default size for sprites
+    #Usprites y Csprites OK
+    #Primer color es el transparente (o negro)
+    swappedpalette = [(0,(0,0,0))]
+    # Despues tengo que ver los posibles swap 3,5,7,9,11,13,y 15
+    availableswaps =[3,5,7,9,11,13,15]
+    #prepareOrs(app)
 
+    createFinalSprites(app)
 
 def zoomimage(app):
     zoom = app.scale.get()
@@ -172,9 +183,9 @@ def getColors(app):
     app.palette =[app.bgcolor]
     for color in app.colors:
         rgb = color[1]
-        r=int(int(rgb[0])/config.colordivider)
-        g=int(int(rgb[1])/config.colordivider)
-        b=int(int(rgb[2])/config.colordivider)
+        r=int(int(rgb[0])/config.palettes[app.targetSystem][1])
+        g=int(int(rgb[1])/config.palettes[app.targetSystem][1])
+        b=int(int(rgb[2])/config.palettes[app.targetSystem][1])
         # make sure we do not add bgcolor
         if set((r,g,b)) != set (app.bgcolor):
            app.palette.append((r,g,b))
@@ -187,7 +198,7 @@ def getPixels (app) :
             r = pixel[0]
             g = pixel[1]
             b = pixel[2]
-            color = (int(r/config.colordivider),int(g/config.colordivider),int(b/config.colordivider))
+            color = (int(r/config.palettes[app.targetSystem][1]),int(g/config.palettes[app.targetSystem][1]),int(b/config.palettes[app.targetSystem][1]))
             if set(color) != set(app.bgcolor): # color chosen by user
                 app.pixels.append(app.palette.index(color))
             else:
@@ -294,16 +305,15 @@ def writefile(app):
 def savefile(app):
     
         #bgcolor should be the first in the list
-    getColors(app)
-    getPixels(app)
-    createTempSprites(app)
-    # default size for sprites
-    #Usprites y Csprites OK
-    #Primer color es el transparente (o negro)
-    swappedpalette = [(0,(0,0,0))]
-    # Despues tengo que ver los posibles swap 3,5,7,9,11,13,y 15
-    availableswaps =[3,5,7,9,11,13,15]
-    #prepareOrs(app)
 
-    createFinalSprites(app)
     writefile(app)
+
+def udpateTargetSystem(app,chgsystem):
+    print (app.targetSystem)
+    print (chgsystem)
+    app.targetSystem=config.systems.index(chgsystem)
+    print (app.targetSystem)
+    
+
+def showsprites (app):
+    app.spwindow.tkraise()
