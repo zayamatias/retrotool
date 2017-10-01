@@ -59,7 +59,7 @@ class App:
 
 
         # DefineWindows
-"""        self.spwindow = tkinter.Tk().Toplevel(self)
+        """        self.spwindow = tkinter.Tk().Toplevel(self)
         self.spwindow.title("Sprite List")
         self.spwindow.iconbitmap(config.iconfile)
         self.spwindow.withdraw()"""
