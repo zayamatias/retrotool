@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import Canvas
 from tkinter.filedialog import askopenfilename
+import tkinter as tk
 import retrofunctions
 from functools import partial
 import config
@@ -58,11 +59,12 @@ class App:
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
 
 
-        # DefineWindows
-"""        self.spwindow = tkinter.Tk().Toplevel(self)
+        # DefineSpriteListWindow
+        self.spwindow =  tk.Toplevel(self.root)
         self.spwindow.title("Sprite List")
         self.spwindow.iconbitmap(config.iconfile)
-        self.spwindow.withdraw()"""
+        self.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
+        self.spwindow.withdraw()
 
 
 

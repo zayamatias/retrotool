@@ -316,4 +316,16 @@ def udpateTargetSystem(app,chgsystem):
     
 
 def showsprites (app):
-    app.spwindow.tkraise()
+    app.spwindow.deiconify()
+    app.spwindow.grid_rowconfigure(len(app.csprites)/8, weight=1)
+    app.spwindow.grid_columnconfigure(8, weight=1)
+    row = 0
+    column = 0
+    top_frame = Frame(app.spwindow, bg='cyan', width=64, height=64, pady=3)
+    for sprite in app.csprites:
+        top_frame.grid(row=row,column=column)
+        column=column+1
+        if column == 9:
+            column = 0
+            row = row + 1
+    
