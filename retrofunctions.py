@@ -317,8 +317,34 @@ def udpateTargetSystem(app,chgsystem):
 
 def showsprites (app):
     app.spwindow.deiconify()
-    app.spwindow.grid_rowconfigure(len(app.csprites)/8, weight=1)
-    app.spwindow.grid_columnconfigure(8, weight=1)
+    numSprites = len(app.csprites)
+    pixelsize = 8
+    spritesPerRow = 8
+    spriteColumns = int(numSprites/8)
+    xsize = (app.spritexsize)*pixelsize
+    ysize = (app.spriteysize)*pixelsize 
+    spacing = 4
+    canvasWidth = spritesPerRow *(xsize+spacing)
+    canvasHeight = spriteColumns*(ysize+spacing)
+    print (canvasWidth,canvasHeight)
+    
+    spritesCanvas=Canvas (app.spwindow,width=canvasWidth,height=canvasHeight)
+    spritesCanvas.pack()
+    currX = 0
+    currY = 0
+    shownSprites = 0
+    for row in range (0,numSprites):
+        destX = currX + (xsize)
+        destY = currY + (ysize)
+        spritesCanvas.create_rectangle(currX,currY,destX,destY)
+        currX = currX+(xsize+spacing)
+        shownSprites = shownSprites + 1
+        if shownSprites == spritesPerRow:
+            currX = 0
+            currY = currY + (ysize+spacing)
+            shownSprites = 0
+
+    """
     row = 0
     column = 0
     top_frame = Frame(app.spwindow, bg='cyan', width=64, height=64, pady=3)
@@ -328,4 +354,4 @@ def showsprites (app):
         if column == 9:
             column = 0
             row = row + 1
-    
+    """

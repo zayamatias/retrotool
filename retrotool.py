@@ -65,7 +65,7 @@ class App:
         self.spwindow.iconbitmap(config.iconfile)
         self.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
         self.spwindow.withdraw()
-
+        self.spwindow.protocol("WM_DELETE_WINDOW", self.closeSprites)
 
 
 
@@ -97,6 +97,10 @@ class App:
     def exit(self):
         self.root.destroy()
         sys.exit()
+
+    def closeSprites(self):
+        self.spwindow.withdraw()
+    
             
 if __name__ == "__main__":
     myapp = App()
