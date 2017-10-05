@@ -76,7 +76,7 @@ class App:
 
         # Nothing gets executed after this statement!
         self.root.mainloop()
-        
+
     def click (self,event):
         # need to consider scale!
         zoom = self.scale.get()
