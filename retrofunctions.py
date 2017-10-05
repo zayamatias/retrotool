@@ -337,9 +337,7 @@ def showsprites (app):
     for row in range (0,numSprites):
         destX = currX + (xsize)
         destY = currY + (ysize)
-        sbox.append(spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas"))
-        print (object(sbox[currentSprite]))
-        #sbox[currentSprite].bind("<Button-1",lambda:changeSpriteBG)
+        rectangle_id = spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas")
         
         
         
