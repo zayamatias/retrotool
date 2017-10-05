@@ -354,7 +354,7 @@ def drawboxel (app,canvas,sprite,x,y):
             print (pixel)
             if row[pixel] != 0:
                 canvas.create_rectangle (x,y,ex,ey,fill="blue")
-            x=ex
+        x = ex
         y = ey
         
                 
