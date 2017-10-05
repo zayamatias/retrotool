@@ -24,3 +24,4 @@ systems = ["MSX","MSX2","MSX2+"]
 #syslimits => System name, max colors per sprite
 syslimits = [("MSX",1,16),("MSX2",3,16),("MSX2+",3,16)]
 pixelsize = 8
+spritesperrow= 6

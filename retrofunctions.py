@@ -318,8 +318,8 @@ def udpateTargetSystem(app,chgsystem):
 def showsprites (app):
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
-    spritesPerRow = 8
-    spriteColumns = int(numSprites/8)
+    spritesPerRow = config.spritesperrow
+    spriteColumns = int(numSprites/config.spritesperrow)
     xsize = (app.spritexsize)*config.pixelsize
     ysize = (app.spriteysize)*config.pixelsize 
     spacing = 4
@@ -328,35 +328,56 @@ def showsprites (app):
     print (canvasWidth,canvasHeight)
     shownSprites = 0
     spritesCanvas=Canvas (app.spwindow,width=canvasWidth,height=canvasHeight)
+    #spritesCanvas.bind('<Button-1>', lambda:changeSpriteBG )
     spritesCanvas.pack()
     currX = 1
     currY = 1
     currentSprite = 0
+    sbox = []
     for row in range (0,numSprites):
         destX = currX + (xsize)
         destY = currY + (ysize)
-        spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2))
-        currX = currX+(xsize+spacing)
+        sbox.append(spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas"))
+        print (object(sbox[currentSprite]))
+        #sbox[currentSprite].bind("<Button-1",lambda:changeSpriteBG)
+        
+        
+        
+        
         drawboxel (app,spritesCanvas,app.usprites[currentSprite],currX,currY)
+        currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
         shownSprites = shownSprites + 1
         if shownSprites == spritesPerRow:
             currX = 1
             currY = currY + (ysize+spacing)
             shownSprites=0
-            
+def changeSpriteBG (canvas):
+    if canvas.find_withtag(CURRENT):
+        canvas.itemconfig(CURRENT, fill="blue")
+        canvas.update_idletasks()
+        canvas.after(200)
+        canvas.itemconfig(CURRENT, fill="red")
+
 def drawboxel (app,canvas,sprite,x,y):
-    print (sprite)
+    startx = x
     for row in sprite:
-        ex = x+config.pixelsize
-        ey = y+config.pixelsize
+        ey = y + config.pixelsize
         for pixel in range (0,app.spritexsize):
-            print (pixel)
-            if row[pixel] != 0:
-                canvas.create_rectangle (x,y,ex,ey,fill="blue")
-        x = ex
-        y = ey
-        
+            ex = x + config.pixelsize
+            if int(row[pixel]) != 0:
+                palettecolor = app.palette[int(row[pixel])]
+                rgb = (palettecolor[0]*config.msxcolordivider,
+                       palettecolor[1]*config.msxcolordivider,
+                       palettecolor[2]*config.msxcolordivider)
+                color = "#%02x%02x%02x" % rgb
+                canvas.create_rectangle (x,y,ex,ey,fill=color)
+            else:
+                canvas.create_rectangle (x,y,ex,ey)
+                
+            x = ex
+        x = startx
+        y=ey
                 
 
     """

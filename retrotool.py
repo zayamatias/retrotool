@@ -60,13 +60,15 @@ class App:
 
 
         # DefineSpriteListWindow
+         
         self.spwindow =  tk.Toplevel(self.root)
         self.spwindow.title("Sprite List")
         self.spwindow.iconbitmap(config.iconfile)
         self.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
         self.spwindow.withdraw()
         self.spwindow.protocol("WM_DELETE_WINDOW", self.closeSprites)
-
+        scrollbar = tk.Scrollbar(self.spwindow, command=self.closeSprites)
+        scrollbar.pack(side=tk.RIGHT, fill='y')
 
 
 
