@@ -16,6 +16,7 @@ class App:
     # the main application ;-)
     def __init__(self):
         self.root = Tk()
+
         self.targetSystem = 0
         self.root.withdraw()
         self.pixels = []
