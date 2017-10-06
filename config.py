@@ -25,3 +25,4 @@ systems = ["MSX","MSX2","MSX2+"]
 syslimits = [("MSX",1,16),("MSX2",3,16),("MSX2+",3,16)]
 pixelsize = 8
 spritesperrow= 6
+default_filename ="C:\\Users\\id087082\\Downloads\\kv2.png" # set it to a default file or leave it blank to have dialog opened

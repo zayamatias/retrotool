@@ -12,6 +12,7 @@ from tkinter import messagebox
 from tkinter import Canvas
 from tkinter.filedialog import askopenfilename
 import config
+import tkinter as tk
 
 def showSprites (sprites):
     count = len(sprites)
@@ -135,7 +136,10 @@ class sprite:
 
 def openfile(app):
     app.cv.update()
-    app.opfile = filedialog.askopenfilename(parent=app.root)
+    if config.default_filename == "":
+        app.opfile = filedialog.askopenfilename(parent=app.root)
+    else:
+        app.opfile = config.default_filename
     app.cv.update()
     app.img = PIL.Image.open(app.opfile)
     colok = checkColors (app)
@@ -149,9 +153,6 @@ def openfile(app):
     app.scale.set(1)
     app.scale.pack()
     app.root.update()
-    getColors(app)
-    getPixels(app)
-    createTempSprites(app)
     # default size for sprites
     #Usprites y Csprites OK
     #Primer color es el transparente (o negro)
@@ -160,7 +161,6 @@ def openfile(app):
     availableswaps =[3,5,7,9,11,13,15]
     #prepareOrs(app)
 
-    createFinalSprites(app)
 
 def zoomimage(app):
     zoom = app.scale.get()
@@ -316,6 +316,12 @@ def udpateTargetSystem(app,chgsystem):
     
 
 def showsprites (app):
+    
+    getColors(app)
+    getPixels(app)
+    createTempSprites(app)
+    createFinalSprites(app)
+    createSpritesWindow(app)
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
     spritesPerRow = config.spritesperrow
@@ -327,22 +333,18 @@ def showsprites (app):
     canvasHeight = spriteColumns*(ysize+spacing)
     print (canvasWidth,canvasHeight)
     shownSprites = 0
-    spritesCanvas=Canvas (app.spwindow,width=canvasWidth,height=canvasHeight)
-    #spritesCanvas.bind('<Button-1>', lambda:changeSpriteBG )
+    spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight)
+    spritesCanvas.bind('<Button-1>', lambda x:updatePixel(spritesCanvas,True,app))
+    spritesCanvas.bind('<Button-3>', lambda x:updatePixel(spritesCanvas,False,app))
     spritesCanvas.pack()
     currX = 1
     currY = 1
     currentSprite = 0
-    sbox = []
     for row in range (0,numSprites):
         destX = currX + (xsize)
         destY = currY + (ysize)
-        rectangle_id = spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas")
-        
-        
-        
-        
-        drawboxel (app,spritesCanvas,app.usprites[currentSprite],currX,currY)
+        spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas")
+        drawboxel (app,spritesCanvas,app.usprites,currentSprite,currX,currY)
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
         shownSprites = shownSprites + 1
@@ -350,16 +352,30 @@ def showsprites (app):
             currX = 1
             currY = currY + (ysize+spacing)
             shownSprites=0
-def changeSpriteBG (canvas):
-    if canvas.find_withtag(CURRENT):
-        canvas.itemconfig(CURRENT, fill="blue")
-        canvas.update_idletasks()
-        canvas.after(200)
-        canvas.itemconfig(CURRENT, fill="red")
 
-def drawboxel (app,canvas,sprite,x,y):
+            
+def updatePixel (canvas,switchon,app):
+    fill = ""
+    pixelcolor = 0
+    tags = canvas.gettags(CURRENT)
+    if len(tags)<2:
+        return
+    print (tags[0])
+    if switchon:
+      fill = "blue"
+      pixelcolor = 1
+    if canvas.find_withtag(CURRENT):
+      canvas.itemconfig(CURRENT, fill=fill)
+      coords = tags[0].split('/')
+      app.usprites[coords[0]][coords[1]][coords[2]]=pixelcolor
+      canvas.update_idletasks()
+        
+def drawboxel (app,canvas,sprites,index,x,y):
     startx = x
+    sprite = sprites[index]
+    py=0
     for row in sprite:
+        px=0
         ey = y + config.pixelsize
         for pixel in range (0,app.spritexsize):
             ex = x + config.pixelsize
@@ -369,14 +385,28 @@ def drawboxel (app,canvas,sprite,x,y):
                        palettecolor[1]*config.msxcolordivider,
                        palettecolor[2]*config.msxcolordivider)
                 color = "#%02x%02x%02x" % rgb
-                canvas.create_rectangle (x,y,ex,ey,fill=color)
+                canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py))
+                px = px +1
             else:
-                canvas.create_rectangle (x,y,ex,ey)
+                canvas.create_rectangle (x,y,ex,ey,tag=str(index)+"/"+str(px)+"/"+str(py))
                 
             x = ex
         x = startx
         y=ey
-                
+        py = py + 1        
+
+def createSpritesWindow(app):
+    app.spwindow =  tk.Toplevel(app.root)
+    app.spwindow.title("Sprite List")
+    app.spwindow.iconbitmap(config.iconfile)
+    app.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
+    app.spwindow.withdraw()
+    app.spwindow.protocol("WM_DELETE_WINDOW", closeSprites(app))
+    #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
+    #scrollbar.pack(side=tk.RIGHT, fill='y')
+
+def closeSprites(app):
+    app.spwindow.destroy()
 
     """
     row = 0
