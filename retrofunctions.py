@@ -355,19 +355,33 @@ def showsprites (app):
 
             
 def updatePixel (canvas,switchon,app):
-    fill = ""
+    fill = config.spriteeditorbgcolor
     pixelcolor = 0
     tags = canvas.gettags(CURRENT)
     if len(tags)<2:
         return
-    print (tags[0])
     if switchon:
       fill = "blue"
       pixelcolor = 1
     if canvas.find_withtag(CURRENT):
+      print (tags)
       canvas.itemconfig(CURRENT, fill=fill)
       coords = tags[0].split('/')
-      app.usprites[coords[0]][coords[1]][coords[2]]=pixelcolor
+      spriteidx = int(coords[0])
+      px = int(coords[1])
+      py = int(coords[2])
+      sprite = app.usprites[spriteidx]
+      row = sprite[py]
+      print (row)
+      row = list(row)
+      row[px]=str(pixelcolor)
+      map(str,row)
+      print (row)
+      row = ''.join(row)
+      print (row)
+      print ("-----------------------------")
+      sprite[py]=row
+      app.usprites[spriteidx]=sprite
       canvas.update_idletasks()
         
 def drawboxel (app,canvas,sprites,index,x,y):
@@ -386,10 +400,10 @@ def drawboxel (app,canvas,sprites,index,x,y):
                        palettecolor[2]*config.msxcolordivider)
                 color = "#%02x%02x%02x" % rgb
                 canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py))
-                px = px +1
             else:
-                canvas.create_rectangle (x,y,ex,ey,tag=str(index)+"/"+str(px)+"/"+str(py))
+                canvas.create_rectangle (x,y,ex,ey,fill=config.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py))
                 
+            px = px + 1
             x = ex
         x = startx
         y=ey
@@ -400,8 +414,8 @@ def createSpritesWindow(app):
     app.spwindow.title("Sprite List")
     app.spwindow.iconbitmap(config.iconfile)
     app.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
+    app.spwindow.protocol("WM_DELETE_WINDOW", lambda:closeSprites(app))
     app.spwindow.withdraw()
-    app.spwindow.protocol("WM_DELETE_WINDOW", closeSprites(app))
     #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
     #scrollbar.pack(side=tk.RIGHT, fill='y')
 
