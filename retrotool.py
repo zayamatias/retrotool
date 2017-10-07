@@ -16,6 +16,7 @@ import config
 class App:
     def __init__(self):
         self.root = Tk()
+
         self.targetSystem = 0
         self.root.withdraw()
         self.pixels = []
@@ -61,19 +62,12 @@ class App:
 
         # DefineSpriteListWindow
          
-        self.spwindow =  tk.Toplevel(self.root)
-        self.spwindow.title("Sprite List")
-        self.spwindow.iconbitmap(config.iconfile)
-        self.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
-        self.spwindow.withdraw()
-        self.spwindow.protocol("WM_DELETE_WINDOW", self.closeSprites)
-        scrollbar = tk.Scrollbar(self.spwindow, command=self.closeSprites)
-        scrollbar.pack(side=tk.RIGHT, fill='y')
 
 
 
 
-
+        if config.default_filename != "":
+            retrofunctions.openfile(self)
 
 
 
@@ -100,8 +94,6 @@ class App:
         self.root.destroy()
         sys.exit()
 
-    def closeSprites(self):
-        self.spwindow.withdraw()
     
             
 if __name__ == "__main__":
