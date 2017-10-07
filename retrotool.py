@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import Canvas
 from tkinter.filedialog import askopenfilename
+import tkinter as tk
 import retrofunctions
 from functools import partial
 import config
@@ -58,13 +59,16 @@ class App:
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
 
 
-        # DefineWindows
-        """        self.spwindow = tkinter.Tk().Toplevel(self)
+        # DefineSpriteListWindow
+         
+        self.spwindow =  tk.Toplevel(self.root)
         self.spwindow.title("Sprite List")
         self.spwindow.iconbitmap(config.iconfile)
-        self.spwindow.withdraw()"""
-
-
+        self.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
+        self.spwindow.withdraw()
+        self.spwindow.protocol("WM_DELETE_WINDOW", self.closeSprites)
+        scrollbar = tk.Scrollbar(self.spwindow, command=self.closeSprites)
+        scrollbar.pack(side=tk.RIGHT, fill='y')
 
 
 
@@ -95,6 +99,10 @@ class App:
     def exit(self):
         self.root.destroy()
         sys.exit()
+
+    def closeSprites(self):
+        self.spwindow.withdraw()
+    
             
 if __name__ == "__main__":
     myapp = App()
