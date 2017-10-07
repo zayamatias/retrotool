@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Sep 22 13:07:29 2017
-
-@author: id087082
-"""
 import sys
 import PIL.Image
 import PIL.ImageTk
@@ -13,12 +7,11 @@ from tkinter import Canvas
 from tkinter.filedialog import askopenfilename
 import config
 import tkinter as tk
-
-def showSprites (sprites):
-    count = len(sprites)
-    sprimg = PIL.Image.new()
+import math
 
 def findOrColor (csprites):
+    # This function finds which is the best pixel to or according to the palette colors
+    # This is used on MSX2 -> See https://www.msx.org/wiki/The_OR_Color
     numcols = len(csprites)
     if  numcols < 5:
         c=[255,255,255]
@@ -47,6 +40,7 @@ def findOrColor (csprites):
     return pc
 
 def needToOr(csprites):
+    #retruns if there is a need to or the colors or not
     toor = False;
     for cols in csprites:
         pc=findOrColor (cols)
@@ -55,6 +49,7 @@ def needToOr(csprites):
     return toor
 
 def getSplits(csprites):
+    #returns the number of sprites that have to be created as a result of the split
     splits = 0
     numcols = 0
     for cols in csprites:
@@ -70,27 +65,31 @@ def getSplits(csprites):
 
 
 class sprite:
+    # Sprite class, to make it easier to manipulate afterwards
     spriteCount = 0
 
     def __init__ (self,pattern,colors,ored):
 
-        self.pattern=pattern
-        self.colors=colors
-        self.ored = ored
-        self.number = sprite.spriteCount
-        sprite.spriteCount = sprite.spriteCount+1
+        self.pattern=pattern   #binary pattern of the sprite
+        self.colors=colors     #colors of the sprite
+        self.ored = ored       #does this sprite come from an ored sprite (for palette purposes)
+        self.number = sprite.spriteCount   #Sprite index
+        sprite.spriteCount = sprite.spriteCount+1 #add one to the index for next sprite
 
     def displayPattern (self):
+        #for testing purposes, show the pattern on console
         rows = self.pattern
         for row in rows:
             print (row)
 
-    def displayColors (self):
+    def displayColors (self):µ
+        #for testing purposes, show the color on console
         rows = self.colors
         for row in rows:
             print (row)
 
     def getPattern (self):
+        #retruns the pattern of a sprite
         line = ""
         rows = self.pattern
         for row in rows:
@@ -98,6 +97,7 @@ class sprite:
         return line
 
     def getColors (self,ysize):
+        #returns the colors of a sprite
         line = ""
         count = 1
         rows = self.colors
@@ -109,6 +109,8 @@ class sprite:
         return line
 
     def getAsmPattern (self):
+        #get the pattern of a sprite in ASM mode (db %xxxxxxxxxxxxxxxx)
+        #attention: for 16bit sprites, msx splits into 2 8x16 patterns
         line = ""
         rows = self.pattern
         pat1 =""
@@ -120,6 +122,8 @@ class sprite:
         return line
 
     def getAsmColors (self,ysize):
+        #get the colors of a sprite in ASM mode (db 1,2,3....) each byte represents the # of the color in the palette
+        #for ored colors, bit #7 should be set, thus the +64
         line = "\tdb "
         rows = self.colors
         count = 1
@@ -135,17 +139,20 @@ class sprite:
         return line
 
 def openfile(app):
+    #ask for a file to open
     app.cv.update()
+    #to speed up testing, if a file is set in the config it will not ask to open but will open directly this one
     if config.default_filename == "":
         app.opfile = filedialog.askopenfilename(parent=app.root)
     else:
         app.opfile = config.default_filename
     app.cv.update()
     app.img = PIL.Image.open(app.opfile)
+    #CHeck if the max number of colors accepted by the system is equal or more than the colors of the image
     colok = checkColors (app)
     if not colok:
         return 1
-
+    #create the image
     app.spritephoto=PIL.ImageTk.PhotoImage(app.img)
     app.cv.itemconfig(app.canvas_ref,image = app.spritephoto)
     app.cv.image = app.spritephoto
@@ -153,16 +160,16 @@ def openfile(app):
     app.scale.set(1)
     app.scale.pack()
     app.root.update()
-    # default size for sprites
-    #Usprites y Csprites OK
-    #Primer color es el transparente (o negro)
+    #to be used in the futrue for automatic adjustment of the palette
     swappedpalette = [(0,(0,0,0))]
-    # Despues tengo que ver los posibles swap 3,5,7,9,11,13,y 15
+    #positions that are vailable for swapping:
+    # 1 or 2 = 3 etc....
     availableswaps =[3,5,7,9,11,13,15]
     #prepareOrs(app)
 
 
 def zoomimage(app):
+    #function called to zoom the image loaded in or out (according to the selected scale)
     zoom = app.scale.get()
     myimg = app.img.resize ((app.img.size[0]*zoom,app.img.size[1]*zoom))
     app.spritephoto=PIL.ImageTk.PhotoImage(myimg)
@@ -172,14 +179,16 @@ def zoomimage(app):
     app.root.update()
 
 def checkColors(app):
+    #check if the colors of the image are within the limits of the system
     app.colors = app.img.getcolors()
     numcolors = len(app.colors)
     if numcolors > 15:
         messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
         return False
     else:
-        return True 
+        return True
 def getColors(app):
+    #get the system colors (needs to be generic, not yet done I believe)
     app.palette =[app.bgcolor]
     for color in app.colors:
         rgb = color[1]
@@ -190,8 +199,9 @@ def getColors(app):
         if set((r,g,b)) != set (app.bgcolor):
            app.palette.append((r,g,b))
 
-def getPixels (app) :   
-    #Read all the pixels and colors
+def getPixels (app) :
+    #Read all the pixels and colorsin the image
+    #scan each pixel (Width) in each row (height)
     for y in range (0,app.img.size[1]):
         for x in range (0,app.img.size[0]):
             pixel = app.img.getpixel((x,y))
@@ -200,16 +210,15 @@ def getPixels (app) :
             b = pixel[2]
             color = (int(r/config.palettes[app.targetSystem][1]),int(g/config.palettes[app.targetSystem][1]),int(b/config.palettes[app.targetSystem][1]))
             if set(color) != set(app.bgcolor): # color chosen by user
+                #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
                 app.pixels.append(app.palette.index(color))
             else:
                 app.pixels.append('0')
-    # Number of pixels check ok
 
 
 def createTempSprites (app):
     txsprites = int(app.img.size[0]/app.spritexsize)
     tysprites = int(app.img.size[1]/app.spriteysize)
-    print (txsprites,tysprites)
     for spy in range (0,tysprites):
         for spx in range (0,txsprites):
             thissprite = []
@@ -227,7 +236,6 @@ def createTempSprites (app):
                 thisspritecolors.append(thiscolors)
             app.usprites.append  (thissprite)
             app.csprites.append (thisspritecolors)
-    print (len(app.usprites))
 
 """
 def prepareOrs (app):
@@ -303,9 +311,7 @@ def writefile(app):
         f.write ("\tdb $77,$7\n")
 
 def savefile(app):
-    
-        #bgcolor should be the first in the list
-
+    #do the actual saving of the file
     writefile(app)
 
 def udpateTargetSystem(app,chgsystem):
@@ -313,10 +319,10 @@ def udpateTargetSystem(app,chgsystem):
     print (chgsystem)
     app.targetSystem=config.systems.index(chgsystem)
     print (app.targetSystem)
-    
+
 
 def showsprites (app):
-    
+
     getColors(app)
     getPixels(app)
     createTempSprites(app)
@@ -325,13 +331,12 @@ def showsprites (app):
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
     spritesPerRow = config.spritesperrow
-    spriteColumns = int(numSprites/config.spritesperrow)
+    spriteColumns = int(math.ceil(numSprites/config.spritesperrow))
     xsize = (app.spritexsize)*config.pixelsize
     ysize = (app.spriteysize)*config.pixelsize 
     spacing = 4
     canvasWidth = spritesPerRow *(xsize+spacing)
     canvasHeight = spriteColumns*(ysize+spacing)
-    print (canvasWidth,canvasHeight)
     shownSprites = 0
     spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight)
     spritesCanvas.bind('<Button-1>', lambda x:updatePixel(spritesCanvas,True,app))
@@ -364,7 +369,6 @@ def updatePixel (canvas,switchon,app):
       fill = "blue"
       pixelcolor = 1
     if canvas.find_withtag(CURRENT):
-      print (tags)
       canvas.itemconfig(CURRENT, fill=fill)
       coords = tags[0].split('/')
       spriteidx = int(coords[0])
@@ -372,14 +376,10 @@ def updatePixel (canvas,switchon,app):
       py = int(coords[2])
       sprite = app.usprites[spriteidx]
       row = sprite[py]
-      print (row)
       row = list(row)
       row[px]=str(pixelcolor)
       map(str,row)
-      print (row)
       row = ''.join(row)
-      print (row)
-      print ("-----------------------------")
       sprite[py]=row
       app.usprites[spriteidx]=sprite
       canvas.update_idletasks()
