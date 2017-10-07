@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import sys
 import PIL.Image
 import PIL.ImageTk
@@ -14,19 +13,19 @@ import config
 
 
 class App:
+    # the main application ;-)
     def __init__(self):
         self.root = Tk()
-
         self.targetSystem = 0
         self.root.withdraw()
         self.pixels = []
         self.finalsprites = []
-        self.spritexsize = 16
-        self.spriteysize = 16
-        self.opfile = ""
-        self.palette=[]
         self.usprites = []
         self.csprites = []
+        self.spritexsize = config.spritexsize
+        self.spriteysize = config.spriteysize
+        self.opfile = ""
+        self.palette=[]
         self.colors = []
         self.maxcolors = 16
         self.bgcolor = (7,7,7)

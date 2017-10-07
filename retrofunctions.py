@@ -82,7 +82,7 @@ class sprite:
         for row in rows:
             print (row)
 
-    def displayColors (self):µ
+    def displayColors (self):
         #for testing purposes, show the color on console
         rows = self.colors
         for row in rows:
@@ -217,6 +217,8 @@ def getPixels (app) :
 
 
 def createTempSprites (app):
+    #Creates two arrays, uspritrs, which holds the pattern in colors (1,2,3....)
+    #Csprites which holds the colors that are used in each line of the sprite
     txsprites = int(app.img.size[0]/app.spritexsize)
     tysprites = int(app.img.size[1]/app.spriteysize)
     for spy in range (0,tysprites):
@@ -253,6 +255,7 @@ def prepareOrs (app):
  """
 
 def createFinalSprites(app):
+    #create the deifnitive sprite patterns (0,1), and splits sprites that need to be ored
     myindex = 0
     for usprite in app.usprites:
         ored = False
@@ -284,6 +287,7 @@ def createFinalSprites(app):
         myindex = myindex+1
 
 def writefile(app):
+    #crete the aoutput .asm file with the sprite data, colors & palette
     app.outfile = app.opfile[:len(app.opfile)-3]+"asm"
     f = open(app.outfile, 'w')
     f.write ("SPRITE_DATA:\n")
@@ -315,6 +319,7 @@ def savefile(app):
     writefile(app)
 
 def udpateTargetSystem(app,chgsystem):
+    #Will be used when changing the target system
     print (app.targetSystem)
     print (chgsystem)
     app.targetSystem=config.systems.index(chgsystem)
@@ -322,6 +327,10 @@ def udpateTargetSystem(app,chgsystem):
 
 
 def showsprites (app):
+    #display the sprites grid, initializing everything first
+    app.finalsprites = []
+    app.usprites = []
+    app.csprites = []
 
     getColors(app)
     getPixels(app)
@@ -331,14 +340,18 @@ def showsprites (app):
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
     spritesPerRow = config.spritesperrow
-    spriteColumns = int(math.ceil(numSprites/config.spritesperrow))
+    if (app.img.size[0]!=0):
+       spritesPerRow = int(math.ceil(app.img.size[0]/config.spritexsize))
+
+    spriteColumns = int(math.ceil(numSprites/spritesPerRow))
     xsize = (app.spritexsize)*config.pixelsize
-    ysize = (app.spriteysize)*config.pixelsize 
+    ysize = (app.spriteysize)*config.pixelsize
     spacing = 4
     canvasWidth = spritesPerRow *(xsize+spacing)
     canvasHeight = spriteColumns*(ysize+spacing)
     shownSprites = 0
     spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight)
+    # Mous click actions left-> Put pixel, Right-> Remove pixel
     spritesCanvas.bind('<Button-1>', lambda x:updatePixel(spritesCanvas,True,app))
     spritesCanvas.bind('<Button-3>', lambda x:updatePixel(spritesCanvas,False,app))
     spritesCanvas.pack()
@@ -349,6 +362,7 @@ def showsprites (app):
         destX = currX + (xsize)
         destY = currY + (ysize)
         spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas")
+        #draw each "boxel" of the sprite
         drawboxel (app,spritesCanvas,app.usprites,currentSprite,currX,currY)
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
@@ -358,7 +372,7 @@ def showsprites (app):
             currY = currY + (ysize+spacing)
             shownSprites=0
 
-            
+
 def updatePixel (canvas,switchon,app):
     fill = config.spriteeditorbgcolor
     pixelcolor = 0
@@ -383,7 +397,7 @@ def updatePixel (canvas,switchon,app):
       sprite[py]=row
       app.usprites[spriteidx]=sprite
       canvas.update_idletasks()
-        
+
 def drawboxel (app,canvas,sprites,index,x,y):
     startx = x
     sprite = sprites[index]
@@ -399,37 +413,29 @@ def drawboxel (app,canvas,sprites,index,x,y):
                        palettecolor[1]*config.msxcolordivider,
                        palettecolor[2]*config.msxcolordivider)
                 color = "#%02x%02x%02x" % rgb
+                # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
                 canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py))
             else:
+                # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
                 canvas.create_rectangle (x,y,ex,ey,fill=config.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py))
-                
+
             px = px + 1
             x = ex
         x = startx
         y=ey
-        py = py + 1        
+        py = py + 1
 
 def createSpritesWindow(app):
+    #window to show the sprites in
     app.spwindow =  tk.Toplevel(app.root)
     app.spwindow.title("Sprite List")
     app.spwindow.iconbitmap(config.iconfile)
     app.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
-    app.spwindow.protocol("WM_DELETE_WINDOW", lambda:closeSprites(app))
+    app.spwindow.protocol("WM_DELETE_WINDOW", lambda:closeSpritesWindow(app))
     app.spwindow.withdraw()
     #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
     #scrollbar.pack(side=tk.RIGHT, fill='y')
 
-def closeSprites(app):
+def closeSpritesWindow(app):
+    #Destroy sprite window so next time it is open it is reinitialized
     app.spwindow.destroy()
-
-    """
-    row = 0
-    column = 0
-    top_frame = Frame(app.spwindow, bg='cyan', width=64, height=64, pady=3)
-    for sprite in app.csprites:
-        top_frame.grid(row=row,column=column)
-        column=column+1
-        if column == 9:
-            column = 0
-            row = row + 1
-    """
