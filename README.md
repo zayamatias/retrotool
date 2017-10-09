@@ -2,6 +2,8 @@
 Tool to facilitate sprites/grahics manipulation for retro-progarmming on several systems.
 (español mas abajo, français plus bas)
 
+English
+
 Basic operations (for the moment):
 
 Open File (any common image format should be ok)
@@ -12,6 +14,8 @@ Sprite editing kinda works (left mb set pixel, right mb unset pixel); palette ki
 
 Still lot's to do!!
 
+Español
+
 Operaciones basicas (por el momento)
 
 Abrir un archivo grafico (open file)
@@ -20,7 +24,9 @@ Guarda el archivo como .asm (mismo nombre y directorio que el archivo grafico)
 
 La edicion de sprites funciona (mas o menos vaya, BD raton pone pixel, BI raton, quita pixel), la paleta funciona tb mas o menos, pero la seleccion de sistema aun no.
 
-Queda mucho por hacer!
+Aub queda muchisimo por hacer!
+
+Frances
 
 Opérations très basiques (désolé s'il me manquent des accents dans mon texte)
 
