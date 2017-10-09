@@ -24,9 +24,9 @@ Guarda el archivo como .asm (mismo nombre y directorio que el archivo grafico)
 
 La edicion de sprites funciona (mas o menos vaya, BD raton pone pixel, BI raton, quita pixel), la paleta funciona tb mas o menos, pero la seleccion de sistema aun no.
 
-Aub queda muchisimo por hacer!
+Aun queda muchisimo por hacer!
 
-Frances
+Français
 
 Opérations très basiques (désolé s'il me manquent des accents dans mon texte)
 
