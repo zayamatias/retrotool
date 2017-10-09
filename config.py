@@ -28,7 +28,7 @@ syslimits = [("MSX",1,16),("MSX2",3,16),("MSX2+",3,16)]
 pixelsize = 8 #pixel size on screen for editing purposes (value will be multiplied x & y)
 spritesperrow= 4 # How many sprites to show per row by default
                  # application will calculate according to screen size
-default_filename ="C:\\Users\\Matias\\Documents\\MSX\\sprites\\ebike.png" # set it to a default file or leave it blank to have dialog opened
+default_filename =""# set it to a default file or leave it blank to have dialog opened
 spriteeditorbgcolor = "white" #BG color for the sprite editor.
 spritexsize = 16 # default sprite width
 spriteysize = 16 #default sprite height
