@@ -214,10 +214,19 @@ def getPixels (app):
             color = (int(r/config.palettes[app.targetSystem][1]),int(g/config.palettes[app.targetSystem][1]),int(b/config.palettes[app.targetSystem][1]))
             if set(color) != set(app.bgcolor): # color chosen by user
                 #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
-                app.pixels.append(app.palette.index(color))
+                index = paletteIndex(app,color)
+                if index >= 0:
+                    app.pixels.append(index)
             else:
                 app.pixels.append('0')
-
+    
+def paletteIndex(app,color):
+    index = 0
+    for palColor in app.palette:
+        if (colorCompare(color,palColor)) and (index != 0):
+            return index
+        index = index + 1
+    return -1
 
 def createTempSprites (app):
     #Creates two arrays, uspritrs, which holds the pattern in colors (1,2,3....)
@@ -231,31 +240,18 @@ def createTempSprites (app):
             for py in range (0,app.spriteysize):
                 thiscolors = []   #Background is a must have as color
                 srow ="" # Holds the scanned row of each sprite
+                         # Since color can be more than 1, we need a color indicator
                 for px in range (0,app.spritexsize):
                     position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.img.size[0]*spy)+(py*app.img.size[0]))
                     color = str(app.pixels[position])
                     if (color not in thiscolors) and (int(color) != 0):
                         thiscolors.append (color)
-                    srow = srow + color
+                    srow = srow + "%" + color
                 thissprite.append(srow)
                 thisspritecolors.append(thiscolors)
             app.usprites.append  (thissprite)
             app.csprites.append (thisspritecolors)
 
-"""
-def prepareOrs (app):
-
-    for csprite in app.csprites:
-        for row in csprite:
-            if ((len(row)>3)):
-                #we need a swap candidate
-                c=[]
-                for col in row:
-                    if int(col) != 0:
-                        c.append(int(col))
-                #find if there is already an or candidate
-                if (c[0]|c[1]==c[2]) or (c[0]|c[2]==c[1]) or (c[2]|c[1]==c[0]):
- """
 
 def createFinalSprites(app):
     #create the deifnitive sprite patterns (0,1), and splits sprites that need to be ored
@@ -273,7 +269,7 @@ def createFinalSprites(app):
                 trow = "";
                 row = usprite[y]
                 for x in range (0,app.spritexsize):
-                    pcolor = int(row[x])
+                    pcolor = getTempColor (row,x)
                     if (pcolor==pc[numsprites]) or (pcolor==oc):
                         trow = trow+"1"
                     else:
@@ -289,6 +285,16 @@ def createFinalSprites(app):
                 ored = not ored
         myindex = myindex+1
 
+def getTempColor (row,position):
+    rowSplit = row.split ("%")
+    rowSplit.pop (0)
+    color = rowSplit[position]
+    if color =="":    
+        print (row)
+        print (position)
+        print (row.split ("%"))
+    return color
+        
 def writefile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
     app.outfile = app.opfile[:len(app.opfile)-3]+"asm"
@@ -424,8 +430,9 @@ def drawboxel (app,canvas,sprites,index,x,y):
         ey = y + config.pixelsize
         for pixel in range (0,app.spritexsize):
             ex = x + config.pixelsize
-            if int(row[pixel]) != 0:
-                color = transformColor (app,int(row[pixel]))
+            pxColor = int(getTempColor(row,pixel))
+            if pxColor != 0:
+                color = transformColor (app,pxColor)
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
                 canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py))
             else:
@@ -484,10 +491,12 @@ def closePaletteWindow(app):
 
 def isColorInPalette(app,color):
     
-    if set(color) in app.palette:
-        return True
-    else:
-        return False    
+    iscolorinpalette = False
+    for palColor in app.palette:
+        if colorCompare (color,palColor):
+            iscolorinpalette = True
+    return iscolorinpalette
+    
     
 def displayPalette(app):
     
@@ -514,5 +523,22 @@ def displayPalette(app):
         y = y + config.paletteColorBoxSize
     paletteCanvas.pack()
     app.palwindow.deiconify()
-
+    
+def colorCompare(colora,colorb):
+    ra=int(colora[0])
+    ga=int(colora[1])
+    ba=int(colora[2])
+    rb=int(colorb[0])
+    gb=int(colorb[1])
+    bb=int(colorb[2])
+    if (ra==rb) and (ga==gb) and (ba==bb):
+        return True
+    if (abs(ra-rb)==1) and (ga==gb) and (ba==bb):
+        return True
+    if (ra==rb) and (abs(ga-gb)==1) and (ba==bb):
+        return True
+    if (ra==rb) and (abs(ba-bb)==1) and (ga==gb):
+        return True
+    return False
+    
     
