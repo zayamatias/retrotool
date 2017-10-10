@@ -151,7 +151,8 @@ def openfile(app):
     app.img = PIL.Image.open(app.opfile)
     #CHeck if the max number of colors accepted by the system is equal or more than the colors of the image
     colok = checkColors (app)
-    if not colok:
+    sizeok = checkSize (app)
+    if (not colok) or (not sizeok):
         return 1
     #create the image
     app.spritephoto=PIL.ImageTk.PhotoImage(app.img)
@@ -189,6 +190,15 @@ def checkColors(app):
     numcolors = len(app.colors)
     if numcolors > 15:
         messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
+        return False
+    else:
+        return True
+
+def checkSize(app):
+    #check if the colors of the image are within the limits of the system
+    width = app.img.size[0]
+    if (width/config.spritexsize) != int (width/config.spritexsize):
+        messagebox.showinfo("Error","Image width is not a multiple of sprite width ( currently set in config to "+str(config.spritexsize)+"px)")
         return False
     else:
         return True
@@ -248,7 +258,10 @@ def createTempSprites (app):
                          # Since color can be more than 1, we need a color indicator
                 for px in range (0,app.spritexsize):
                     position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.img.size[0]*spy)+(py*app.img.size[0]))
-                    color = str(app.pixels[position])
+                    if (position < len(app.pixels)):
+                        color = str(app.pixels[position])
+                    else:
+                        color = "0"
                     if (color not in thiscolors) and (int(color) != 0):
                         thiscolors.append (color)
                     srow = srow + "%" + color
