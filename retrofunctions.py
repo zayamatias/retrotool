@@ -223,8 +223,6 @@ def getPixels (app):
             g = pixel[1]
             b = pixel[2]
             color = (int(r/config.palettes[app.targetSystem][1]),int(g/config.palettes[app.targetSystem][1]),int(b/config.palettes[app.targetSystem][1]))
-            print (color)
-            print (app.bgcolor)
             if set(color) != set(app.bgcolor): # color chosen by user
                 #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
                 index = paletteIndex(app,color)
