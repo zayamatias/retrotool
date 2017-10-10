@@ -32,7 +32,6 @@ pixelsize = 8 #pixel size on screen for editing purposes (value will be multipli
 spritesperrow= 4 # How many sprites to show per row by default
                  # application will calculate according to screen size
 #default_filename ="C:\\Users\\Matias\\Documents\\MSX\\sprites\\ebike.png" # set it to a default file or leave it blank to have dialog opened
-default_filename = "C:\\Users\\id087082\\Downloads\\kv2.png"
 spriteeditorbgcolor = "white" #BG color for the sprite editor.
 spritexsize = 16 # default sprite width
 spriteysize = 16 #default sprite height
