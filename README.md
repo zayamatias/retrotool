@@ -1,5 +1,8 @@
 # retrotool
 Tool to facilitate sprites/grahics manipulation for retro-progarmming on several systems.
+
+Tool should be "runnable" under python in any system supporting "tkinter" library (Win/Linux/MacOS)
+
 (español mas abajo, français plus bas)
 
 English
