@@ -20,7 +20,7 @@ class App:
         self.targetSystem = 0
         self.root.withdraw()
         self.paletteIndex = 0
-        self.drawColor = 1
+        self.drawColor = 0 # Color selected in the palette
         self.pixels = []
         self.finalsprites = []
         self.usprites = []
@@ -32,7 +32,6 @@ class App:
         self.colors = []
         self.maxcolors = 16
         self.bgcolor = (7,7,7)
-        self.pointercolor = 1 # palette index to the color of the pointer
         self.root =Toplevel()
         self.root.title (config.tooltitle)
         self.root.geometry(str(config.appxsize)+"x"+str(config.appysize))

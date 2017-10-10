@@ -13,9 +13,10 @@ def findOrColor (csprites):
     # This function finds which is the best pixel to or according to the palette colors
     # This is used on MSX2 -> See https://www.msx.org/wiki/The_OR_Color
     numcols = len(csprites)
+    
     if  numcols < 5:
-        c=[255,255,255]
-        pc=[255,255,255,False]
+        c=[-1,-1,-1]
+        pc=[-1,-1,-1,False]
         # We need to split the sprite
         if numcols > 0:
             c[0]= int(csprites[0])
@@ -166,6 +167,10 @@ def openfile(app):
     # 1 or 2 = 3 etc....
     availableswaps =[3,5,7,9,11,13,15]
     #prepareOrs(app)
+    getColors(app)
+    getPixels(app)
+    if app.usprites == []:
+        createTempSprites(app)
 
 
 def zoomimage(app):
@@ -255,6 +260,7 @@ def createTempSprites (app):
 
 def createFinalSprites(app):
     #create the deifnitive sprite patterns (0,1), and splits sprites that need to be ored
+    app.finalsprites=[]    
     myindex = 0
     for usprite in app.usprites:
         ored = False
@@ -270,12 +276,12 @@ def createFinalSprites(app):
                 row = usprite[y]
                 for x in range (0,app.spritexsize):
                     pcolor = getTempColor (row,x)
-                    if (pcolor==pc[numsprites]) or (pcolor==oc):
+                    if (int(pcolor)==int(pc[numsprites])) or (int(pcolor)==int(oc)):
                         trow = trow+"1"
                     else:
                         trow = trow+"0"
                 tsprite.append(trow)
-                if pc[numsprites]==255:
+                if pc[numsprites]==-1:
                     tcolor.append (0)
                 else:
                     tcolor.append (pc[numsprites])
@@ -289,14 +295,22 @@ def getTempColor (row,position):
     rowSplit = row.split ("%")
     rowSplit.pop (0)
     color = rowSplit[position]
-    if color =="":    
-        print (row)
-        print (position)
-        print (row.split ("%"))
     return color
-        
+
+def updateTempColor (row,position,color):
+    
+    rowSplit = row.split ("%")
+    rowSplit.pop (0)
+    rowSplit[position]=color
+    returnRow = ""   
+    for pixel in rowSplit:
+        returnRow = returnRow + "%" + str(pixel)
+    return returnRow
+    
 def writefile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
+    
+    createFinalSprites(app)
     app.outfile = app.opfile[:len(app.opfile)-3]+"asm"
     f = open(app.outfile, 'w')
     f.write ("SPRITE_DATA:\n")
@@ -337,14 +351,7 @@ def udpateTargetSystem(app,chgsystem):
 
 def showsprites (app):
     #display the sprites grid, initializing everything first
-    app.finalsprites = []
-    app.usprites = []
-    app.csprites = []
 
-    getColors(app)
-    getPixels(app)
-    createTempSprites(app)
-    createFinalSprites(app)
     createSpritesWindow(app)
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
@@ -399,8 +406,7 @@ def updatePixel (canvas,switchon,app):
       py = int(coords[2])
       sprite = app.usprites[spriteidx]
       row = sprite[py]
-      row = list(row)
-      row[px]=str(pixelcolor)
+      row = updateTempColor (row,px,app.drawColor)
       map(str,row)
       row = ''.join(row)
       sprite[py]=row
