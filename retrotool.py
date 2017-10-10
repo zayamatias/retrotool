@@ -16,7 +16,6 @@ class App:
     # the main application ;-)
     def __init__(self):
         self.root = Tk()
-
         self.targetSystem = 0
         self.root.withdraw()
         self.paletteIndex = 0
@@ -60,7 +59,7 @@ class App:
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
-
+        
 
         # DefineSpriteListWindow
          
@@ -81,11 +80,14 @@ class App:
         y = int(int(event.y - ((config.appysize - height)/2))/zoom)
         if (x>0 and x<(width+1)) and (y>0 and y<(height+1)):
             color = self.img.getpixel ((x,y))
-            r=int(int(color[0])/36)
-            g=int(int(color[1])/36)
-            b=int(int(color[2])/36)
+            r=int(int(color[0])/config.msxcolordivider)
+            g=int(int(color[1])/config.msxcolordivider)
+            b=int(int(color[2])/config.msxcolordivider)
             self.bgcolor = (r,g,b)
-    
+            retrofunctions.getColors(self)
+            retrofunctions.getPixels(self)
+            retrofunctions.createTempSprites(self)
+
     def exit(self):
         self.root.destroy()
         sys.exit()
