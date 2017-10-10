@@ -168,10 +168,6 @@ def openfile(app):
     # 1 or 2 = 3 etc....
     availableswaps =[3,5,7,9,11,13,15]
     #prepareOrs(app)
-    getColors(app)
-    getPixels(app)
-    if app.usprites == []:
-        createTempSprites(app)
 
 
 def zoomimage(app):
@@ -227,6 +223,8 @@ def getPixels (app):
             g = pixel[1]
             b = pixel[2]
             color = (int(r/config.palettes[app.targetSystem][1]),int(g/config.palettes[app.targetSystem][1]),int(b/config.palettes[app.targetSystem][1]))
+            print (color)
+            print (app.bgcolor)
             if set(color) != set(app.bgcolor): # color chosen by user
                 #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
                 index = paletteIndex(app,color)
@@ -352,6 +350,9 @@ def writefile(app):
 
 def savefile(app):
     #do the actual saving of the file
+    if app.usprites == []:
+        messagebox.showinfo("Error","Please, click on the background color of the image first")
+        return 1
     writefile(app)
 
 def udpateTargetSystem(app,chgsystem):
@@ -364,14 +365,15 @@ def udpateTargetSystem(app,chgsystem):
 
 def showsprites (app):
     #display the sprites grid, initializing everything first
-
+    if app.usprites == []:
+        messagebox.showinfo("Error","Please, click on the background color of the image first")
+        return 1
     createSpritesWindow(app)
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
-    spritesPerRow = config.spritesperrow
+    spritesPerRow = int(app.img.size[0]/config.spritexsize)
     if (app.img.size[0]!=0):
        spritesPerRow = int(math.ceil(app.img.size[0]/config.spritexsize))
-
     spriteColumns = int(math.ceil(numSprites/spritesPerRow))
     xsize = (app.spritexsize)*config.pixelsize
     ysize = (app.spriteysize)*config.pixelsize
