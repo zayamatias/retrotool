@@ -72,21 +72,22 @@ class App:
 
     def click (self,event):
         # need to consider scale!
-        zoom = self.scale.get()
-        width, height = self.img.size
-        width = width * zoom
-        height = height * zoom
-        x = int(int(event.x - ((config.appxsize - width)/2))/zoom)
-        y = int(int(event.y - ((config.appysize - height)/2))/zoom)
-        if (x>0 and x<(width+1)) and (y>0 and y<(height+1)):
-            color = self.img.getpixel ((x,y))
-            r=int(int(color[0])/config.msxcolordivider)
-            g=int(int(color[1])/config.msxcolordivider)
-            b=int(int(color[2])/config.msxcolordivider)
-            self.bgcolor = (r,g,b)
-            retrofunctions.getColors(self)
-            retrofunctions.getPixels(self)
-            retrofunctions.createTempSprites(self)
+        if self.spritephoto != "":
+            zoom = self.scale.get() 
+            width, height = self.img.size
+            width = width * zoom
+            height = height * zoom
+            x = int(int(event.x - ((config.appxsize - width)/2))/zoom)
+            y = int(int(event.y - ((config.appysize - height)/2))/zoom)
+            if (x>0 and x<(width+1)) and (y>0 and y<(height+1)):
+                color = self.img.getpixel ((x,y))
+                r=int(int(color[0])/config.msxcolordivider)
+                g=int(int(color[1])/config.msxcolordivider)
+                b=int(int(color[2])/config.msxcolordivider)
+                self.bgcolor = (r,g,b)
+                retrofunctions.getColors(self)
+                retrofunctions.getPixels(self)
+                retrofunctions.createTempSprites(self)
 
     def exit(self):
         self.root.destroy()
