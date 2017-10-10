@@ -1,11 +1,13 @@
 # retrotool
+
 Tool to facilitate sprites/grahics manipulation for retro-progarmming on several systems.
 
 Tool should be "runnable" under python in any system supporting "tkinter" library (Win/Linux/MacOS)
 
-(español mas abajo, français plus bas)
+(Español mas abajo, Français plus bas)
 
 English
+-------
 
 Basic operations (for the moment):
 
@@ -18,6 +20,7 @@ Sprite editing kinda works (left mb set pixel, right mb unset pixel); palette ki
 Still lot's to do!!
 
 Español
+-------
 
 Operaciones basicas (por el momento)
 
@@ -30,6 +33,7 @@ La edicion de sprites funciona (mas o menos vaya, BD raton pone pixel, BI raton,
 Aun queda muchisimo por hacer!
 
 Français
+--------
 
 Opérations très basiques (désolé s'il me manquent des accents dans mon texte)
 
