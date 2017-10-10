@@ -1,6 +1,9 @@
 # retrotool
 Tool to facilitate sprites/grahics manipulation for retro-progarmming on several systems.
-(espaÃ±ol mas abajo, franÃ§ais plus bas)
+
+Tool should be "runnable" under python in any system supporting "tkinter" library (Win/Linux/MacOS)
+
+(español mas abajo, français plus bas)
 
 English
 
@@ -14,7 +17,7 @@ Sprite editing kinda works (left mb set pixel, right mb unset pixel); palette ki
 
 Still lot's to do!!
 
-EspaÃ±ol
+Español
 
 Operaciones basicas (por el momento)
 
@@ -26,14 +29,14 @@ La edicion de sprites funciona (mas o menos vaya, BD raton pone pixel, BI raton,
 
 Aun queda muchisimo por hacer!
 
-FranÃ§ais
+Français
 
-OpÃ©rations trÃ¨s basiques (dÃ©solÃ© s'il me manquent des accents dans mon texte)
+Opérations très basiques (désolé s'il me manquent des accents dans mon texte)
 
 Ouvrir un fichier image (open file - formats le plus communs)
-SÃ©lectionner la couleur du fond (celle que sera transofmÃ© en 0 pour les sprites)
-Sauvgarder le fichier .asm (au mÃªme endroit et mÃªme nom que l'image)
+Sélectionner la couleur du fond (celle que sera transofmé en 0 pour les sprites)
+Sauvgarder le fichier .asm (au même endroit et même nom que l'image)
 
-L'Ã©dition des sprites marche moyenne, SG pour setter le pixel, SD pour l'enlever, la palette marche aussi pas terrible, mais la sÃ©lection du systeme pas encore.
+L'édition des sprites marche moyenne, SG pour setter le pixel, SD pour l'enlever, la palette marche aussi pas terrible, mais la sélection du systeme pas encore.
 
 Il y encore du pain sur la planche!
