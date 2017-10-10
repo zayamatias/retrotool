@@ -189,7 +189,7 @@ def checkColors(app):
         return True
 def getColors(app):
     #get the system colors (needs to be generic, not yet done I believe)
-    app.palette =[app.bgcolor]
+    #app.palette =[app.bgcolor]
     for color in app.colors:
         rgb = color[1]
         r=int(int(rgb[0])/config.palettes[app.targetSystem][1])
@@ -197,9 +197,12 @@ def getColors(app):
         b=int(int(rgb[2])/config.palettes[app.targetSystem][1])
         # make sure we do not add bgcolor
         if set((r,g,b)) != set (app.bgcolor):
-           app.palette.append((r,g,b))
+           if not isColorInPalette (app,(r,g,b)):
+               app.palette[app.paletteIndex]=(r,g,b)
+        app.paletteIndex = app.paletteIndex + 1
+    app.paletteIndex = 0
 
-def getPixels (app) :
+def getPixels (app):
     #Read all the pixels and colorsin the image
     #scan each pixel (Width) in each row (height)
     for y in range (0,app.img.size[1]):
@@ -371,7 +374,7 @@ def showsprites (app):
             currX = 1
             currY = currY + (ysize+spacing)
             shownSprites=0
-
+    displayPalette(app)
 
 def updatePixel (canvas,switchon,app):
     fill = config.spriteeditorbgcolor
@@ -380,7 +383,7 @@ def updatePixel (canvas,switchon,app):
     if len(tags)<2:
         return
     if switchon:
-      fill = "blue"
+      fill = transformColor(app,app.drawColor)
       pixelcolor = 1
     if canvas.find_withtag(CURRENT):
       canvas.itemconfig(CURRENT, fill=fill)
@@ -398,6 +401,20 @@ def updatePixel (canvas,switchon,app):
       app.usprites[spriteidx]=sprite
       canvas.update_idletasks()
 
+def updateDrawColor (canvas,app):
+    tags = canvas.gettags(CURRENT)
+    for rectangle in canvas.find_all():
+       compare = canvas.itemcget(rectangle,"tags")
+       if "current" not in compare :
+            canvas.itemconfig (rectangle, outline="black")
+       else:
+            canvas.itemconfig (rectangle, outline="white")
+    canvas.update_idletasks()
+    if len(tags)<1:
+        return
+    app.drawColor = int(tags[0])-1
+
+      
 def drawboxel (app,canvas,sprites,index,x,y):
     startx = x
     sprite = sprites[index]
@@ -408,11 +425,7 @@ def drawboxel (app,canvas,sprites,index,x,y):
         for pixel in range (0,app.spritexsize):
             ex = x + config.pixelsize
             if int(row[pixel]) != 0:
-                palettecolor = app.palette[int(row[pixel])]
-                rgb = (palettecolor[0]*config.msxcolordivider,
-                       palettecolor[1]*config.msxcolordivider,
-                       palettecolor[2]*config.msxcolordivider)
-                color = "#%02x%02x%02x" % rgb
+                color = transformColor (app,int(row[pixel]))
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
                 canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py))
             else:
@@ -425,6 +438,20 @@ def drawboxel (app,canvas,sprites,index,x,y):
         y=ey
         py = py + 1
 
+def transformColor (app,paletteIndex):
+    palettecolor = app.palette[paletteIndex]
+    r = palettecolor[0]
+    g = palettecolor[1]
+    b = palettecolor[2]
+    if r<0: r = 0        
+    if g<0: g = 0        
+    if b<0: b = 0        
+    rgb = (r*config.msxcolordivider,
+           g*config.msxcolordivider,
+           b*config.msxcolordivider)
+    color = "#%02x%02x%02x" % rgb
+    return color
+
 def createSpritesWindow(app):
     #window to show the sprites in
     app.spwindow =  tk.Toplevel(app.root)
@@ -436,6 +463,56 @@ def createSpritesWindow(app):
     #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
     #scrollbar.pack(side=tk.RIGHT, fill='y')
 
+def createPaletteWindow(app,ysize):
+    #window to show the sprites in
+    app.palwindow =  tk.Toplevel(app.spwindow)
+    app.palwindow.title("ColorPalette")
+    app.palwindow.iconbitmap(config.iconfile)
+    app.palwindow.geometry(str(config.paletteWxSize)+"x"+str(ysize))
+    app.palwindow.protocol("WM_DELETE_WINDOW", lambda:closePaletteWindow(app))
+    app.palwindow.withdraw()
+    #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
+    #scrollbar.pack(side=tk.RIGHT, fill='y')
+
 def closeSpritesWindow(app):
     #Destroy sprite window so next time it is open it is reinitialized
     app.spwindow.destroy()
+
+def closePaletteWindow(app):
+    #Destroy sprite window so next time it is open it is reinitialized
+    app.palwindow.destroy()
+
+def isColorInPalette(app,color):
+    
+    if set(color) in app.palette:
+        return True
+    else:
+        return False    
+    
+def displayPalette(app):
+    
+    numColors= len(app.palette)
+    maxColorsPerRow = int(math.ceil(config.paletteWxSize/config.paletteColorBoxSize))
+    numRows = int (math.ceil(numColors/maxColorsPerRow))
+    paletteWySize = numRows*config.paletteColorBoxSize
+    createPaletteWindow (app,paletteWySize)
+    paletteCanvas = Canvas (app.palwindow,width=config.paletteWxSize,height=paletteWySize)
+    paletteCanvas.bind('<Button-1>', lambda x:updateDrawColor(paletteCanvas,app))
+    x=1
+    y=1
+    color = 0
+    for c in range (1,numColors-1):
+        for col in range (0,maxColorsPerRow):
+            if color<numColors:
+                boxColor = transformColor(app,color)
+                color = color + 1
+                dx = x+config.paletteColorBoxSize
+                dy = y+config.paletteColorBoxSize
+                paletteCanvas.create_rectangle (x,y,dx,dy,fill=boxColor,tag=str(color))
+                x = x + config.paletteColorBoxSize
+        x = 1
+        y = y + config.paletteColorBoxSize
+    paletteCanvas.pack()
+    app.palwindow.deiconify()
+
+    

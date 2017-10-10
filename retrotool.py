@@ -16,8 +16,11 @@ class App:
     # the main application ;-)
     def __init__(self):
         self.root = Tk()
+
         self.targetSystem = 0
         self.root.withdraw()
+        self.paletteIndex = 0
+        self.drawColor = 1
         self.pixels = []
         self.finalsprites = []
         self.usprites = []
@@ -25,10 +28,11 @@ class App:
         self.spritexsize = config.spritexsize
         self.spriteysize = config.spriteysize
         self.opfile = ""
-        self.palette=[]
+        self.palette=config.palettes[self.targetSystem][2]
         self.colors = []
         self.maxcolors = 16
         self.bgcolor = (7,7,7)
+        self.pointercolor = 1 # palette index to the color of the pointer
         self.root =Toplevel()
         self.root.title (config.tooltitle)
         self.root.geometry(str(config.appxsize)+"x"+str(config.appysize))
@@ -62,16 +66,10 @@ class App:
         # DefineSpriteListWindow
          
 
-
-
-
         if config.default_filename != "":
             retrofunctions.openfile(self)
 
-
-
-
-        # Nothing gets executed after this statement!
+       # Nothing gets executed after this statement!
         self.root.mainloop()
 
     def click (self,event):
