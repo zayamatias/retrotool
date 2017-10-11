@@ -411,17 +411,17 @@ def showSprites (app):
         #add horizontal scroll
         xscrollbar = Scrollbar(app.spwindow,orient=HORIZONTAL)
         xscrollbar.pack (side=BOTTOM, fill=X)
+        app.spritesCanvas.config(xscrollcommand=xscrollbar.set)
+        xscrollbar.config(command=app.spritesCanvas.xview)
     if canvasHeight>config.appysize:
         #add vertical scroll
         yscrollbar = Scrollbar(app.spwindow)
-        yscrollbar.pack (side=RIGHT, fill=Y)   
-    
+        yscrollbar.pack (side=RIGHT, fill=Y)
+        app.spritesCanvas.config(yscrollcommand=yscrollbar.set)
+        yscrollbar.config(command=app.spritesCanvas.yview)
+
     #Add scroll commands:
-    app.spritesCanvas.config(yscrollcommand=yscrollbar.set)
-    yscrollbar.config(command=app.spritesCanvas.yview)
-    app.spritesCanvas.config(xscrollcommand=xscrollbar.set)
-    xscrollbar.config(command=app.spritesCanvas.xview)
-    
+
     app.spritesCanvas.pack()
     app.spritesCanvas.focus_set()
     currX = 1
