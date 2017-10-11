@@ -253,19 +253,22 @@ def createTempSprites (app):
                 srow ="" # Holds the scanned row of each sprite
                          # Since color can be more than 1, we need a color indicator
                 for px in range (0,app.spritexsize):
-                    
+
                     #WIP
-                    
+
                     position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.img.size[0]*spy)+(py*app.img.size[0]))
-                    
-                    
-                    
-                    imgRow = int (position/app.img.size[0])+1
-                    upperlimit = (app.img.size[0])*imgRow
-                    lowerlimit = (app.img.size[0])*(imgRow-1)
+
+
+                    imgRow = int ((position)/app.img.size[0])+1
+                    extraRowUpper = imgRow+int(app.sprImgOffset/app.img.size[0])
+                    extraRowLower = imgRow+int(app.sprImgOffset/app.img.size[0])-1
+                    upperlimit = (app.img.size[0])*extraRowUpper
+                    lowerlimit = (app.img.size[0])*extraRowLower
+
+                    position = position + app.sprImgOffset
+
                     #print ("position="+str(position)+" width="+str(app.img.size[0])+" Row = "+str(imgRow)+" limit = "+str(limit))
                     ### We need to calculate the offset
-                    position = position + app.sprImgOffset
                     if ((position < len(app.pixels)) and (position >= 0) and (position < upperlimit) and (position >= lowerlimit)):
                         color = str(app.pixels[position])
                     else:
@@ -450,6 +453,10 @@ def moveSprites(event,canvas,app):
     Right    39
     Down     40
     """
+    if int(event.keycode) == 38:
+        app.sprImgOffset = app.sprImgOffset + app.img.size[0]
+    if int(event.keycode) == 40:
+        app.sprImgOffset = app.sprImgOffset - app.img.size[0]
     if int(event.keycode) == 37:
         app.sprImgOffset = app.sprImgOffset +1
     if int(event.keycode) == 39:
