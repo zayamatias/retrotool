@@ -253,8 +253,20 @@ def createTempSprites (app):
                 srow ="" # Holds the scanned row of each sprite
                          # Since color can be more than 1, we need a color indicator
                 for px in range (0,app.spritexsize):
+                    
+                    #WIP
+                    
                     position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.img.size[0]*spy)+(py*app.img.size[0]))
-                    if (position < len(app.pixels)):
+                    
+                    
+                    
+                    imgRow = int (position/app.img.size[0])+1
+                    upperlimit = (app.img.size[0])*imgRow
+                    lowerlimit = (app.img.size[0])*(imgRow-1)
+                    #print ("position="+str(position)+" width="+str(app.img.size[0])+" Row = "+str(imgRow)+" limit = "+str(limit))
+                    ### We need to calculate the offset
+                    position = position + app.sprImgOffset
+                    if ((position < len(app.pixels)) and (position >= 0) and (position < upperlimit) and (position >= lowerlimit)):
                         color = str(app.pixels[position])
                     else:
                         color = "0"
@@ -363,12 +375,18 @@ def udpateTargetSystem(app,chgsystem):
     print (app.targetSystem)
 
 
-def showsprites (app):
+def showSprites (app):
     #display the sprites grid, initializing everything first
+    
+    if app.spritesCanvas != None:
+        for child in app.spwindow.winfo_children():
+            child.destroy()
+        app.spritesCanvas = None
+    else:
+        createSpritesWindow(app)
     if app.usprites == []:
         messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
-    createSpritesWindow(app)
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
     spritesPerRow = int(app.img.size[0]/config.spritexsize)
@@ -381,10 +399,14 @@ def showsprites (app):
     canvasWidth = spritesPerRow *(xsize+spacing)
     canvasHeight = spriteColumns*(ysize+spacing)
     shownSprites = 0
-    spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
+    app.spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
     # Mous click actions left-> Put pixel, Right-> Remove pixel
-    spritesCanvas.bind('<Button-1>', lambda x:updatePixel(spritesCanvas,True,app))
-    spritesCanvas.bind('<Button-3>', lambda x:updatePixel(spritesCanvas,False,app))
+    app.spritesCanvas.bind('<Button-1>', lambda x:updatePixel(app.spritesCanvas,True,app))
+    app.spritesCanvas.bind('<Button-3>', lambda x:updatePixel(app.spritesCanvas,False,app))
+    # Canvas by default does not get focus, so this means that if this is not set
+    # key binding will not work!
+    app.spritesCanvas.bind('<Key>', lambda event:moveSprites(event,app.spritesCanvas,app))
+
     if canvasWidth>config.appxsize:
         #add horizontal scroll
         xscrollbar = Scrollbar(app.spwindow,orient=HORIZONTAL)
@@ -395,21 +417,22 @@ def showsprites (app):
         yscrollbar.pack (side=RIGHT, fill=Y)   
     
     #Add scroll commands:
-    spritesCanvas.config(yscrollcommand=yscrollbar.set)
-    yscrollbar.config(command=spritesCanvas.yview)
-    spritesCanvas.config(xscrollcommand=xscrollbar.set)
-    xscrollbar.config(command=spritesCanvas.xview)
+    app.spritesCanvas.config(yscrollcommand=yscrollbar.set)
+    yscrollbar.config(command=app.spritesCanvas.yview)
+    app.spritesCanvas.config(xscrollcommand=xscrollbar.set)
+    xscrollbar.config(command=app.spritesCanvas.xview)
     
-    spritesCanvas.pack()
+    app.spritesCanvas.pack()
+    app.spritesCanvas.focus_set()
     currX = 1
     currY = 1
     currentSprite = 0
     for row in range (0,numSprites):
         destX = currX + (xsize)
         destY = currY + (ysize)
-        spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas")
+        app.spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas")
         #draw each "boxel" of the sprite
-        drawboxel (app,spritesCanvas,app.usprites,currentSprite,currX,currY)
+        drawboxel (app,app.spritesCanvas,app.usprites,currentSprite,currX,currY)
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
         shownSprites = shownSprites + 1
@@ -420,6 +443,21 @@ def showsprites (app):
     displayPalette(app)
     # If canvas is bigger than screen then show scrollbars
 
+def moveSprites(event,canvas,app):
+    """
+    Left     37
+    Up	    38
+    Right    39
+    Down     40
+    """
+    if int(event.keycode) == 37:
+        app.sprImgOffset = app.sprImgOffset +1
+    if int(event.keycode) == 39:
+        app.sprImgOffset = app.sprImgOffset -1
+    app.usprites = []
+    app.csprites = []
+    createTempSprites (app)
+    showSprites(app)
 
 def updatePixel (canvas,switchon,app):
     fill = config.spriteeditorbgcolor
@@ -538,13 +576,15 @@ def isColorInPalette(app,color):
     
 def displayPalette(app):
     
+    if not (app.paletteCanvas == None):
+        return 1
     numColors= len(app.palette)
     maxColorsPerRow = int(math.ceil(config.paletteWxSize/config.paletteColorBoxSize))
     numRows = int (math.ceil(numColors/maxColorsPerRow))
     paletteWySize = numRows*config.paletteColorBoxSize
     createPaletteWindow (app,paletteWySize)
-    paletteCanvas = Canvas (app.palwindow,width=config.paletteWxSize,height=paletteWySize)
-    paletteCanvas.bind('<Button-1>', lambda x:updateDrawColor(paletteCanvas,app))
+    app.paletteCanvas = Canvas (app.palwindow,width=config.paletteWxSize,height=paletteWySize)
+    app.paletteCanvas.bind('<Button-1>', lambda x:updateDrawColor(app.paletteCanvas,app))
     x=1
     y=1
     color = 0
@@ -555,11 +595,11 @@ def displayPalette(app):
                 color = color + 1
                 dx = x+config.paletteColorBoxSize
                 dy = y+config.paletteColorBoxSize
-                paletteCanvas.create_rectangle (x,y,dx,dy,fill=boxColor,tag=str(color))
+                app.paletteCanvas.create_rectangle (x,y,dx,dy,fill=boxColor,tag=str(color))
                 x = x + config.paletteColorBoxSize
         x = 1
         y = y + config.paletteColorBoxSize
-    paletteCanvas.pack()
+    app.paletteCanvas.pack()
     app.palwindow.deiconify()
     
 def colorCompare(colora,colorb):

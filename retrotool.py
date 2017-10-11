@@ -16,6 +16,9 @@ class App:
     # the main application ;-)
     def __init__(self):
         self.root = Tk()
+        self.sprImgOffset = 0
+        self.spritesCanvas = None
+        self.paletteCanvas = None
         self.targetSystem = 0
         self.root.withdraw()
         self.paletteIndex = 0
@@ -54,7 +57,7 @@ class App:
             self.filemenu.add_checkbutton(label=system, onvalue=config.systems.index(system), offvalue=False, variable=self.targetSystem)
         self.menubar.add_cascade(label="Target System", menu=self.filemenu)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Show Sprites", command=lambda:retrofunctions.showsprites(self))
+        self.filemenu.add_command(label="Show Sprites", command=lambda:retrofunctions.showSprites(self))
         self.filemenu.add_command(label="Sprite Editor", command=lambda:retrofunctions.spriteditor(self))
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
