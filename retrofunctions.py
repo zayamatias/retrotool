@@ -381,10 +381,25 @@ def showsprites (app):
     canvasWidth = spritesPerRow *(xsize+spacing)
     canvasHeight = spriteColumns*(ysize+spacing)
     shownSprites = 0
-    spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight)
+    spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
     # Mous click actions left-> Put pixel, Right-> Remove pixel
     spritesCanvas.bind('<Button-1>', lambda x:updatePixel(spritesCanvas,True,app))
     spritesCanvas.bind('<Button-3>', lambda x:updatePixel(spritesCanvas,False,app))
+    if canvasWidth>config.appxsize:
+        #add horizontal scroll
+        xscrollbar = Scrollbar(app.spwindow,orient=HORIZONTAL)
+        xscrollbar.pack (side=BOTTOM, fill=X)
+    if canvasHeight>config.appysize:
+        #add vertical scroll
+        yscrollbar = Scrollbar(app.spwindow)
+        yscrollbar.pack (side=RIGHT, fill=Y)   
+    
+    #Add scroll commands:
+    spritesCanvas.config(yscrollcommand=yscrollbar.set)
+    yscrollbar.config(command=spritesCanvas.yview)
+    spritesCanvas.config(xscrollcommand=xscrollbar.set)
+    xscrollbar.config(command=spritesCanvas.xview)
+    
     spritesCanvas.pack()
     currX = 1
     currY = 1
@@ -403,6 +418,8 @@ def showsprites (app):
             currY = currY + (ysize+spacing)
             shownSprites=0
     displayPalette(app)
+    # If canvas is bigger than screen then show scrollbars
+
 
 def updatePixel (canvas,switchon,app):
     fill = config.spriteeditorbgcolor
