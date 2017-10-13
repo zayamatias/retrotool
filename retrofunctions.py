@@ -13,7 +13,11 @@ import math
 
 def saveProject (app):
     if (app.projfile==""):
-        app.projfile = app.opfile[:len(app.opfile)-3]+"prj"
+        if app.opfile!="":
+            app.projfile = app.opfile[:len(app.opfile)-3]+"prj"
+        else:
+            app.projfile = filedialog.asksaveasfilename(parent=app.root)
+
     with open(app.projfile,"wb") as f:
         pickle.dump ((app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette),f,pickle.HIGHEST_PROTOCOL)
     

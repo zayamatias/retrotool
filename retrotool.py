@@ -17,7 +17,7 @@ class App:
     def __init__(self):
 
         self.targetSystem = 0
-
+        self.projfile =""
         # Objects to be saved/loaded to/from project file
         self.pixels = []
         self.finalsprites = []
