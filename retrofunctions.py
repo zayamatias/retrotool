@@ -1,4 +1,5 @@
 import sys
+import pickle
 import PIL.Image
 import PIL.ImageTk
 from tkinter import *
@@ -8,6 +9,17 @@ from tkinter.filedialog import askopenfilename
 import config
 import tkinter as tk
 import math
+
+
+def saveProject (app):
+    app.projfile = app.opfile[:len(app.opfile)-3]+"prj"
+    output = open(app.projfile,"wb")
+    pickle.dump ([app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette],output,pickle.HIGHEST_PROTOCOL)
+
+def loadProject (app):
+    app.projfile = filedialog.askopenfilename(parent=app.root)
+    finput = open(app.projfile,"rb")
+    [app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette]=pickle.load(finput)
 
 def findOrColor (csprites):
     # This function finds which is the best pixel to or according to the palette colors
@@ -155,6 +167,10 @@ def openfile(app):
     if (not colok) or (not sizeok):
         return 1
     #create the image
+    app.imgwidth=app.img.size[0]
+    app.imgheight=app.img.size[1]
+    
+    
     app.spritephoto=PIL.ImageTk.PhotoImage(app.img)
     app.cv.itemconfig(app.canvas_ref,image = app.spritephoto)
     app.cv.image = app.spritephoto
@@ -173,7 +189,7 @@ def openfile(app):
 def zoomimage(app):
     #function called to zoom the image loaded in or out (according to the selected scale)
     zoom = app.scale.get()
-    myimg = app.img.resize ((app.img.size[0]*zoom,app.img.size[1]*zoom))
+    myimg = app.img.resize ((app.imgwidth*zoom,app.imgheight*zoom))
     app.spritephoto=PIL.ImageTk.PhotoImage(myimg)
     app.cv.itemconfig(app.canvas_ref,image = app.spritephoto)
     app.cv.image = app.spritephoto
@@ -192,7 +208,7 @@ def checkColors(app):
 
 def checkSize(app):
     #check if the colors of the image are within the limits of the system
-    width = app.img.size[0]
+    width = app.imgwidth
     if (width/config.spritexsize) != int (width/config.spritexsize):
         messagebox.showinfo("Error","Image width is not a multiple of sprite width ( currently set in config to "+str(config.spritexsize)+"px)")
         return False
@@ -216,8 +232,8 @@ def getColors(app):
 def getPixels (app):
     #Read all the pixels and colorsin the image
     #scan each pixel (Width) in each row (height)
-    for y in range (0,app.img.size[1]):
-        for x in range (0,app.img.size[0]):
+    for y in range (0,app.imgheight):
+        for x in range (0,app.imgwidth):
             pixel = app.img.getpixel((x,y))
             r = pixel[0]
             g = pixel[1]
@@ -242,8 +258,8 @@ def paletteIndex(app,color):
 def createTempSprites (app):
     #Creates two arrays, uspritrs, which holds the pattern in colors (1,2,3....)
     #Csprites which holds the colors that are used in each line of the sprite
-    txsprites = int(app.img.size[0]/app.spritexsize)
-    tysprites = int(app.img.size[1]/app.spriteysize)
+    txsprites = int(app.imgwidth/app.spritexsize)
+    tysprites = int(app.imgheight/app.spriteysize)
     for spy in range (0,tysprites):
         for spx in range (0,txsprites):
             thissprite = []
@@ -256,14 +272,14 @@ def createTempSprites (app):
 
                     #WIP
 
-                    position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.img.size[0]*spy)+(py*app.img.size[0]))
+                    position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.imgwidth*spy)+(py*app.imgwidth))
 
 
-                    imgRow = int ((position)/app.img.size[0])+1
-                    extraRowUpper = imgRow+int(app.sprImgOffset/app.img.size[0])
-                    extraRowLower = imgRow+int(app.sprImgOffset/app.img.size[0])-1
-                    upperlimit = (app.img.size[0])*extraRowUpper
-                    lowerlimit = (app.img.size[0])*extraRowLower
+                    imgRow = int ((position)/app.imgwidth)+1
+                    extraRowUpper = imgRow+int(app.sprImgOffset/app.imgwidth)
+                    extraRowLower = imgRow+int(app.sprImgOffset/app.imgwidth)-1
+                    upperlimit = (app.imgwidth)*extraRowUpper
+                    lowerlimit = (app.imgwidth)*extraRowLower
 
                     position = position + app.sprImgOffset
 
@@ -381,10 +397,15 @@ def udpateTargetSystem(app,chgsystem):
 def showSprites (app):
     #display the sprites grid, initializing everything first
     
-    if app.spritesCanvas != None:
-        for child in app.spwindow.winfo_children():
-            child.destroy()
-        app.spritesCanvas = None
+    if (app.spwindow!=None):
+        if (app.spritesCanvas != None) and (app.spwindow.winfo_exists()!=0):    
+            for child in app.spwindow.winfo_children():
+                child.destroy()
+                app.spritesCanvas = None
+        else:
+            createSpritesWindow(app)
+            print ("1")
+            displayPalette(app)
     else:
         createSpritesWindow(app)
     if app.usprites == []:
@@ -392,9 +413,9 @@ def showSprites (app):
         return 1
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
-    spritesPerRow = int(app.img.size[0]/config.spritexsize)
-    if (app.img.size[0]!=0):
-       spritesPerRow = int(math.ceil(app.img.size[0]/config.spritexsize))
+    spritesPerRow = int(app.imgwidth/config.spritexsize)
+    if (app.imgwidth!=0):
+       spritesPerRow = int(math.ceil(app.imgwidth/config.spritexsize))
     spriteColumns = int(math.ceil(numSprites/spritesPerRow))
     xsize = (app.spritexsize)*config.pixelsize
     ysize = (app.spriteysize)*config.pixelsize
@@ -454,9 +475,9 @@ def moveSprites(event,canvas,app):
     Down     40
     """
     if int(event.keycode) == 38:
-        app.sprImgOffset = app.sprImgOffset + app.img.size[0]
+        app.sprImgOffset = app.sprImgOffset + app.imgwidth
     if int(event.keycode) == 40:
-        app.sprImgOffset = app.sprImgOffset - app.img.size[0]
+        app.sprImgOffset = app.sprImgOffset - app.imgwidth
     if int(event.keycode) == 37:
         app.sprImgOffset = app.sprImgOffset +1
     if int(event.keycode) == 39:
@@ -488,6 +509,10 @@ def updatePixel (canvas,switchon,app):
       row = ''.join(row)
       sprite[py]=row
       app.usprites[spriteidx]=sprite
+      
+      # Update pixels object
+      app.pixels[px*py]=app.drawColor
+
       canvas.update_idletasks()
 
 def updateDrawColor (canvas,app):
@@ -583,8 +608,12 @@ def isColorInPalette(app,color):
     
 def displayPalette(app):
     
-    if not (app.paletteCanvas == None):
-        return 1
+    skip = False
+    if (app.paletteCanvas == None):
+        skip = True
+    if not skip:
+        if app.paletteCanvas.winfo_exists()!=0:
+            return 1
     numColors= len(app.palette)
     maxColorsPerRow = int(math.ceil(config.paletteWxSize/config.paletteColorBoxSize))
     numRows = int (math.ceil(numColors/maxColorsPerRow))

@@ -15,22 +15,29 @@ import config
 class App:
     # the main application ;-)
     def __init__(self):
-        self.root = Tk()
-        self.sprImgOffset = 0
-        self.spritesCanvas = None
-        self.paletteCanvas = None
+
         self.targetSystem = 0
-        self.root.withdraw()
-        self.paletteIndex = 0
-        self.drawColor = 0 # Color selected in the palette
+
+        # Objects to be saved/loaded to/from project file
         self.pixels = []
         self.finalsprites = []
         self.usprites = []
         self.csprites = []
+        self.palette=config.palettes[self.targetSystem][2]
+        self.imgwidth = 0
+        self.imgheight = 0
+
+        
+        self.root = Tk()
+        self.sprImgOffset = 0
+        self.spritesCanvas = None
+        self.paletteCanvas = None
+        self.root.withdraw()
+        self.paletteIndex = 0
+        self.drawColor = 0 # Color selected in the palette
         self.spritexsize = config.spritexsize
         self.spriteysize = config.spriteysize
         self.opfile = ""
-        self.palette=config.palettes[self.targetSystem][2]
         self.colors = []
         self.maxcolors = 16
         self.bgcolor = (7,7,7)
@@ -47,8 +54,13 @@ class App:
         self.scale = Scale(self.root, from_=1, to=20, orient=HORIZONTAL, length=800, command=lambda x:retrofunctions.zoomimage(self))
         self.menubar = Menu(self.root)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Open", command=lambda:retrofunctions.openfile(self))
-        self.filemenu.add_command(label="Save", command=lambda:retrofunctions.savefile(self))
+        self.filemenu.add_command(label="Open Image", command=lambda:retrofunctions.openfile(self))
+        self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.savefile(self))
+
+        self.filemenu.add_command(label="Open Project", command=lambda:retrofunctions.loadProject(self))
+        self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
+
+
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=self.exit)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
@@ -65,7 +77,7 @@ class App:
         
 
         # DefineSpriteListWindow
-         
+        self.spwindow = None
 
         if config.default_filename != "":
             retrofunctions.openfile(self)
