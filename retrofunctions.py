@@ -12,15 +12,16 @@ import math
 
 
 def saveProject (app):
-    app.projfile = app.opfile[:len(app.opfile)-3]+"prj"
-    output = open(app.projfile,"wb")
-    pickle.dump ([app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette],output,pickle.HIGHEST_PROTOCOL)
-
+    if (app.projfile==""):
+        app.projfile = app.opfile[:len(app.opfile)-3]+"prj"
+    with open(app.projfile,"wb") as f:
+        pickle.dump ((app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette),f,pickle.HIGHEST_PROTOCOL)
+    
 def loadProject (app):
     app.projfile = filedialog.askopenfilename(parent=app.root)
-    finput = open(app.projfile,"rb")
-    [app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette]=pickle.load(finput)
-
+    with open(app.projfile,"rb") as f:
+        (app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette)=pickle.load(f)
+    
 def findOrColor (csprites):
     # This function finds which is the best pixel to or according to the palette colors
     # This is used on MSX2 -> See https://www.msx.org/wiki/The_OR_Color
@@ -493,9 +494,10 @@ def updatePixel (canvas,switchon,app):
     tags = canvas.gettags(CURRENT)
     if len(tags)<2:
         return
-    if switchon:
+    if (switchon) and (app.drawColor != 0):
       fill = transformColor(app,app.drawColor)
       pixelcolor = 1
+
     if canvas.find_withtag(CURRENT):
       canvas.itemconfig(CURRENT, fill=fill)
       coords = tags[0].split('/')
@@ -511,8 +513,10 @@ def updatePixel (canvas,switchon,app):
       app.usprites[spriteidx]=sprite
       
       # Update pixels object
-      app.pixels[px*py]=app.drawColor
-
+      # need to convert sprite/pixel/pxpy 
+      # Tengo el spriteID, y las coordenadas del pixel en el sprite
+      position = ((spriteidx*app.spritexsize)+px)+(py*app.imgwidth)
+      app.pixels[position]=str(app.drawColor)
       canvas.update_idletasks()
 
 def updateDrawColor (canvas,app):
