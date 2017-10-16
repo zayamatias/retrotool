@@ -334,8 +334,6 @@ def createTempSprites (app):
                     #WIP
 
                     position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.imgwidth*spy)+(py*app.imgwidth))
-
-
                     imgRow = int ((position)/app.imgwidth)+1
                     extraRowUpper = imgRow+int(app.sprImgOffset/app.imgwidth)
                     extraRowLower = imgRow+int(app.sprImgOffset/app.imgwidth)-1
@@ -343,8 +341,6 @@ def createTempSprites (app):
                     lowerlimit = (app.imgwidth)*extraRowLower
 
                     position = position + app.sprImgOffset
-
-                    #print ("position="+str(position)+" width="+str(app.img.size[0])+" Row = "+str(imgRow)+" limit = "+str(limit))
                     ### We need to calculate the offset
                     if ((position < len(app.pixels)) and (position >= 0) and (position < upperlimit) and (position >= lowerlimit)):
                         color = str(app.pixels[position])
