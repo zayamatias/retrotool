@@ -10,6 +10,14 @@ import config
 import tkinter as tk
 import math
 
+def newProject(app):
+    # Create empty array of pixels
+    app.imgwidth = 160
+    app.imgheight = 160
+    app.pixels = [0]*(app.imgwidth*app.imgheight)
+    createTempSprites (app)
+
+
 def writeASMFile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
     
@@ -421,7 +429,7 @@ def showSprites (app):
             displayPalette(app)
     else:
         createSpritesWindow(app)
-    if app.usprites == []:
+    if (app.usprites == []):
         messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
     app.spwindow.deiconify()
