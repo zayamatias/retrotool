@@ -54,6 +54,7 @@ class App:
         self.scale = Scale(self.root, from_=1, to=20, orient=HORIZONTAL, length=800, command=lambda x:retrofunctions.zoomimage(self))
         self.menubar = Menu(self.root)
         self.filemenu = Menu(self.menubar, tearoff=0)
+        self.filemenu.add_command(label="New Project", command=lambda:retrofunctions.newProject(self))
         self.filemenu.add_command(label="Open Image", command=lambda:retrofunctions.openImageFile(self))
         self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.exportASMFile(self))
 
