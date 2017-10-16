@@ -26,8 +26,11 @@ class App:
         self.palette=config.palettes[self.targetSystem][2]
         self.imgwidth = 0
         self.imgheight = 0
-
-        
+        self.pixelsize = config.pixelsize
+        self.spriteeditorbgcolor = config.spriteeditorbgcolor
+        self.spritexsize = config.spritexsize
+        self.spriteysize = config.spriteysize
+        self.newSprites = config.newSprites
         self.root = Tk()
         self.sprImgOffset = 0
         self.spritesCanvas = None
@@ -35,8 +38,6 @@ class App:
         self.root.withdraw()
         self.paletteIndex = 0
         self.drawColor = 0 # Color selected in the palette
-        self.spritexsize = config.spritexsize
-        self.spriteysize = config.spriteysize
         self.opfile = ""
         self.colors = []
         self.maxcolors = 16
@@ -54,6 +55,7 @@ class App:
         self.scale = Scale(self.root, from_=1, to=20, orient=HORIZONTAL, length=800, command=lambda x:retrofunctions.zoomimage(self))
         self.menubar = Menu(self.root)
         self.filemenu = Menu(self.menubar, tearoff=0)
+        self.filemenu.add_command(label="Preferences", command=lambda:retrofunctions.showPreferences(self))
         self.filemenu.add_command(label="New Project", command=lambda:retrofunctions.newProject(self))
         self.filemenu.add_command(label="Open Image", command=lambda:retrofunctions.openImageFile(self))
         self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.exportASMFile(self))
@@ -70,8 +72,7 @@ class App:
             self.filemenu.add_checkbutton(label=system, onvalue=config.systems.index(system), offvalue=False, variable=self.targetSystem)
         self.menubar.add_cascade(label="Target System", menu=self.filemenu)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Show Sprites", command=lambda:retrofunctions.showSprites(self))
-        self.filemenu.add_command(label="Sprite Editor", command=lambda:retrofunctions.spriteditor(self))
+        self.filemenu.add_command(label="Sprite Editor", command=lambda:retrofunctions.showSprites(self))
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.exit)

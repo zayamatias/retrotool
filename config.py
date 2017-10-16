@@ -28,15 +28,16 @@ palettes = [("MSX",msxcolordivider,msxpalette),("MSX2",msxcolordivider,msxpalett
 systems = ["MSX","MSX2","MSX2+"]
 #System Limits => System name, max colors per sprite
 syslimits = [("MSX",1,16),("MSX2",3,16),("MSX2+",3,16)]
+preferencesWxSize = 400
+preferencesWySize = 400
+default_filename = ""
+paletteWxSize = 256 # Width of the palette window
+paletteColorBoxSize= 64 #size x&y of the box of the color in the palettes
+
 
 ## The parameters below should be updatabe via "preferences"
 pixelsize = 8 #pixel size on screen for editing purposes (value will be multiplied x & y)
-spritesperrow= 4 # How many sprites to show per row by default
-                 # application will calculate according to screen size
-default_filename = ""
 spriteeditorbgcolor = "white" #BG color for the sprite editor.
 spritexsize = 16 # default sprite width
 spriteysize = 16 #default sprite height
-paletteWxSize = 256 # Width of the palette window
-paletteColorBoxSize= 64 #size x&y of the box of the color in the palettes
 newSprites = 2 # Number of sprites for new project

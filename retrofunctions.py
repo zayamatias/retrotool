@@ -12,8 +12,8 @@ import math
 
 def newProject(app):
     # Create empty array of pixels
-    app.imgwidth = config.spritexsize*math.ceil(math.sqrt(config.newSprites))
-    app.imgheight = config.spriteysize*math.ceil(math.sqrt(config.newSprites))
+    app.imgwidth = app.spritexsize*math.ceil(math.sqrt(app.newSprites))
+    app.imgheight = app.spriteysize*math.ceil(math.sqrt(app.newSprites))
     app.pixels = [0]*(app.imgwidth*app.imgheight)
     createTempSprites (app)
 
@@ -80,8 +80,6 @@ def openImageFile(app):
     #create the image
     app.imgwidth=app.img.size[0]
     app.imgheight=app.img.size[1]
-    
-    
     app.spritephoto=PIL.ImageTk.PhotoImage(app.img)
     app.cv.itemconfig(app.canvas_ref,image = app.spritephoto)
     app.cv.image = app.spritephoto
@@ -268,8 +266,8 @@ def checkColors(app):
 def checkSize(app):
     #check if the colors of the image are within the limits of the system
     width = app.imgwidth
-    if (width/config.spritexsize) != int (width/config.spritexsize):
-        messagebox.showinfo("Error","Image width is not a multiple of sprite width ( currently set in config to "+str(config.spritexsize)+"px)")
+    if (width/app.spritexsize) != int (width/app.spritexsize):
+        messagebox.showinfo("Error","Image width is not a multiple of sprite width ( currently set in config to "+str(app.spritexsize)+"px)")
         return False
     else:
         return True
@@ -419,6 +417,13 @@ def udpateTargetSystem(app,chgsystem):
 def showSprites (app):
     #display the sprites grid, initializing everything first
     
+    if (app.usprites == []):
+        if app.img.filename ==config.logoimage :
+            messagebox.showinfo("Error","Please, load an image or start a new project first")
+            return 1
+        else:
+            messagebox.showinfo("Error","Please, click on the background color of the image first")
+            return 1
     if (app.spwindow!=None):
         if (app.spritesCanvas != None) and (app.spwindow.winfo_exists()!=0):    
             for child in app.spwindow.winfo_children():
@@ -429,17 +434,15 @@ def showSprites (app):
             displayPalette(app)
     else:
         createSpritesWindow(app)
-    if (app.usprites == []):
-        messagebox.showinfo("Error","Please, click on the background color of the image first")
-        return 1
+            
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
-    spritesPerRow = int(app.imgwidth/config.spritexsize)
+    spritesPerRow = int(app.imgwidth/app.spritexsize)
     if (app.imgwidth!=0):
-       spritesPerRow = int(math.ceil(app.imgwidth/config.spritexsize))
+       spritesPerRow = int(math.ceil(app.imgwidth/app.spritexsize))
     spriteColumns = int(math.ceil(numSprites/spritesPerRow))
-    xsize = (app.spritexsize)*config.pixelsize
-    ysize = (app.spriteysize)*config.pixelsize
+    xsize = (app.spritexsize)*app.pixelsize
+    ysize = (app.spriteysize)*app.pixelsize
     spacing = 4
     canvasWidth = spritesPerRow *(xsize+spacing)
     canvasHeight = spriteColumns*(ysize+spacing)
@@ -509,7 +512,7 @@ def moveSprites(event,canvas,app):
     showSprites(app)
 
 def updatePixel (canvas,switchon,app):
-    fill = config.spriteeditorbgcolor
+    fill = app.spriteeditorbgcolor
     pixelcolor = 0
     tags = canvas.gettags(CURRENT)
     if len(tags)<2:
@@ -554,22 +557,25 @@ def updateDrawColor (canvas,app):
 
       
 def drawboxel (app,canvas,sprites,index,x,y):
+    border = 1
+    if (app.pixelsize==2):
+        border = 0
     startx = x
     sprite = sprites[index]
     py=0
     for row in sprite:
         px=0
-        ey = y + config.pixelsize
+        ey = y +app.pixelsize
         for pixel in range (0,app.spritexsize):
-            ex = x + config.pixelsize
+            ex = x +app.pixelsize
             pxColor = int(getTempColor(row,pixel))
             if pxColor != 0:
                 color = transformColor (app,pxColor)
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
-                canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py))
+                canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
             else:
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
-                canvas.create_rectangle (x,y,ex,ey,fill=config.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py))
+                canvas.create_rectangle (x,y,ex,ey,fill=app.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
 
             px = px + 1
             x = ex
@@ -594,7 +600,7 @@ def transformColor (app,paletteIndex):
 def createSpritesWindow(app):
     #window to show the sprites in
     app.spwindow =  tk.Toplevel(app.root)
-    app.spwindow.title("Sprite List")
+    app.spwindow.title("Sprite Overview")
     app.spwindow.iconbitmap(config.iconfile)
     app.spwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
     app.spwindow.protocol("WM_DELETE_WINDOW", lambda:closeSpritesWindow(app))
@@ -612,6 +618,41 @@ def createPaletteWindow(app,ysize):
     app.palwindow.withdraw()
     #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
     #scrollbar.pack(side=tk.RIGHT, fill='y')
+
+def createPreferencesWindow(app):
+    #window to show the sprites in
+    app.prefwindow =  tk.Toplevel(app.root)
+    app.prefwindow.title("Preferences")
+    app.prefwindow.iconbitmap(config.iconfile)
+    app.prefwindow.geometry(str(config.preferencesWxSize)+"x"+str(config.preferencesWySize))
+    app.prefwindow.protocol("WM_DELETE_WINDOW", lambda:closePreferencesWindow(app))
+    
+    pixlabel = Label(app.prefwindow, text="Pixel size in sprite editor")
+    pixlabel.grid(row=0, sticky=W)
+    pixsizes = StringVar(app.prefwindow)
+    pixsizes.set(app.pixelsize) # default value
+    pixelsize = OptionMenu(app.prefwindow, pixsizes, 2,4,6,8,10,12,14,16,command= lambda x:chgPixelSize(pixsizes,app))
+    pixelsize.grid(row=0, column=1, sticky=W)
+  
+ 
+#    applybutton = Button (app.prefwindow,"Apply",command= lambda:applyPrefs(app)).grid(row=10)
+    
+    app.prefwindow.withdraw()
+    #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
+    #scrollbar.pack(side=tk.RIGHT, fill='y')
+
+def chgPixelSize(value,app):
+    app.pixelsize = int(value.get())
+    
+    
+def showPreferences(app):
+    createPreferencesWindow(app)   
+    app.prefwindow.deiconify()
+
+    
+def closePreferencesWindow(app):
+    #Destroy sprite window so next time it is open it is reinitialized
+    app.prefwindow.destroy()
 
 def closeSpritesWindow(app):
     #Destroy sprite window so next time it is open it is reinitialized
