@@ -19,6 +19,7 @@ def writeASMFile(app):
     f.write ("SPRITE_DATA:\n")
     idx = 0
     for fsprite in app.finalsprites:
+        print (idx)
         line = fsprite.getAsmPattern()
         f.write (";Sprite"+str(idx)+"\n")
         f.write (line)
@@ -303,6 +304,8 @@ def paletteIndex(app,color):
 def createTempSprites (app):
     #Creates two arrays, uspritrs, which holds the pattern in colors (1,2,3....)
     #Csprites which holds the colors that are used in each line of the sprite
+    app.usprites = []
+    app.csprites = []
     txsprites = int(app.imgwidth/app.spritexsize)
     tysprites = int(app.imgheight/app.spriteysize)
     for spy in range (0,tysprites):
@@ -354,6 +357,7 @@ def createFinalSprites(app):
         for numsprites in range (0,spritesplit):
             tsprite =[]
             tcolor = []
+            emptySprite = True
             for y in range (0,app.spriteysize):
                 pc=findOrColor(app.csprites[myindex][y])
                 oc=pc[2]
@@ -363,6 +367,7 @@ def createFinalSprites(app):
                     pcolor = getTempColor (row,x)
                     if (int(pcolor)==int(pc[numsprites])) or (int(pcolor)==int(oc)):
                         trow = trow+"1"
+                        emptySprite = False
                     else:
                         trow = trow+"0"
                 tsprite.append(trow)
@@ -370,8 +375,9 @@ def createFinalSprites(app):
                     tcolor.append (0)
                 else:
                     tcolor.append (pc[numsprites])
-            mysprite = sprite (tsprite,tcolor,ored)
-            app.finalsprites.append(mysprite)
+            if not emptySprite:
+                mysprite = sprite (tsprite,tcolor,ored)
+                app.finalsprites.append(mysprite)
             if needtoor:
                 ored = not ored
         myindex = myindex+1
