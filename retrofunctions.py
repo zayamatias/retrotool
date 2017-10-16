@@ -20,14 +20,12 @@ def newProject(app):
 
 def writeASMFile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
-    
+    createTempSprites (app)
     createFinalSprites(app)
-    app.outfile = app.opfile[:len(app.opfile)-3]+"asm"
     f = open(app.outfile, 'w')
     f.write ("SPRITE_DATA:\n")
     idx = 0
     for fsprite in app.finalsprites:
-        print (idx)
         line = fsprite.getAsmPattern()
         f.write (";Sprite"+str(idx)+"\n")
         f.write (line)
@@ -53,10 +51,15 @@ def writeASMFile(app):
 
 
 def exportASMFile(app):
+
     #do the actual saving of the file
     if app.usprites == []:
         messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
+    if (app.opfile == ""):
+        app.outfile = filedialog.asksaveasfilename(parent=app.root)
+    else:    
+        app.outfile = app.opfile[:len(app.opfile)-3]+"asm"
     writeASMFile(app)
 
 def openImageFile(app):
@@ -150,6 +153,8 @@ def needToOr(csprites):
 
 def getSplits(csprites):
     #returns the number of sprites that have to be created as a result of the split
+    
+ 
     splits = 0
     numcols = 0
     for cols in csprites:
@@ -425,7 +430,6 @@ def showSprites (app):
                 app.spritesCanvas = None
         else:
             createSpritesWindow(app)
-            print ("1")
             displayPalette(app)
     else:
         createSpritesWindow(app)
