@@ -37,3 +37,4 @@ spritexsize = 16 # default sprite width
 spriteysize = 16 #default sprite height
 paletteWxSize = 256 # Width of the palette window
 paletteColorBoxSize= 64 #size x&y of the box of the color in the palettes
+newSprites = 30 # Number of sprites for new project

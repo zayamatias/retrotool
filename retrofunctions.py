@@ -12,8 +12,8 @@ import math
 
 def newProject(app):
     # Create empty array of pixels
-    app.imgwidth = 160
-    app.imgheight = 160
+    app.imgwidth = config.spritexsize*math.ceil(math.sqrt(config.newSprites))
+    app.imgheight = app.imgwidth
     app.pixels = [0]*(app.imgwidth*app.imgheight)
     createTempSprites (app)
 
