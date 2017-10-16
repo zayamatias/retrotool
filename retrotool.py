@@ -54,8 +54,8 @@ class App:
         self.scale = Scale(self.root, from_=1, to=20, orient=HORIZONTAL, length=800, command=lambda x:retrofunctions.zoomimage(self))
         self.menubar = Menu(self.root)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Open Image", command=lambda:retrofunctions.openfile(self))
-        self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.savefile(self))
+        self.filemenu.add_command(label="Open Image", command=lambda:retrofunctions.openImageFile(self))
+        self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.exportASMFile(self))
 
         self.filemenu.add_command(label="Open Project", command=lambda:retrofunctions.loadProject(self))
         self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
@@ -80,7 +80,7 @@ class App:
         self.spwindow = None
 
         if config.default_filename != "":
-            retrofunctions.openfile(self)
+            retrofunctions.openImageFile(self)
 
        # Nothing gets executed after this statement!
         self.root.mainloop()

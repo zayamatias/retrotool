@@ -10,6 +10,79 @@ import config
 import tkinter as tk
 import math
 
+def writeASMFile(app):
+    #crete the aoutput .asm file with the sprite data, colors & palette
+    
+    createFinalSprites(app)
+    app.outfile = app.opfile[:len(app.opfile)-3]+"asm"
+    f = open(app.outfile, 'w')
+    f.write ("SPRITE_DATA:\n")
+    idx = 0
+    for fsprite in app.finalsprites:
+        line = fsprite.getAsmPattern()
+        f.write (";Sprite"+str(idx)+"\n")
+        f.write (line)
+        idx = idx + 1
+    f.write("SPRITE_COLORS:\n")
+    idx = 0
+    for fsprite in app.finalsprites:
+        line = fsprite.getAsmColors(app.spriteysize)
+        f.write (";Sprite"+str(idx)+"\n")
+        f.write (line)
+        idx = idx +1
+    f.write ("PALETTE:\n")
+    cindex =0;
+    for color in app.palette:
+        if set(color)==set((-1,-1,-1)):
+            color = (0,0,0)
+        f.write ("\tdb $"+str(hex(int(color[1]))[2:])+str(hex(int(color[2]))[2:])+",$"+str(color[0])+"\n")
+        cindex = cindex+1
+        # fill in dummy colors
+
+    for dindex in range (cindex,16):
+        f.write ("\tdb $77,$7\n")
+
+
+def exportASMFile(app):
+    #do the actual saving of the file
+    if app.usprites == []:
+        messagebox.showinfo("Error","Please, click on the background color of the image first")
+        return 1
+    writeASMFile(app)
+
+def openImageFile(app):
+    #ask for a file to open
+    app.cv.update()
+    #to speed up testing, if a file is set in the config it will not ask to open but will open directly this one
+    if config.default_filename == "":
+        app.opfile = filedialog.askopenfilename(parent=app.root)
+    else:
+        app.opfile = config.default_filename
+    app.cv.update()
+    app.img = PIL.Image.open(app.opfile)
+    #CHeck if the max number of colors accepted by the system is equal or more than the colors of the image
+    colok = checkColors (app)
+    sizeok = checkSize (app)
+    if (not colok) or (not sizeok):
+        return 1
+    #create the image
+    app.imgwidth=app.img.size[0]
+    app.imgheight=app.img.size[1]
+    
+    
+    app.spritephoto=PIL.ImageTk.PhotoImage(app.img)
+    app.cv.itemconfig(app.canvas_ref,image = app.spritephoto)
+    app.cv.image = app.spritephoto
+    app.cv.update()
+    app.scale.set(1)
+    app.scale.pack()
+    app.root.update()
+    #to be used in the futrue for automatic adjustment of the palette
+    swappedpalette = [(0,(0,0,0))]
+    #positions that are vailable for swapping:
+    # 1 or 2 = 3 etc....
+    availableswaps =[3,5,7,9,11,13,15]
+    #prepareOrs(app)
 
 def saveProject (app):
     if (app.projfile==""):
@@ -156,39 +229,6 @@ class sprite:
         line = line + "\n"
         return line
 
-def openfile(app):
-    #ask for a file to open
-    app.cv.update()
-    #to speed up testing, if a file is set in the config it will not ask to open but will open directly this one
-    if config.default_filename == "":
-        app.opfile = filedialog.askopenfilename(parent=app.root)
-    else:
-        app.opfile = config.default_filename
-    app.cv.update()
-    app.img = PIL.Image.open(app.opfile)
-    #CHeck if the max number of colors accepted by the system is equal or more than the colors of the image
-    colok = checkColors (app)
-    sizeok = checkSize (app)
-    if (not colok) or (not sizeok):
-        return 1
-    #create the image
-    app.imgwidth=app.img.size[0]
-    app.imgheight=app.img.size[1]
-    
-    
-    app.spritephoto=PIL.ImageTk.PhotoImage(app.img)
-    app.cv.itemconfig(app.canvas_ref,image = app.spritephoto)
-    app.cv.image = app.spritephoto
-    app.cv.update()
-    app.scale.set(1)
-    app.scale.pack()
-    app.root.update()
-    #to be used in the futrue for automatic adjustment of the palette
-    swappedpalette = [(0,(0,0,0))]
-    #positions that are vailable for swapping:
-    # 1 or 2 = 3 etc....
-    availableswaps =[3,5,7,9,11,13,15]
-    #prepareOrs(app)
 
 
 def zoomimage(app):
@@ -352,44 +392,6 @@ def updateTempColor (row,position,color):
         returnRow = returnRow + "%" + str(pixel)
     return returnRow
     
-def writefile(app):
-    #crete the aoutput .asm file with the sprite data, colors & palette
-    
-    createFinalSprites(app)
-    app.outfile = app.opfile[:len(app.opfile)-3]+"asm"
-    f = open(app.outfile, 'w')
-    f.write ("SPRITE_DATA:\n")
-    idx = 0
-    for fsprite in app.finalsprites:
-        line = fsprite.getAsmPattern()
-        f.write (";Sprite"+str(idx)+"\n")
-        f.write (line)
-        idx = idx + 1
-    f.write("SPRITE_COLORS:\n")
-    idx = 0
-    for fsprite in app.finalsprites:
-        line = fsprite.getAsmColors(app.spriteysize)
-        f.write (";Sprite"+str(idx)+"\n")
-        f.write (line)
-        idx = idx +1
-    f.write ("PALETTE:\n")
-    cindex =0;
-    for color in app.palette:
-        if set(color)==set((-1,-1,-1)):
-            color = (0,0,0)
-        f.write ("\tdb $"+str(hex(int(color[1]))[2:])+str(hex(int(color[2]))[2:])+",$"+str(color[0])+"\n")
-        cindex = cindex+1
-        # fill in dummy colors
-
-    for dindex in range (cindex,16):
-        f.write ("\tdb $77,$7\n")
-
-def savefile(app):
-    #do the actual saving of the file
-    if app.usprites == []:
-        messagebox.showinfo("Error","Please, click on the background color of the image first")
-        return 1
-    writefile(app)
 
 def udpateTargetSystem(app,chgsystem):
     #Will be used when changing the target system
