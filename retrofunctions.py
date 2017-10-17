@@ -739,7 +739,6 @@ def animateSprite (event,app):
             app.frame = 0
         if app.frame < 0 :
             app.frame = app.animation.numFrames()-1
-    print (app.frame)
     xsize = (app.spritexsize)*app.pixelsize
     ysize = (app.spriteysize)*app.pixelsize
     spacing = 2
