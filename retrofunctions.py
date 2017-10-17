@@ -9,6 +9,8 @@ from tkinter.filedialog import askopenfilename
 import config
 import tkinter as tk
 import math
+import retroclasses
+import time
 
 def newProject(app):
     # Create empty array of pixels
@@ -166,83 +168,6 @@ def getSplits(csprites):
             splits = 2
     return splits
 
-
-class sprite:
-    # Sprite class, to make it easier to manipulate afterwards
-    spriteCount = 0
-
-    def __init__ (self,pattern,colors,ored):
-
-        self.pattern=pattern   #binary pattern of the sprite
-        self.colors=colors     #colors of the sprite
-        self.ored = ored       #does this sprite come from an ored sprite (for palette purposes)
-        self.number = sprite.spriteCount   #Sprite index
-        sprite.spriteCount = sprite.spriteCount+1 #add one to the index for next sprite
-
-    def displayPattern (self):
-        #for testing purposes, show the pattern on console
-        rows = self.pattern
-        for row in rows:
-            print (row)
-
-    def displayColors (self):
-        #for testing purposes, show the color on console
-        rows = self.colors
-        for row in rows:
-            print (row)
-
-    def getPattern (self):
-        #retruns the pattern of a sprite
-        line = ""
-        rows = self.pattern
-        for row in rows:
-            line = line + str(row) + "\n"
-        return line
-
-    def getColors (self,ysize):
-        #returns the colors of a sprite
-        line = ""
-        count = 1
-        rows = self.colors
-        for row in rows:
-            line = line + str(row)
-            if count < ysize :
-                count = count + 1
-                line = line + ","
-        return line
-
-    def getAsmPattern (self):
-        #get the pattern of a sprite in ASM mode (db %xxxxxxxxxxxxxxxx)
-        #attention: for 16bit sprites, msx splits into 2 8x16 patterns
-        line = ""
-        rows = self.pattern
-        pat1 =""
-        pat2 =""
-        for row in rows:
-            pat1=pat1+"\tdb %"+str(row)[:8]+"\n"
-            pat2=pat2+"\tdb %"+str(row)[8:]+"\n"
-        line = pat1 + pat2
-        return line
-
-    def getAsmColors (self,ysize):
-        #get the colors of a sprite in ASM mode (db 1,2,3....) each byte represents the # of the color in the palette
-        #for ored colors, bit #7 should be set, thus the +64
-        line = "\tdb "
-        rows = self.colors
-        count = 1
-        for row in rows:
-            if self.ored :
-                if (row!=0):
-                   row = row + 64
-            line = line + str(row)
-            if count < ysize :
-                count = count + 1
-                line = line + ","
-        line = line + "\n"
-        return line
-
-
-
 def zoomimage(app):
     #function called to zoom the image loaded in or out (according to the selected scale)
     zoom = app.scale.get()
@@ -383,7 +308,7 @@ def createFinalSprites(app):
                 else:
                     tcolor.append (pc[numsprites])
             if not emptySprite:
-                mysprite = sprite (tsprite,tcolor,ored)
+                mysprite = retroclasses.sprite (tsprite,tcolor,ored)
                 app.finalsprites.append(mysprite)
             if needtoor:
                 ored = not ored
@@ -450,7 +375,8 @@ def showSprites (app):
     app.spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
     # Mous click actions left-> Put pixel, Right-> Remove pixel
     app.spritesCanvas.bind('<Button-1>', lambda x:updatePixel(app.spritesCanvas,True,app))
-    app.spritesCanvas.bind('<Button-3>', lambda x:updatePixel(app.spritesCanvas,False,app))
+    #app.spritesCanvas.bind("<B1-Motion>",lambda event: moveSpriteCanvas(app.spritesCanvas,x = event.x,y = event.y))
+    app.spritesCanvas.bind('<Button-3>', lambda x:selectSprite(app.spritesCanvas,app))
     # Canvas by default does not get focus, so this means that if this is not set
     # key binding will not work!
     app.spritesCanvas.bind('<Key>', lambda event:moveSprites(event,app.spritesCanvas,app))
@@ -478,9 +404,9 @@ def showSprites (app):
     for row in range (0,numSprites):
         destX = currX + (xsize)
         destY = currY + (ysize)
-        app.spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="spr"+str(currentSprite)+"canvas")
+        app.spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="sprite,spr"+str(currentSprite)+"canvas")
         #draw each "boxel" of the sprite
-        drawboxel (app,app.spritesCanvas,app.usprites,currentSprite,currX,currY)
+        drawboxel (app,app.spritesCanvas,app.usprites[currentSprite],currX,currY)
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
         shownSprites = shownSprites + 1
@@ -491,6 +417,9 @@ def showSprites (app):
     displayPalette(app)
     # If canvas is bigger than screen then show scrollbars
 
+def moveSpriteCanvas(canvas,x,y):
+    print ("moving"+str(x)+"//"+str(y))
+    
 def moveSprites(event,canvas,app):
     """
     Left     37
@@ -510,7 +439,8 @@ def moveSprites(event,canvas,app):
     app.csprites = []
     createTempSprites (app)
     showSprites(app)
-
+def selectSprite(canvas,app):
+    print (canvas.gettags("sprite"))
 def updatePixel (canvas,switchon,app):
     fill = app.spriteeditorbgcolor
     pixelcolor = 0
@@ -556,12 +486,12 @@ def updateDrawColor (canvas,app):
     app.drawColor = int(tags[0])-1
 
       
-def drawboxel (app,canvas,sprites,index,x,y):
+def drawboxel (app,canvas,sprite,x,y):
     border = 1
     if (app.pixelsize==2):
         border = 0
     startx = x
-    sprite = sprites[index]
+    index = app.usprites.index(sprite) 
     py=0
     for row in sprite:
         px=0
@@ -634,13 +564,39 @@ def createPreferencesWindow(app):
     pixelsize = OptionMenu(app.prefwindow, pixsizes, 2,4,6,8,10,12,14,16,command= lambda x:chgPixelSize(pixsizes,app))
     pixelsize.grid(row=0, column=1, sticky=W)
   
+    sprXSizelabel = Label(app.prefwindow, text="Sprite width in pixels")
+    sprXSizelabel.grid(row=1, sticky=W)
+    sprXSizes = StringVar(app.prefwindow)
+    sprXSizes.set(app.spritexsize) # default value
+    sprXSize = OptionMenu(app.prefwindow, sprXSizes, 8,16,command= lambda x:chgSprXSize(sprXSizes,app))
+    sprXSize.grid(row=1, column=1, sticky=W)
+
+    sprYSizelabel = Label(app.prefwindow, text="Sprite height in pixels")
+    sprYSizelabel.grid(row=2, sticky=W)
+    sprYSizes = StringVar(app.prefwindow)
+    sprYSizes.set(app.spriteysize) # default value
+    sprYSize = OptionMenu(app.prefwindow, sprYSizes, 8,16,command= lambda x:chgSprYSize(sprXSizes,app))
+    sprYSize.grid(row=2, column=1, sticky=W)
  
-#    applybutton = Button (app.prefwindow,"Apply",command= lambda:applyPrefs(app)).grid(row=10)
+    nbrSpriteslabel = Label(app.prefwindow, text="Number of sprites for new project")
+    nbrSpriteslabel.grid(row=3, sticky=W)
+    nbrSprites = Entry(app.prefwindow)
+    nbrSprites.grid(row=3, column=1, sticky=W)
+
+    #    applybutton = Button (app.prefwindow,"Apply",command= lambda:applyPrefs(app)).grid(row=10)
     
     app.prefwindow.withdraw()
     #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
     #scrollbar.pack(side=tk.RIGHT, fill='y')
+def chgNbrSprites(value,app):
+    app.newSprites = int(value.get())
 
+def chgSprXSize(value,app):
+    app.spritexsize = int(value.get())
+
+def chgSprYSize(value,app):
+    app.spriteysize = int(value.get())
+    
 def chgPixelSize(value,app):
     app.pixelsize = int(value.get())
     
@@ -661,6 +617,10 @@ def closeSpritesWindow(app):
 def closePaletteWindow(app):
     #Destroy sprite window so next time it is open it is reinitialized
     app.palwindow.destroy()
+
+def closeAnimationWindow(app):
+    #Destroy sprite window so next time it is open it is reinitialized
+    app.animWindow.destroy()
 
 def isColorInPalette(app,color):
     
@@ -719,5 +679,83 @@ def colorCompare(colora,colorb):
     if (ra==rb) and (abs(ba-bb)==1) and (ga==gb):
         return True
     return False
+
+
+def createAnimationWindow (app):
+    app.animWindow =  tk.Toplevel(app.root)
+    app.animWindow.title("Character Animation")
+    app.animWindow.iconbitmap(config.iconfile)
+    app.animWindow.geometry(str(config.animWxSize)+"x"+str(config.animWySize))
+    app.animWindow.protocol("WM_DELETE_WINDOW", lambda:closeAnimationWindow(app))
+
     
+def animate (app):
+    if (app.csprites == []):
+        messagebox.showinfo("Error","Please, create sprites before trying to animate them ;-)")
+        return 1
+   
+    app.animation = retroclasses.animation()
+ 
+    character1 = retroclasses.character (2,1)
+    character1.insertSprite(app.usprites[0],0,0)
+    character1.insertSprite(app.usprites[6],1,0)
+    app.animation.addCharacter(character1)
     
+    character2= retroclasses.character (2,1)
+    character2.insertSprite(app.usprites[1],0,0)
+    character2.insertSprite(app.usprites[7],1,0)
+    app.animation.addCharacter(character2)
+
+    character3 = retroclasses.character (2,1)
+    character3.insertSprite(app.usprites[2],0,0)
+    character3.insertSprite(app.usprites[8],1,0)
+    app.animation.addCharacter(character3)
+
+    character4 = retroclasses.character (2,1)
+    character4.insertSprite(app.usprites[1],0,0)
+    character4.insertSprite(app.usprites[7],1,0)
+    app.animation.addCharacter(character4)
+    
+    createAnimationWindow (app)
+    app.animCanvas = Canvas (app.animWindow,width=config.animWxSize,height=config.animWySize)
+    app.animCanvas.bind('<Key>', lambda event:animateSprite(event,app))
+
+    app.animCanvas.pack()
+    app.animCanvas.focus_set()
+
+    app.frame = 0
+    animateSprite(None,app)
+
+
+
+
+def animateSprite (event,app):
+    if event != None:
+        if int(event.keycode) == 37:
+            app.frame = app.frame+1
+        if int(event.keycode) == 39:
+            app.frame = app.frame -1
+        if app.frame >= app.animation.numFrames():   
+            app.frame = 0
+        if app.frame < 0 :
+            app.frame = app.animation.numFrames()-1
+    print (app.frame)
+    xsize = (app.spritexsize)*app.pixelsize
+    ysize = (app.spriteysize)*app.pixelsize
+    spacing = 2
+    currX = 1
+    currY = 1
+    app.animCanvas.delete("all")
+    for row in range (app.animation.characters[app.frame].rows):
+        for col in range (app.animation.characters[app.frame].cols):
+            destX = currX + (xsize)
+            destY = currY + (ysize)
+            app.animCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2))
+            #draw each "boxel" of the sprite
+            drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY)
+            currX = currX+(xsize+spacing)
+        currX = 1
+        currY = currY + (ysize+spacing)
+    app.animWindow.update()
+    app.root.update()
+        

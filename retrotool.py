@@ -10,6 +10,7 @@ import tkinter as tk
 import retrofunctions
 from functools import partial
 import config
+import retroclasses
 
 
 class App:
@@ -31,6 +32,8 @@ class App:
         self.spritexsize = config.spritexsize
         self.spriteysize = config.spriteysize
         self.newSprites = config.newSprites
+        self.animWindow = ""
+        self.animCanvas = ""
         self.root = Tk()
         self.sprImgOffset = 0
         self.spritesCanvas = None
@@ -73,6 +76,7 @@ class App:
         self.menubar.add_cascade(label="Target System", menu=self.filemenu)
         self.filemenu = Menu(self.menubar, tearoff=0)
         self.filemenu.add_command(label="Sprite Editor", command=lambda:retrofunctions.showSprites(self))
+        self.filemenu.add_command(label="Animate", command=lambda:retrofunctions.animate(self))
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
