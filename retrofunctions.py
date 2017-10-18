@@ -116,18 +116,24 @@ def saveProject (app):
         if app.opfile!="":
             app.projfile = app.opfile[:len(app.opfile)-3]+"prj"
         else:
-            app.projfile = filedialog.asksaveasfilename(parent=app.root)
+            app.projfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
 
     with open(app.projfile,"wb") as f:
         pickle.dump ((app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette),f,pickle.HIGHEST_PROTOCOL)
     
 def loadProject (app):
-    app.projfile = filedialog.askopenfilename(parent=app.root)
-    if (app.projfile!=""):
+    loadprojfile = filedialog.askopenfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
+    if (loadprojfile!=""):
         resetProject(app)
-        with open(app.projfile,"rb") as f:
-            (app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette)=pickle.load(f)
-    
+        app.projfile = loadprojfile
+        print (app.projfile)
+        try:
+            with open(app.projfile,"rb") as f:
+                (app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette)=pickle.load(f)
+        except:
+            messagebox.showinfo("Error","The file you tried to open is not compatible")
+
+            
 def findOrColor (csprites):
     # This function finds which is the best pixel to or according to the palette colors
     # This is used on MSX2 -> See https://www.msx.org/wiki/The_OR_Color
