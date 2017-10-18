@@ -43,7 +43,7 @@ spriteeditorbgcolor = "white" #BG color for the sprite editor.
 spritexsize = 16 # default sprite width
 spriteysize = 16 #default sprite height
 newSprites = 2 # Number of sprites for new project
-animCols = 2 # Number of columns for the sprite animation
+animCols = 1 # Number of columns for the sprite animation
 animRows = 2 # Number of rows for the sprite animation
-animArray = (0,1,2,3,2,1)  # "character" list to show in animation
+animArray = (3,4,3)  # "character" list to show in animation
 
