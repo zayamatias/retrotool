@@ -242,10 +242,10 @@ def createTempSprites (app):
     #Csprites which holds the colors that are used in each line of the sprite
     app.usprites = []
     app.csprites = []
-    txsprites = int(app.imgwidth/app.spritexsize)
-    tysprites = int(app.imgheight/app.spriteysize)
-    for spy in range (0,tysprites):
-        for spx in range (0,txsprites):
+    app.spritesPerRow = int(app.imgwidth/app.spritexsize)
+    app.spritesPerCol = int(app.imgheight/app.spriteysize)
+    for spy in range (0,app.spritesPerCol):
+        for spx in range (0,app.spritesPerRow):
             thissprite = []
             thisspritecolors=[]
             for py in range (0,app.spriteysize):
@@ -362,15 +362,14 @@ def showSprites (app):
             
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
-    spritesPerRow = int(app.imgwidth/app.spritexsize)
     if (app.imgwidth!=0):
-       spritesPerRow = int(math.ceil(app.imgwidth/app.spritexsize))
-    spriteColumns = int(math.ceil(numSprites/spritesPerRow))
+       app.spritesPerRow = int(math.ceil(app.imgwidth/app.spritexsize))
+    app.spritePerCol = int(math.ceil(numSprites/app.spritesPerRow))
     xsize = (app.spritexsize)*app.pixelsize
     ysize = (app.spriteysize)*app.pixelsize
     spacing = 4
-    canvasWidth = spritesPerRow *(xsize+spacing)
-    canvasHeight = spriteColumns*(ysize+spacing)
+    canvasWidth = app.spritesPerRow *(xsize+spacing)
+    canvasHeight = app.spritePerCol*(ysize+spacing)
     shownSprites = 0
     app.spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
     # Mous click actions left-> Put pixel, Right-> Remove pixel
@@ -410,7 +409,7 @@ def showSprites (app):
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
         shownSprites = shownSprites + 1
-        if shownSprites == spritesPerRow:
+        if shownSprites == app.spritesPerRow:
             currX = 1
             currY = currY + (ysize+spacing)
             shownSprites=0
@@ -695,26 +694,17 @@ def animate (app):
         return 1
    
     app.animation = retroclasses.animation()
- 
-    character1 = retroclasses.character (2,1)
-    character1.insertSprite(app.usprites[0],0,0)
-    character1.insertSprite(app.usprites[6],1,0)
-    app.animation.addCharacter(character1)
     
-    character2= retroclasses.character (2,1)
-    character2.insertSprite(app.usprites[1],0,0)
-    character2.insertSprite(app.usprites[7],1,0)
-    app.animation.addCharacter(character2)
-
-    character3 = retroclasses.character (2,1)
-    character3.insertSprite(app.usprites[2],0,0)
-    character3.insertSprite(app.usprites[8],1,0)
-    app.animation.addCharacter(character3)
-
-    character4 = retroclasses.character (2,1)
-    character4.insertSprite(app.usprites[1],0,0)
-    character4.insertSprite(app.usprites[7],1,0)
-    app.animation.addCharacter(character4)
+    for ch in config.animArray:
+        character = retroclasses.character (config.animRows,config.animCols)
+        for x in range (0,config.animRows):
+            for y in range (0,config.animCols):
+                idx = (ch*config.animCols)+y+(x*app.spritesPerRow)
+                print (str(ch)+" Character -> "+str(x)+"X "+str(y)+"Y ="+str(idx)+" Index")
+                character.insertSprite(app.usprites[idx],x,y)
+        app.animation.addCharacter(character)
+            
+    
     
     createAnimationWindow (app)
     app.animCanvas = Canvas (app.animWindow,width=config.animWxSize,height=config.animWySize)

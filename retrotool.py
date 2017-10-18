@@ -32,6 +32,8 @@ class App:
         self.spritexsize = config.spritexsize
         self.spriteysize = config.spriteysize
         self.newSprites = config.newSprites
+        self.spritesPerRow = 0
+        self.spritesPerCol = 0
         self.animWindow = ""
         self.animCanvas = ""
         self.root = Tk()
