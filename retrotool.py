@@ -104,6 +104,9 @@ class App:
             y = int(int(event.y - ((config.appysize - height)/2))/zoom)
             if (x>0 and x<(width+1)) and (y>0 and y<(height+1)):
                 color = self.img.getpixel ((x,y))
+                if isinstance(color,int):
+                    messagebox.showinfo("Warning","Could not retrieve color properly, please chose another image or convert to another format")
+                    return 1
                 r=int(int(color[0])/config.msxcolordivider)
                 g=int(int(color[1])/config.msxcolordivider)
                 b=int(int(color[2])/config.msxcolordivider)

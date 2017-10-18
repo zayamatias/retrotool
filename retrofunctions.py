@@ -64,14 +64,29 @@ def exportASMFile(app):
         app.outfile = app.opfile[:len(app.opfile)-3]+"asm"
     writeASMFile(app)
 
+    
+def resetProject(app):
+        app.projfile =""
+        # Objects to be saved/loaded to/from project file
+        app.pixels = []
+        app.finalsprites = []
+        app.usprites = []
+        app.csprites = []
+        app.palette=config.palettes[app.targetSystem][2]
+        app.imgwidth = 0
+        app.imgheight = 0
+
+    
 def openImageFile(app):
     #ask for a file to open
-    app.cv.update()
     #to speed up testing, if a file is set in the config it will not ask to open but will open directly this one
     if config.default_filename == "":
-        app.opfile = filedialog.askopenfilename(parent=app.root)
+        app.opfile = filedialog.askopenfilename(parent=app.root,filetypes=[("Image Files","*.jpg;*.gif;*.png;*.bmp")])
     else:
         app.opfile = config.default_filename
+    if (app.opfile==""):
+        return 1
+    resetProject(app)
     app.cv.update()
     app.img = PIL.Image.open(app.opfile)
     #CHeck if the max number of colors accepted by the system is equal or more than the colors of the image
@@ -108,8 +123,10 @@ def saveProject (app):
     
 def loadProject (app):
     app.projfile = filedialog.askopenfilename(parent=app.root)
-    with open(app.projfile,"rb") as f:
-        (app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette)=pickle.load(f)
+    if (app.projfile!=""):
+        resetProject(app)
+        with open(app.projfile,"rb") as f:
+            (app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette)=pickle.load(f)
     
 def findOrColor (csprites):
     # This function finds which is the best pixel to or according to the palette colors
@@ -181,6 +198,8 @@ def zoomimage(app):
 def checkColors(app):
     #check if the colors of the image are within the limits of the system
     app.colors = app.img.getcolors()
+    if (app.colors==None):
+        app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
     if numcolors > 15:
         messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
@@ -700,7 +719,6 @@ def animate (app):
         for x in range (0,config.animRows):
             for y in range (0,config.animCols):
                 idx = (ch*config.animCols)+y+(x*app.spritesPerRow)
-                print (str(ch)+" Character -> "+str(x)+"X "+str(y)+"Y ="+str(idx)+" Index")
                 character.insertSprite(app.usprites[idx],x,y)
         app.animation.addCharacter(character)
             
