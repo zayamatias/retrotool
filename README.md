@@ -21,6 +21,8 @@ You have 2 options to work with sprites:
 	  - The tool will try to match the colors with the MSX palette or adapt the palette if no close match is found
 	  - It will also try to find automatically the OR color for a sprite row with 3 colours
 	  
+   - System selection does not work yet (first I want to make sure al functioanlities are ok!)
+   
    - Edit sprites:
 	  
 	  - Open sprite editor window
@@ -34,7 +36,8 @@ You have 2 options to work with sprites:
 	  - animCols = 1 # Number of columns for the sprite animation
 	  - animRows = 2 # Number of rows for the sprite animation (this will create characters of Cols*Rows for sprite animations)
 	  - animArray = (3,4,3)  # "character" list to show in animation [If you input from an image, it is 0 for the first row first col, then 2 for first row second col and so on...]
-		
+	  - Use right/left arrows in keyboard to cycle through characters
+	  
    - Save projects / load projects allows you to save a complete project and load it again (without loading any image) - changes made to te sprites should also be saved.
    
    - Preferences : Very basic for the moment, check.
