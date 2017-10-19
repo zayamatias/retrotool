@@ -126,7 +126,6 @@ def loadProject (app):
     if (loadprojfile!=""):
         resetProject(app)
         app.projfile = loadprojfile
-        print (app.projfile)
         try:
             with open(app.projfile,"rb") as f:
                 (app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette)=pickle.load(f)
