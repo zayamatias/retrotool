@@ -45,6 +45,10 @@ You have 2 options to work with sprites:
 	  - The list of sprites (2 sprites for a character will be created with the ored pixels setted on both)
 	  - The colors for each sprite row
 	  - The colors for the palette
+	  
+	 Yo will be able then to import the .asm into your code for usage.
+	 
+	 Happy sprite editing!!
 
 Español
 -------
