@@ -31,10 +31,9 @@ You have 2 options to work with sprites:
    - Animate Sprites:
    
 	  - For the moment you need to edit the config file:
-		animCols = 1 # Number of columns for the sprite animation
-		animRows = 2 # Number of rows for the sprite animation
-		(this will create characters of Cols*Rows for sprite animations)
-		animArray = (3,4,3)  # "character" list to show in animation [If you input from an image, it is 0 for the first row first col, then 2 for first row second col and so on...]
+	  - animCols = 1 # Number of columns for the sprite animation
+	  - animRows = 2 # Number of rows for the sprite animation (this will create characters of Cols*Rows for sprite animations)
+	  - animArray = (3,4,3)  # "character" list to show in animation [If you input from an image, it is 0 for the first row first col, then 2 for first row second col and so on...]
 		
    - Save projects / load projects allows you to save a complete project and load it again (without loading any image) - changes made to te sprites should also be saved.
    
