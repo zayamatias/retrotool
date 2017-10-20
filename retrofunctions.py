@@ -17,6 +17,7 @@ def newProject(app):
     app.imgwidth = app.spritexsize*math.ceil(math.sqrt(app.newSprites))
     app.imgheight = app.spriteysize*math.ceil(math.sqrt(app.newSprites))
     app.pixels = [0]*(app.imgwidth*app.imgheight)
+    app.img.filename=""
     createTempSprites (app)
 
 
@@ -75,6 +76,29 @@ def resetProject(app):
         app.palette=config.palettes[app.targetSystem][2]
         app.imgwidth = 0
         app.imgheight = 0
+
+def openROMFile(app):
+    app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms")])
+    if (app.romfile==""):
+        return 1
+    resetProject(app)
+    with open(app.romfile, mode='rb') as file:
+        romContent = file.read()
+    app.imgwidth = config.ROMWidth
+    cols = 1
+    rows = 1
+    for byte in romContent:
+        binbyte = '{0:08b}'.format(byte)
+        #( bin(int(sbyte, 16))[2:] ).zfill(16)
+        for bit in range(8):
+            cols = cols + 1
+            app.pixels.append (binbyte[bit])   
+            if cols==config.ROMWidth:
+                rows = rows+1
+                cols = 1
+                
+    app.imgheight=rows
+    createTempSprites (app)
 
     
 def openImageFile(app):
@@ -279,7 +303,6 @@ def createTempSprites (app):
                 for px in range (0,app.spritexsize):
 
                     #WIP
-
                     position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.imgwidth*spy)+(py*app.imgwidth))
                     imgRow = int ((position)/app.imgwidth)+1
                     extraRowUpper = imgRow+int(app.sprImgOffset/app.imgwidth)
@@ -700,6 +723,14 @@ def colorCompare(colora,colorb):
     if (ra==rb) and (abs(ga-gb)==1) and (ba==bb):
         return True
     if (ra==rb) and (abs(ba-bb)==1) and (ga==gb):
+        return True
+    if abs(ra-rb)==1 and abs(ga-gb)==1 and abs(ba-bb)==1:
+        return True
+    if abs(ra-rb)==1 and abs(ga-gb)==1 and (ba==bb):
+        return True
+    if abs(ra-rb)==1 and abs(ba-bb)==1 and (ga==gb):
+        return True
+    if abs(ga-gb)==1 and abs(ba-bb)==1 and (ra==rb):
         return True
     return False
 

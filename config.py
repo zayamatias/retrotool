@@ -50,3 +50,4 @@ animCols = 1 # Number of columns for the sprite animation
 animRows = 2 # Number of rows for the sprite animation
 animArray = (3,4,3)  # "character" list to show in animation
 
+ROMWidth = 256

@@ -41,7 +41,7 @@ class App:
         self.spritesCanvas = None
         self.paletteCanvas = None
         self.root.withdraw()
-        self.paletteIndex = 0
+        self.paletteIndex = 1 # We cannot change the "0" colour, ever!
         self.drawColor = 0 # Color selected in the palette
         self.opfile = ""
         self.colors = []
@@ -60,12 +60,12 @@ class App:
         self.scale = Scale(self.root, from_=1, to=20, orient=HORIZONTAL, length=800, command=lambda x:retrofunctions.zoomimage(self))
         self.menubar = Menu(self.root)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Preferences", command=lambda:retrofunctions.showPreferences(self))
-        self.filemenu.add_command(label="New Project", command=lambda:retrofunctions.newProject(self))
         self.filemenu.add_command(label="Open Image", command=lambda:retrofunctions.openImageFile(self))
-        self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.exportASMFile(self))
-
+        self.filemenu.add_command(label="Open ROM", command=lambda:retrofunctions.openROMFile(self))
         self.filemenu.add_command(label="Open Project", command=lambda:retrofunctions.loadProject(self))
+        self.filemenu.add_command(label="New Project", command=lambda:retrofunctions.newProject(self))
+        self.filemenu.add_command(label="Preferences", command=lambda:retrofunctions.showPreferences(self))
+        self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.exportASMFile(self))
         self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
 
 
