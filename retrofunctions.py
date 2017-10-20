@@ -113,6 +113,7 @@ def openImageFile(app):
     resetProject(app)
     app.cv.update()
     app.img = PIL.Image.open(app.opfile)
+    app.img = app.img.convert('RGB')
     #CHeck if the max number of colors accepted by the system is equal or more than the colors of the image
     colok = checkColors (app)
     sizeok = checkSize (app)
@@ -230,7 +231,7 @@ def checkColors(app):
     if (app.colors==None):
         app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
-    if numcolors > 15:
+    if numcolors > (config.syslimits[app.targetSystem][2] -1) :
         messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
         return False
     else:
@@ -249,19 +250,28 @@ def getColors(app):
     #app.palette =[app.bgcolor]
     for color in app.colors:
         rgb = color[1]
-        r=int(int(rgb[0])/config.palettes[app.targetSystem][1])
-        g=int(int(rgb[1])/config.palettes[app.targetSystem][1])
-        b=int(int(rgb[2])/config.palettes[app.targetSystem][1])
-        # make sure we do not add bgcolor
-        if set((r,g,b)) != set (app.bgcolor):
-           if not isColorInPalette (app,(r,g,b)):
-               app.palette[app.paletteIndex]=(r,g,b)
-        app.paletteIndex = app.paletteIndex + 1
+        if not (isinstance( rgb, int )):
+            r=int(int(rgb[0])/config.palettes[app.targetSystem][1])
+            g=int(int(rgb[1])/config.palettes[app.targetSystem][1])
+            b=int(int(rgb[2])/config.palettes[app.targetSystem][1])
+            # make sure we do not add bgcolor
+            if set((r,g,b)) != set (app.bgcolor):
+               if not isColorInPalette (app,(r,g,b)):
+                   if app.paletteIndex>(len(app.palette)-1):
+                       app.palette.append((r,g,b))
+                   else:  
+                       app.palette[app.paletteIndex]=(r,g,b)
+            app.paletteIndex = app.paletteIndex + 1
     app.paletteIndex = 0
 
 def getPixels (app):
     #Read all the pixels and colorsin the image
     #scan each pixel (Width) in each row (height)
+    if (app.imgwidth/app.spritexsize != int(app.imgwidth/app.spritexsize)):
+        extracols = ((int(app.imgwidth/app.spritexsize)+1)*app.spritexsize)-app.imgwidth
+    else:
+        extracols = 0
+    extrarows = 0
     for y in range (0,app.imgheight):
         for x in range (0,app.imgwidth):
             pixel = app.img.getpixel((x,y))
@@ -276,7 +286,9 @@ def getPixels (app):
                     app.pixels.append(index)
             else:
                 app.pixels.append('0')
-    
+        for x in range (0,extracols):
+                app.pixels.append('0')
+    app.imgwidth= app.imgwidth+extracols
 def paletteIndex(app,color):
     index = 0
     for palColor in app.palette:
