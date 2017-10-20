@@ -25,7 +25,16 @@ msxpalette = [(-1,-1,-1),
 #Below will hold palettes for different systems
 palettes = [("MSX",msxcolordivider,msxpalette),("MSX2",msxcolordivider,msxpalette),("MSX2+",msxcolordivider,msxpalette)]
 #Systems of choice, maybe beyond MSX one day?
-systems = ["MSX","MSX2","MSX2+"]
+systems = ["MSX - Screen 2",
+           "MSX - Screen 3",
+           "MSX2 - Screen 4",
+           "MSX2 - Screen 5",
+           "MSX2 - Screen6",
+           "MSX2 - Screen 7",
+           "MSX2 - Screen 8",
+           "MSX2+ - Screen 10",
+           "MSX2+ - Screen 11",
+           "MSX2+ - Screen 12"]
 #System Limits => System name, max colors per sprite
 syslimits = [("MSX",1,256),("MSX2",3,256),("MSX2+",3,256)]
 preferencesWxSize = 400
