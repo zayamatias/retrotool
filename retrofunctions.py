@@ -162,10 +162,9 @@ def findOrColor (csprites):
     # This function finds which is the best pixel to or according to the palette colors
     # This is used on MSX2 -> See https://www.msx.org/wiki/The_OR_Color
     numcols = len(csprites)
-    
+    c=[-1,-1,-1]
+    pc=[-1,-1,-1,False]
     if  numcols < 5:
-        c=[-1,-1,-1]
-        pc=[-1,-1,-1,False]
         # We need to split the sprite
         if numcols > 0:
             c[0]= int(csprites[0])
@@ -764,10 +763,12 @@ def animate (app):
     
     for ch in config.animArray:
         character = retroclasses.character (config.animRows,config.animCols)
-        for x in range (0,config.animRows):
-            for y in range (0,config.animCols):
-                idx = (ch*config.animCols)+y+(x*app.spritesPerRow)
-                character.insertSprite(app.usprites[idx],x,y)
+        for y in range (0,config.animRows):
+            for x in range (0,config.animCols):
+                #(MOD(ch;(ssr/animcol))*animcol)+(int(ch/(ssr/animcol))*animrows*ssr)+x+(y*ssr)
+
+                idx = ( (ch % int(app.spritesPerRow/config.animCols))*config.animCols)+(int(ch/(app.spritesPerRow/config.animCols))*config.animRows*app.spritesPerRow)+x+(y*app.spritesPerRow)
+                character.insertSprite(app.usprites[idx],y,x)
         app.animation.addCharacter(character)
             
     
