@@ -46,6 +46,7 @@ paletteWxSize = 256 # Width of the palette window
 paletteColorBoxSize= 64 #size x&y of the box of the color in the palettes
 
 
+
 ## The parameters below should be updatabe via "preferences"
 pixelsize = 8 #pixel size on screen for editing purposes (value will be multiplied x & y)
 spriteeditorbgcolor = "white" #BG color for the sprite editor.
@@ -57,6 +58,6 @@ newSprites = 2 # Number of sprites for new project
 
 animCols = 3 # Number of columns for the sprite animation
 animRows = 4 # Number of rows for the sprite animation
-animArray = (14,15,16)  # "character" list to show in animation
+animArray = [14,15,16]  # "character" list to show in animation
 
 ROMWidth = 256

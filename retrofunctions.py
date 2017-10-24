@@ -267,7 +267,7 @@ def getPixels (app):
     #Read all the pixels and colorsin the image
     #scan each pixel (Width) in each row (height)
     if (app.imgwidth/app.spritexsize != int(app.imgwidth/app.spritexsize)):
-        extracols = ((int(app.imgwidth/app.spritexsize)+1)*app.spritexsize)-app.imgwidth
+        extracols = ((math.ceil(app.imgwidth/app.spritexsize))*app.spritexsize)-app.imgwidth
     else:
         extracols = 0
     extrarows = 0
@@ -283,8 +283,10 @@ def getPixels (app):
                 index = paletteIndex(app,color)
                 if index >= 0:
                     app.pixels.append(index)
+                else:
+                    app.pixels.append('0')
             else:
-                app.pixels.append('0')
+                    app.pixels.append('0')
         for x in range (0,extracols):
                 app.pixels.append('0')
     app.imgwidth= app.imgwidth+extracols
@@ -753,7 +755,28 @@ def createAnimationWindow (app):
     app.animWindow.geometry(str(config.animWxSize)+"x"+str(config.animWySize))
     app.animWindow.protocol("WM_DELETE_WINDOW", lambda:closeAnimationWindow(app))
 
+    e = Entry(app.animWindow)
+    e.insert (0,app.animArray)
+    w = Entry(app.animWindow)
+    w.insert (0,app.animCols)
+    h = Entry(app.animWindow)
+    h.insert (0,app.animRows)
+    b = tk.Button(app.animWindow, text="update sprites",command = lambda:updateAnimation(app,e,w,h))
+    e.pack()
+    w.pack()
+    h.pack()
+    b.pack()
     
+    
+    
+def updateAnimation(app,e,w,h):
+        app.animArray = e.get().split(' ')
+        app.animCols = int(w.get())
+        app.animRows = int(h.get())
+        print (app.animArray)
+        animate (app)
+        
+        
 def animate (app):
     if (app.csprites == []):
         messagebox.showinfo("Error","Please, create sprites before trying to animate them ;-)")
@@ -761,20 +784,24 @@ def animate (app):
    
     app.animation = retroclasses.animation()
     
-    for ch in config.animArray:
-        character = retroclasses.character (config.animRows,config.animCols)
-        for y in range (0,config.animRows):
-            for x in range (0,config.animCols):
+    for ch in app.animArray:
+        ch =int(ch)
+        character = retroclasses.character (app.animRows,app.animCols)
+        for y in range (0,app.animRows):
+            for x in range (0,app.animCols):
                 #(MOD(ch;(ssr/animcol))*animcol)+(int(ch/(ssr/animcol))*animrows*ssr)+x+(y*ssr)
 
-                idx = ( (ch % int(app.spritesPerRow/config.animCols))*config.animCols)+(int(ch/(app.spritesPerRow/config.animCols))*config.animRows*app.spritesPerRow)+x+(y*app.spritesPerRow)
+                idx = ( (ch % int(app.spritesPerRow/app.animCols))*app.animCols)+(int(ch/(app.spritesPerRow/app.animCols))*app.animRows*app.spritesPerRow)+x+(y*app.spritesPerRow)
                 character.insertSprite(app.usprites[idx],y,x)
         app.animation.addCharacter(character)
             
-    
-    
+    animWxSize = app.spritexsize*app.animCols*config.pixelsize
+    animWySize = app.spriteysize*app.animRows*config.pixelsize
+        
+    if app.animWindow != "":
+        app.animWindow.destroy()
     createAnimationWindow (app)
-    app.animCanvas = Canvas (app.animWindow,width=config.animWxSize,height=config.animWySize)
+    app.animCanvas = Canvas (app.animWindow,width=animWxSize,height=animWySize)
     app.animCanvas.bind('<Key>', lambda event:animateSprite(event,app))
 
     app.animCanvas.pack()
