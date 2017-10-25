@@ -73,6 +73,7 @@ def resetProject(app):
         app.finalsprites = []
         app.usprites = []
         app.csprites = []
+        app.bgcolor = (-1,-1,-1)
         app.palette=config.palettes[app.targetSystem][2]
         app.imgwidth = 0
         app.imgheight = 0
@@ -135,7 +136,7 @@ def openImageFile(app):
     # 1 or 2 = 3 etc....
     availableswaps =[3,5,7,9,11,13,15]
     #prepareOrs(app)
-
+    app.bgcolor=(-1,-1,-1) # for some reason color is changed when double ckicking on filename, maybe a canvas thing;...
 def saveProject (app):
     if (app.projfile==""):
         if app.opfile!="":
@@ -322,7 +323,6 @@ def createTempSprites (app):
                     extraRowLower = imgRow+int(app.sprImgOffset/app.imgwidth)-1
                     upperlimit = (app.imgwidth)*extraRowUpper
                     lowerlimit = (app.imgwidth)*extraRowLower
-
                     position = position + app.sprImgOffset
                     ### We need to calculate the offset
                     if ((position < len(app.pixels)) and (position >= 0) and (position < upperlimit) and (position >= lowerlimit)):
@@ -332,11 +332,11 @@ def createTempSprites (app):
                     if (color not in thiscolors) and (int(color) != 0):
                         thiscolors.append (color)
                     srow = srow + "%" + color
+                    
                 thissprite.append(srow)
                 thisspritecolors.append(thiscolors)
             app.usprites.append  (thissprite)
             app.csprites.append (thisspritecolors)
-
 
 def createFinalSprites(app):
     #create the deifnitive sprite patterns (0,1), and splits sprites that need to be ored
@@ -401,14 +401,13 @@ def udpateTargetSystem(app,chgsystem):
 
 def showSprites (app):
     #display the sprites grid, initializing everything first
-    
-    if (app.usprites == []):
-        if app.img.filename ==config.logoimage :
+    if hasattr(app.img,'filename'):
+        if app.img.filename == config.logoimage :
             messagebox.showinfo("Error","Please, load an image or start a new project first")
             return 1
-        else:
-            messagebox.showinfo("Error","Please, click on the background color of the image first")
-            return 1
+    if set(app.bgcolor) == set((-1,-1,-1)):
+        messagebox.showinfo("Error","Please, click on the background color of the image first")
+        return 1
     if (app.spwindow!=None):
         if (app.spritesCanvas != None) and (app.spwindow.winfo_exists()!=0):    
             for child in app.spwindow.winfo_children():
@@ -420,6 +419,8 @@ def showSprites (app):
     else:
         createSpritesWindow(app)
             
+    createTempSprites(app)
+    
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
     if (app.imgwidth!=0):
@@ -465,7 +466,9 @@ def showSprites (app):
         destY = currY + (ysize)
         app.spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="sprite,spr"+str(currentSprite)+"canvas")
         #draw each "boxel" of the sprite
-        drawboxel (app,app.spritesCanvas,app.usprites[currentSprite],currX,currY)
+        
+        
+        drawboxel (app,app.spritesCanvas,app.usprites[currentSprite],currX,currY,currentSprite,app.spritexsize)
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
         shownSprites = shownSprites + 1
@@ -545,17 +548,16 @@ def updateDrawColor (canvas,app):
     app.drawColor = int(tags[0])-1
 
       
-def drawboxel (app,canvas,sprite,x,y):
+def drawboxel (app,canvas,sprite,x,y,index,width):
     border = 1
     if (app.pixelsize==2):
         border = 0
     startx = x
-    index = app.usprites.index(sprite) 
     py=0
     for row in sprite:
         px=0
         ey = y +app.pixelsize
-        for pixel in range (0,app.spritexsize):
+        for pixel in range (0,width):
             ex = x +app.pixelsize
             pxColor = int(getTempColor(row,pixel))
             if pxColor != 0:
@@ -773,7 +775,7 @@ def updateAnimation(app,e,w,h):
         app.animArray = e.get().split(' ')
         app.animCols = int(w.get())
         app.animRows = int(h.get())
-        print (app.animArray)
+        
         animate (app)
         
         
@@ -835,7 +837,7 @@ def animateSprite (event,app):
             destY = currY + (ysize)
             app.animCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2))
             #draw each "boxel" of the sprite
-            drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY)
+            drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY,fsdjhfsdfjksd)
             currX = currX+(xsize+spacing)
         currX = 1
         currY = currY + (ysize+spacing)

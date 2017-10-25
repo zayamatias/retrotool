@@ -11,6 +11,7 @@ import retrofunctions
 from functools import partial
 import config
 import retroclasses
+import tiles
 
 
 class App:
@@ -31,6 +32,8 @@ class App:
         self.spriteeditorbgcolor = config.spriteeditorbgcolor
         self.spritexsize = config.spritexsize
         self.spriteysize = config.spriteysize
+        self.tilexsize = config.tilexsize
+        self.tileysize = config.tileysize
         self.newSprites = config.newSprites
         self.spritesPerRow = 0
         self.spritesPerCol = 0
@@ -38,7 +41,9 @@ class App:
         self.animCanvas = ""
         self.root = Tk()
         self.sprImgOffset = 0
+        self.tileImgOffset = 0
         self.spritesCanvas = None
+        self.tilesCanvas = None
         self.paletteCanvas = None
         self.animArray  = config.animArray
         self.animCols = config.animCols
@@ -49,7 +54,7 @@ class App:
         self.opfile = ""
         self.colors = []
         self.maxcolors = 16
-        self.bgcolor = (7,7,7)
+        self.bgcolor = (-1,-1,-1)
         self.root =Toplevel()
         self.root.title (config.tooltitle)
         self.root.geometry(str(config.appxsize)+"x"+str(config.appysize))
@@ -80,7 +85,8 @@ class App:
             self.filemenu.add_checkbutton(label=system, onvalue=config.systems.index(system), offvalue=False, variable=self.targetSystem)
         self.menubar.add_cascade(label="Target System", menu=self.filemenu)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Sprite Editor", command=lambda:retrofunctions.showSprites(self))
+        self.filemenu.add_command(label="Sprite Viewer/Editor", command=lambda:retrofunctions.showSprites(self))
+        self.filemenu.add_command(label="Tiles Viewer/Editor", command=lambda:tiles.showTiles(self))
         self.filemenu.add_command(label="Animate", command=lambda:retrofunctions.animate(self))
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
@@ -89,7 +95,7 @@ class App:
 
         # DefineSpriteListWindow
         self.spwindow = None
-
+        self.tilwindow = None
         if config.default_filename != "":
             retrofunctions.openImageFile(self)
 
@@ -98,6 +104,9 @@ class App:
 
     def click (self,event):
         # need to consider scale!
+        if hasattr(self.img,'filename'):
+            if self.img.filename == config.logoimage :
+                return 1 #do not allow BG selection on loading screen!
         if self.spritephoto != "":
             zoom = self.scale.get() 
             width, height = self.img.size
@@ -116,7 +125,6 @@ class App:
                 self.bgcolor = (r,g,b)
                 retrofunctions.getColors(self)
                 retrofunctions.getPixels(self)
-                retrofunctions.createTempSprites(self)
 
     def exit(self):
         self.root.destroy()
