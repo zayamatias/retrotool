@@ -29,7 +29,7 @@ def writeASMFile(app):
     f.write ("SPRITE_DATA:\n")
     idx = 0
     for fsprite in app.finalsprites:
-        line = fsprite.getAsmPattern()
+        line = fsprite.getAsmPattern(app.spritexsize)
         f.write (";Sprite"+str(idx)+"\n")
         f.write (line)
         idx = idx + 1

@@ -42,7 +42,7 @@ class sprite:
                 line = line + ","
         return line
 
-    def getAsmPattern (self):
+    def getAsmPattern (self,width):
         #get the pattern of a sprite in ASM mode (db %xxxxxxxxxxxxxxxx)
         #attention: for 16bit sprites, msx splits into 2 8x16 patterns
         line = ""
@@ -52,7 +52,9 @@ class sprite:
         for row in rows:
             pat1=pat1+"\tdb %"+str(row)[:8]+"\n"
             pat2=pat2+"\tdb %"+str(row)[8:]+"\n"
-        line = pat1 + pat2
+        line = pat1
+        if width > 8:
+            line = line + pat2
         return line
 
     def getAsmColors (self,ysize):
