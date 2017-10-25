@@ -217,7 +217,7 @@ def getSplits(csprites):
 
 def zoomimage(app):
     #function called to zoom the image loaded in or out (according to the selected scale)
-    zoom = app.scale.get()
+    zoom = int(app.scale.get())
     myimg = app.img.resize ((app.imgwidth*zoom,app.imgheight*zoom))
     app.spritephoto=PIL.ImageTk.PhotoImage(myimg)
     app.cv.itemconfig(app.canvas_ref,image = app.spritephoto)
@@ -267,13 +267,21 @@ def getColors(app):
 def getPixels (app):
     #Read all the pixels and colorsin the image
     #scan each pixel (Width) in each row (height)
+    pixelScale = int(app.imgwidth* app.imgheight/100)
+    pixelCount = 1
     if (app.imgwidth/app.spritexsize != int(app.imgwidth/app.spritexsize)):
         extracols = ((math.ceil(app.imgwidth/app.spritexsize))*app.spritexsize)-app.imgwidth
     else:
         extracols = 0
     extrarows = 0
+    app.prcanvas.pack()
     for y in range (0,app.imgheight):
         for x in range (0,app.imgwidth):
+            pixelCount = pixelCount + 1
+            if pixelCount >= pixelScale:
+                pixelCount = 0
+                app.progress['value']=app.progress['value']+1
+                app.root.update_idletasks()
             pixel = app.img.getpixel((x,y))
             r = pixel[0]
             g = pixel[1]
@@ -291,6 +299,8 @@ def getPixels (app):
         for x in range (0,extracols):
                 app.pixels.append('0')
     app.imgwidth= app.imgwidth+extracols
+    app.prcanvas.pack_forget()
+    app.progress['value']=0
 def paletteIndex(app,color):
     index = 0
     for palColor in app.palette:

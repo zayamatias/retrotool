@@ -5,6 +5,7 @@ import tkinter
 from tkinter import *
 from tkinter import messagebox
 from tkinter import Canvas
+from tkinter.ttk import *
 from tkinter.filedialog import askopenfilename
 import tkinter as tk
 import retrofunctions
@@ -42,6 +43,7 @@ class App:
         self.root = Tk()
         self.sprImgOffset = 0
         self.tileImgOffset = 0
+        self.TileMap = []
         self.spritesCanvas = None
         self.tilesCanvas = None
         self.paletteCanvas = None
@@ -59,6 +61,9 @@ class App:
         self.root.title (config.tooltitle)
         self.root.geometry(str(config.appxsize)+"x"+str(config.appysize))
         self.root.iconbitmap(config.iconfile)
+        self.prcanvas = Canvas(self.root)
+        self.progress = Progressbar(self.prcanvas,orient=HORIZONTAL,length=500,mode='determinate')
+        self.progress.pack()
         self.img = PIL.Image.open (config.logoimage)
         self.spritephoto = PIL.ImageTk.PhotoImage(self.img)
         self.cv = Canvas(self.root)
@@ -87,6 +92,7 @@ class App:
         self.filemenu = Menu(self.menubar, tearoff=0)
         self.filemenu.add_command(label="Sprite Viewer/Editor", command=lambda:retrofunctions.showSprites(self))
         self.filemenu.add_command(label="Tiles Viewer/Editor", command=lambda:tiles.showTiles(self))
+        self.filemenu.add_command(label="View Tile Map", command=lambda:tiles.showTilesMap(self))
         self.filemenu.add_command(label="Animate", command=lambda:retrofunctions.animate(self))
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)

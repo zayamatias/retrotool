@@ -4,7 +4,52 @@ import math
 from tkinter import *
 import retrofunctions
 
-
+def showTilesMap (app):
+    if app.TileMap==[]:
+         messagebox.showinfo("Error","Please, create some tiles from an image first")
+         return 1
+    tilesPerRow = math.ceil(app.imgwidth/app.tilexsize)
+    tilesPerCol = math.ceil(len(app.TileMap)/tilesPerRow)
+    currX = 0
+    currY = 0
+    createTilesMapWindow(app)
+    app.tilmwindow.deiconify()
+    xsize = (app.tilexsize)*app.pixelsize
+    ysize = (app.tileysize)*app.pixelsize
+    spacing = 4
+    canvasWidth = tilesPerRow *(xsize+spacing)
+    canvasHeight = tilesPerCol*(ysize+spacing)
+    app.tilesMapCanvas = Canvas (app.tilmwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
+    if canvasWidth>config.appxsize:
+        #add horizontal scroll
+        xscrollbar = Scrollbar(app.tilmwindow,orient=HORIZONTAL)
+        xscrollbar.pack (side=BOTTOM, fill=X)
+        app.tilesMapCanvas.config(xscrollcommand=xscrollbar.set)
+        xscrollbar.config(command=app.tilesMapCanvas.xview)
+    if canvasHeight>config.appysize:
+        #add vertical scroll
+        yscrollbar = Scrollbar(app.tilmwindow)
+        yscrollbar.pack (side=RIGHT, fill=Y)
+        app.tilesMapCanvas.config(yscrollcommand=yscrollbar.set)
+        yscrollbar.config(command=app.tilesMapCanvas.yview)
+    shownTiles = 0
+    currentTile = 0
+    app.tilesMapCanvas.pack()
+    app.tilesMapCanvas.focus_set()
+    for tile in app.TileMap:
+        destX = currX + (xsize)
+        destY = currY + (ysize)
+        app.tilesMapCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="tile,til"+str(currentTile)+"canvas")
+        #draw each "boxel" of the sprite
+        retrofunctions.drawboxel (app,app.tilesMapCanvas,app.Tiles[tile],currX,currY,currentTile,app.tilexsize)
+        currX = currX+(xsize+spacing)
+        currentTile = currentTile + 1
+        shownTiles = shownTiles + 1
+        if shownTiles == tilesPerRow:
+            currX = 1
+            currY = currY + (ysize+spacing)
+            shownTiles=0
+        
 def showTiles (app):
     #display the sprites grid, initializing everything first
     if hasattr(app.img,'filename'):
@@ -83,6 +128,8 @@ def showTiles (app):
 def createTempTiles(app):
     #Goal is to go trhough pixels in tilex*tiley and extract tiles
     #find duplicate tiles and skip them so at the end you only have the minimum needed tiles
+    currentTile = 0
+    app.TileMap = []
     app.Tiles = []
     app.tilesPerRow = int(app.imgwidth/app.tilexsize)
     app.tilesPerCol = int(app.imgheight/app.tileysize)
@@ -110,15 +157,21 @@ def createTempTiles(app):
                         thiscolors.append (color)
                     srow = srow + "%" + color
                 thistile.append(srow)
-            if not isTileExisting (thistile,app.Tiles):
+            tileIndex = getTileIndex(thistile,app.Tiles,currentTile)
+            app.TileMap.append(tileIndex)
+            if tileIndex == currentTile:
+                currentTile = currentTile +1
                 app.Tiles.append(thistile)
 #    print ("Finsihed creating tiles, found a total of "+str(len(app.Tiles)))           
 
-def isTileExisting (tile,tiles): # Check if te tile is already in the tileset
+def getTileIndex (tile,tiles,idx): # Check if te tile is already in the tileset
+    nidx = 0;
     for tileb in tiles:
         if compareTiles (tile,tileb):
-            return True
-    return False
+            return nidx
+        nidx = nidx + 1
+    return idx
+
 def compareTiles(tilea,tileb): # check if tilea is the same as tileb
     for x in range (0,len(tilea)):
         if tilea[x] != tileb[x]:
@@ -137,3 +190,16 @@ def createTilesWindow(app):
 def closeTilesWindow(app):
     #Destroy sprite window so next time it is open it is reinitialized
     app.tilwindow.destroy()
+
+def createTilesMapWindow(app):
+    #window to show the sprites in
+    app.tilmwindow =  tk.Toplevel(app.root)
+    app.tilmwindow.title("Tiles Map Overview")
+    app.tilmwindow.iconbitmap(config.iconfile)
+    app.tilmwindow.geometry(str(config.appxsize)+"x"+str(config.appysize))
+    app.tilmwindow.protocol("WM_DELETE_WINDOW", lambda:closeTilesMapWindow(app))
+    app.tilmwindow.withdraw()
+
+def closeTilesMapWindow(app):
+    #Destroy sprite window so next time it is open it is reinitialized
+    app.tilmwindow.destroy()
