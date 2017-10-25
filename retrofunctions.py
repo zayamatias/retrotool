@@ -206,7 +206,7 @@ def checkColors(app):
     if (app.colors==None):
         app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
-    if numcolors > 15:
+    if numcolors > config.syslimits[app.targetSystem][2]:
         messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
         return False
     else:

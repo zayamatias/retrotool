@@ -27,7 +27,7 @@ palettes = [("MSX",msxcolordivider,msxpalette),("MSX2",msxcolordivider,msxpalett
 #Systems of choice, maybe beyond MSX one day?
 systems = ["MSX","MSX2","MSX2+"]
 #System Limits => System name, max colors per sprite
-syslimits = [("MSX",1,16),("MSX2",3,16),("MSX2+",3,16)]
+syslimits = [("MSX",1,255),("MSX2",3,255),("MSX2+",3,255)]
 preferencesWxSize = 400
 preferencesWySize = 400
 animWxSize = 400
