@@ -124,7 +124,8 @@ def showTiles (app):
             currX = 1
             currY = currY + (ysize+spacing)
             shownTiles=0
-
+    retrofunctions.displayPalette(app)
+    
 def createTempTiles(app):
     #Goal is to go trhough pixels in tilex*tiley and extract tiles
     #find duplicate tiles and skip them so at the end you only have the minimum needed tiles

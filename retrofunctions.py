@@ -77,6 +77,10 @@ def resetProject(app):
         app.palette=config.palettes[app.targetSystem][2]
         app.imgwidth = 0
         app.imgheight = 0
+        app.sprImgOffset = 0
+        app.tileImgOffset = 0
+        app.TileMap = []
+
 
 def openROMFile(app):
     app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms")])
@@ -570,13 +574,13 @@ def drawboxel (app,canvas,sprite,x,y,index,width):
         for pixel in range (0,width):
             ex = x +app.pixelsize
             pxColor = int(getTempColor(row,pixel))
-            if pxColor != 0:
-                color = transformColor (app,pxColor)
+            #if pxColor != 0:
+            color = transformColor (app,pxColor)
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
-                canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
-            else:
+            canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
+            #else:
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
-                canvas.create_rectangle (x,y,ex,ey,fill=app.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
+            #    canvas.create_rectangle (x,y,ex,ey,fill=app.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
 
             px = px + 1
             x = ex
