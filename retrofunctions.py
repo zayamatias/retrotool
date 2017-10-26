@@ -17,6 +17,7 @@ def newProject(app):
     app.imgwidth = app.spritexsize*math.ceil(math.sqrt(app.newSprites))
     app.imgheight = app.spriteysize*math.ceil(math.sqrt(app.newSprites))
     app.pixels = [0]*(app.imgwidth*app.imgheight)
+    app.img.filename=""
     createTempSprites (app)
 
 
@@ -28,7 +29,7 @@ def writeASMFile(app):
     f.write ("SPRITE_DATA:\n")
     idx = 0
     for fsprite in app.finalsprites:
-        line = fsprite.getAsmPattern()
+        line = fsprite.getAsmPattern(app.spritexsize)
         f.write (";Sprite"+str(idx)+"\n")
         f.write (line)
         idx = idx + 1
@@ -72,9 +73,37 @@ def resetProject(app):
         app.finalsprites = []
         app.usprites = []
         app.csprites = []
+        app.bgcolor = (-1,-1,-1)
         app.palette=config.palettes[app.targetSystem][2]
         app.imgwidth = 0
         app.imgheight = 0
+        app.sprImgOffset = 0
+        app.tileImgOffset = 0
+        app.TileMap = []
+
+
+def openROMFile(app):
+    app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms")])
+    if (app.romfile==""):
+        return 1
+    resetProject(app)
+    with open(app.romfile, mode='rb') as file:
+        romContent = file.read()
+    app.imgwidth = config.ROMWidth
+    cols = 1
+    rows = 1
+    for byte in romContent:
+        binbyte = '{0:08b}'.format(byte)
+        #( bin(int(sbyte, 16))[2:] ).zfill(16)
+        for bit in range(8):
+            cols = cols + 1
+            app.pixels.append (binbyte[bit])   
+            if cols==config.ROMWidth:
+                rows = rows+1
+                cols = 1
+                
+    app.imgheight=rows
+    createTempSprites (app)
 
     
 def openImageFile(app):
@@ -89,6 +118,7 @@ def openImageFile(app):
     resetProject(app)
     app.cv.update()
     app.img = PIL.Image.open(app.opfile)
+    app.img = app.img.convert('RGB')
     #CHeck if the max number of colors accepted by the system is equal or more than the colors of the image
     colok = checkColors (app)
     sizeok = checkSize (app)
@@ -110,7 +140,7 @@ def openImageFile(app):
     # 1 or 2 = 3 etc....
     availableswaps =[3,5,7,9,11,13,15]
     #prepareOrs(app)
-
+    app.bgcolor=(-1,-1,-1) # for some reason color is changed when double ckicking on filename, maybe a canvas thing;...
 def saveProject (app):
     if (app.projfile==""):
         if app.opfile!="":
@@ -137,10 +167,9 @@ def findOrColor (csprites):
     # This function finds which is the best pixel to or according to the palette colors
     # This is used on MSX2 -> See https://www.msx.org/wiki/The_OR_Color
     numcols = len(csprites)
-    
+    c=[-1,-1,-1]
+    pc=[-1,-1,-1,False]
     if  numcols < 5:
-        c=[-1,-1,-1]
-        pc=[-1,-1,-1,False]
         # We need to split the sprite
         if numcols > 0:
             c[0]= int(csprites[0])
@@ -192,7 +221,7 @@ def getSplits(csprites):
 
 def zoomimage(app):
     #function called to zoom the image loaded in or out (according to the selected scale)
-    zoom = app.scale.get()
+    zoom = int(app.scale.get())
     myimg = app.img.resize ((app.imgwidth*zoom,app.imgheight*zoom))
     app.spritephoto=PIL.ImageTk.PhotoImage(myimg)
     app.cv.itemconfig(app.canvas_ref,image = app.spritephoto)
@@ -206,7 +235,7 @@ def checkColors(app):
     if (app.colors==None):
         app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
-    if numcolors > config.syslimits[app.targetSystem][2]:
+    if numcolors > (config.syslimits[app.targetSystem][2] -1) :
         messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
         return False
     else:
@@ -225,21 +254,38 @@ def getColors(app):
     #app.palette =[app.bgcolor]
     for color in app.colors:
         rgb = color[1]
-        r=int(int(rgb[0])/config.palettes[app.targetSystem][1])
-        g=int(int(rgb[1])/config.palettes[app.targetSystem][1])
-        b=int(int(rgb[2])/config.palettes[app.targetSystem][1])
-        # make sure we do not add bgcolor
-        if set((r,g,b)) != set (app.bgcolor):
-           if not isColorInPalette (app,(r,g,b)):
-               app.palette[app.paletteIndex]=(r,g,b)
-        app.paletteIndex = app.paletteIndex + 1
+        if not (isinstance( rgb, int )):
+            r=int(int(rgb[0])/config.palettes[app.targetSystem][1])
+            g=int(int(rgb[1])/config.palettes[app.targetSystem][1])
+            b=int(int(rgb[2])/config.palettes[app.targetSystem][1])
+            # make sure we do not add bgcolor
+            if set((r,g,b)) != set (app.bgcolor):
+               if not isColorInPalette (app,(r,g,b)):
+                   if app.paletteIndex>(len(app.palette)-1):
+                       app.palette.append((r,g,b))
+                   else:  
+                       app.palette[app.paletteIndex]=(r,g,b)
+            app.paletteIndex = app.paletteIndex + 1
     app.paletteIndex = 0
 
 def getPixels (app):
     #Read all the pixels and colorsin the image
     #scan each pixel (Width) in each row (height)
+    pixelScale = int(app.imgwidth* app.imgheight/100)
+    pixelCount = 1
+    if (app.imgwidth/app.spritexsize != int(app.imgwidth/app.spritexsize)):
+        extracols = ((math.ceil(app.imgwidth/app.spritexsize))*app.spritexsize)-app.imgwidth
+    else:
+        extracols = 0
+    extrarows = 0
+    app.prcanvas.pack()
     for y in range (0,app.imgheight):
         for x in range (0,app.imgwidth):
+            pixelCount = pixelCount + 1
+            if pixelCount >= pixelScale:
+                pixelCount = 0
+                app.progress['value']=app.progress['value']+1
+                app.root.update_idletasks()
             pixel = app.img.getpixel((x,y))
             r = pixel[0]
             g = pixel[1]
@@ -250,9 +296,15 @@ def getPixels (app):
                 index = paletteIndex(app,color)
                 if index >= 0:
                     app.pixels.append(index)
+                else:
+                    app.pixels.append('0')
             else:
+                    app.pixels.append('0')
+        for x in range (0,extracols):
                 app.pixels.append('0')
-    
+    app.imgwidth= app.imgwidth+extracols
+    app.prcanvas.pack_forget()
+    app.progress['value']=0
 def paletteIndex(app,color):
     index = 0
     for palColor in app.palette:
@@ -279,14 +331,12 @@ def createTempSprites (app):
                 for px in range (0,app.spritexsize):
 
                     #WIP
-
                     position = ((spx*app.spritexsize)+px)+((app.spriteysize*app.imgwidth*spy)+(py*app.imgwidth))
                     imgRow = int ((position)/app.imgwidth)+1
                     extraRowUpper = imgRow+int(app.sprImgOffset/app.imgwidth)
                     extraRowLower = imgRow+int(app.sprImgOffset/app.imgwidth)-1
                     upperlimit = (app.imgwidth)*extraRowUpper
                     lowerlimit = (app.imgwidth)*extraRowLower
-
                     position = position + app.sprImgOffset
                     ### We need to calculate the offset
                     if ((position < len(app.pixels)) and (position >= 0) and (position < upperlimit) and (position >= lowerlimit)):
@@ -296,11 +346,11 @@ def createTempSprites (app):
                     if (color not in thiscolors) and (int(color) != 0):
                         thiscolors.append (color)
                     srow = srow + "%" + color
+                    
                 thissprite.append(srow)
                 thisspritecolors.append(thiscolors)
             app.usprites.append  (thissprite)
             app.csprites.append (thisspritecolors)
-
 
 def createFinalSprites(app):
     #create the deifnitive sprite patterns (0,1), and splits sprites that need to be ored
@@ -365,14 +415,13 @@ def udpateTargetSystem(app,chgsystem):
 
 def showSprites (app):
     #display the sprites grid, initializing everything first
-    
-    if (app.usprites == []):
-        if app.img.filename ==config.logoimage :
+    if hasattr(app.img,'filename'):
+        if app.img.filename == config.logoimage :
             messagebox.showinfo("Error","Please, load an image or start a new project first")
             return 1
-        else:
-            messagebox.showinfo("Error","Please, click on the background color of the image first")
-            return 1
+    if set(app.bgcolor) == set((-1,-1,-1)):
+        messagebox.showinfo("Error","Please, click on the background color of the image first")
+        return 1
     if (app.spwindow!=None):
         if (app.spritesCanvas != None) and (app.spwindow.winfo_exists()!=0):    
             for child in app.spwindow.winfo_children():
@@ -384,6 +433,8 @@ def showSprites (app):
     else:
         createSpritesWindow(app)
             
+    createTempSprites(app)
+    
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
     if (app.imgwidth!=0):
@@ -429,7 +480,9 @@ def showSprites (app):
         destY = currY + (ysize)
         app.spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="sprite,spr"+str(currentSprite)+"canvas")
         #draw each "boxel" of the sprite
-        drawboxel (app,app.spritesCanvas,app.usprites[currentSprite],currX,currY)
+        
+        
+        drawboxel (app,app.spritesCanvas,app.usprites[currentSprite],currX,currY,currentSprite,app.spritexsize)
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
         shownSprites = shownSprites + 1
@@ -509,26 +562,25 @@ def updateDrawColor (canvas,app):
     app.drawColor = int(tags[0])-1
 
       
-def drawboxel (app,canvas,sprite,x,y):
+def drawboxel (app,canvas,sprite,x,y,index,width):
     border = 1
     if (app.pixelsize==2):
         border = 0
     startx = x
-    index = app.usprites.index(sprite) 
     py=0
     for row in sprite:
         px=0
         ey = y +app.pixelsize
-        for pixel in range (0,app.spritexsize):
+        for pixel in range (0,width):
             ex = x +app.pixelsize
             pxColor = int(getTempColor(row,pixel))
-            if pxColor != 0:
-                color = transformColor (app,pxColor)
+            #if pxColor != 0:
+            color = transformColor (app,pxColor)
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
-                canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
-            else:
+            canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
+            #else:
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
-                canvas.create_rectangle (x,y,ex,ey,fill=app.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
+            #    canvas.create_rectangle (x,y,ex,ey,fill=app.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
 
             px = px + 1
             x = ex
@@ -701,6 +753,14 @@ def colorCompare(colora,colorb):
         return True
     if (ra==rb) and (abs(ba-bb)==1) and (ga==gb):
         return True
+    if abs(ra-rb)==1 and abs(ga-gb)==1 and abs(ba-bb)==1:
+        return True
+    if abs(ra-rb)==1 and abs(ga-gb)==1 and (ba==bb):
+        return True
+    if abs(ra-rb)==1 and abs(ba-bb)==1 and (ga==gb):
+        return True
+    if abs(ga-gb)==1 and abs(ba-bb)==1 and (ra==rb):
+        return True
     return False
 
 
@@ -711,7 +771,28 @@ def createAnimationWindow (app):
     app.animWindow.geometry(str(config.animWxSize)+"x"+str(config.animWySize))
     app.animWindow.protocol("WM_DELETE_WINDOW", lambda:closeAnimationWindow(app))
 
+    e = Entry(app.animWindow)
+    e.insert (0,app.animArray)
+    w = Entry(app.animWindow)
+    w.insert (0,app.animCols)
+    h = Entry(app.animWindow)
+    h.insert (0,app.animRows)
+    b = tk.Button(app.animWindow, text="update sprites",command = lambda:updateAnimation(app,e,w,h))
+    e.pack()
+    w.pack()
+    h.pack()
+    b.pack()
     
+    
+    
+def updateAnimation(app,e,w,h):
+        app.animArray = e.get().split(' ')
+        app.animCols = int(w.get())
+        app.animRows = int(h.get())
+        
+        animate (app)
+        
+        
 def animate (app):
     if (app.csprites == []):
         messagebox.showinfo("Error","Please, create sprites before trying to animate them ;-)")
@@ -719,18 +800,24 @@ def animate (app):
    
     app.animation = retroclasses.animation()
     
-    for ch in config.animArray:
-        character = retroclasses.character (config.animRows,config.animCols)
-        for x in range (0,config.animRows):
-            for y in range (0,config.animCols):
-                idx = (ch*config.animCols)+y+(x*app.spritesPerRow)
-                character.insertSprite(app.usprites[idx],x,y)
+    for ch in app.animArray:
+        ch =int(ch)
+        character = retroclasses.character (app.animRows,app.animCols)
+        for y in range (0,app.animRows):
+            for x in range (0,app.animCols):
+                #(MOD(ch;(ssr/animcol))*animcol)+(int(ch/(ssr/animcol))*animrows*ssr)+x+(y*ssr)
+
+                idx = ( (ch % int(app.spritesPerRow/app.animCols))*app.animCols)+(int(ch/(app.spritesPerRow/app.animCols))*app.animRows*app.spritesPerRow)+x+(y*app.spritesPerRow)
+                character.insertSprite(app.usprites[idx],y,x)
         app.animation.addCharacter(character)
             
-    
-    
+    animWxSize = app.spritexsize*app.animCols*config.pixelsize
+    animWySize = app.spriteysize*app.animRows*config.pixelsize
+        
+    if app.animWindow != "":
+        app.animWindow.destroy()
     createAnimationWindow (app)
-    app.animCanvas = Canvas (app.animWindow,width=config.animWxSize,height=config.animWySize)
+    app.animCanvas = Canvas (app.animWindow,width=animWxSize,height=animWySize)
     app.animCanvas.bind('<Key>', lambda event:animateSprite(event,app))
 
     app.animCanvas.pack()
@@ -764,7 +851,7 @@ def animateSprite (event,app):
             destY = currY + (ysize)
             app.animCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2))
             #draw each "boxel" of the sprite
-            drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY)
+            drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY,fsdjhfsdfjksd)
             currX = currX+(xsize+spacing)
         currX = 1
         currY = currY + (ysize+spacing)

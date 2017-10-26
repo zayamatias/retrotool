@@ -1,10 +1,10 @@
 # retrotool
 
-Tool to facilitate sprites/grahics manipulation for retro-progarmming on several systems.
+Tool to facilitate sprites/graphics manipulation and creation for retro-progarmming on several systems (MSX for now).
 
 Tool should be "runnable" under python in any system supporting "tkinter" library (Win/Linux/MacOS)
 
-(Español mas abajo, Français plus bas)
+(EspaÃ±ol mas abajo, FranÃ§ais plus bas)
 
 English
 -------
@@ -52,13 +52,13 @@ You have 2 options to work with sprites:
 	 
 	 Happy sprite editing!!
 
-Español
+EspaÃ±ol
 -------
 
 Prometo traducir pronto
 
 
-Français
+FranÃ§ais
 --------
 
-Je promets de faire la traduction bientôt!
+Je promets de faire la traduction bientÃ´t!

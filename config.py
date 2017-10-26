@@ -25,9 +25,18 @@ msxpalette = [(-1,-1,-1),
 #Below will hold palettes for different systems
 palettes = [("MSX",msxcolordivider,msxpalette),("MSX2",msxcolordivider,msxpalette),("MSX2+",msxcolordivider,msxpalette)]
 #Systems of choice, maybe beyond MSX one day?
-systems = ["MSX","MSX2","MSX2+"]
+systems = ["MSX - Screen 2",
+           "MSX - Screen 3",
+           "MSX2 - Screen 4",
+           "MSX2 - Screen 5",
+           "MSX2 - Screen6",
+           "MSX2 - Screen 7",
+           "MSX2 - Screen 8",
+           "MSX2+ - Screen 10",
+           "MSX2+ - Screen 11",
+           "MSX2+ - Screen 12"]
 #System Limits => System name, max colors per sprite
-syslimits = [("MSX",1,255),("MSX2",3,255),("MSX2+",3,255)]
+syslimits = [("MSX",1,256),("MSX2",3,256),("MSX2+",3,256)]
 preferencesWxSize = 400
 preferencesWySize = 400
 animWxSize = 400
@@ -37,16 +46,20 @@ paletteWxSize = 256 # Width of the palette window
 paletteColorBoxSize= 64 #size x&y of the box of the color in the palettes
 
 
-## The parameters below should be updatabe via "preferences"
-pixelsize = 8 #pixel size on screen for editing purposes (value will be multiplied x & y)
-spriteeditorbgcolor = "white" #BG color for the sprite editor.
-spritexsize = 16 # default sprite width
-spriteysize = 16 #default sprite height
-newSprites = 2 # Number of sprites for new project
 
+## The parameters below should be updatabe via "preferences"
+pixelsize = 4 #pixel size on screen for editing purposes (value will be multiplied x & y)
+spriteeditorbgcolor = "white" #BG color for the sprite editor.
+spritexsize = 8 # default sprite width
+spriteysize = 8 #default sprite height
+tilexsize = 8 # default sprite width
+tileysize = 8 #default sprite height
+newSprites = 2 # Number of sprites for new project
+tilesPerRow = 10
 # Animation Section
 
-animCols = 1 # Number of columns for the sprite animation
-animRows = 2 # Number of rows for the sprite animation
-animArray = (3,4,3)  # "character" list to show in animation
+animCols = 3 # Number of columns for the sprite animation
+animRows = 4 # Number of rows for the sprite animation
+animArray = [14,15,16]  # "character" list to show in animation
 
+ROMWidth = 256

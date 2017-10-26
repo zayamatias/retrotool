@@ -5,12 +5,14 @@ import tkinter
 from tkinter import *
 from tkinter import messagebox
 from tkinter import Canvas
+from tkinter.ttk import *
 from tkinter.filedialog import askopenfilename
 import tkinter as tk
 import retrofunctions
 from functools import partial
 import config
 import retroclasses
+import tiles
 
 
 class App:
@@ -31,6 +33,8 @@ class App:
         self.spriteeditorbgcolor = config.spriteeditorbgcolor
         self.spritexsize = config.spritexsize
         self.spriteysize = config.spriteysize
+        self.tilexsize = config.tilexsize
+        self.tileysize = config.tileysize
         self.newSprites = config.newSprites
         self.spritesPerRow = 0
         self.spritesPerCol = 0
@@ -38,19 +42,28 @@ class App:
         self.animCanvas = ""
         self.root = Tk()
         self.sprImgOffset = 0
+        self.tileImgOffset = 0
+        self.TileMap = []
         self.spritesCanvas = None
+        self.tilesCanvas = None
         self.paletteCanvas = None
+        self.animArray  = config.animArray
+        self.animCols = config.animCols
+        self.animRows = config.animRows
         self.root.withdraw()
-        self.paletteIndex = 0
+        self.paletteIndex = 1 # We cannot change the "0" colour, ever!
         self.drawColor = 0 # Color selected in the palette
         self.opfile = ""
         self.colors = []
         self.maxcolors = 16
-        self.bgcolor = (7,7,7)
+        self.bgcolor = (-1,-1,-1)
         self.root =Toplevel()
         self.root.title (config.tooltitle)
         self.root.geometry(str(config.appxsize)+"x"+str(config.appysize))
         self.root.iconbitmap(config.iconfile)
+        self.prcanvas = Canvas(self.root)
+        self.progress = Progressbar(self.prcanvas,orient=HORIZONTAL,length=500,mode='determinate')
+        self.progress.pack()
         self.img = PIL.Image.open (config.logoimage)
         self.spritephoto = PIL.ImageTk.PhotoImage(self.img)
         self.cv = Canvas(self.root)
@@ -60,12 +73,12 @@ class App:
         self.scale = Scale(self.root, from_=1, to=20, orient=HORIZONTAL, length=800, command=lambda x:retrofunctions.zoomimage(self))
         self.menubar = Menu(self.root)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Preferences", command=lambda:retrofunctions.showPreferences(self))
-        self.filemenu.add_command(label="New Project", command=lambda:retrofunctions.newProject(self))
         self.filemenu.add_command(label="Open Image", command=lambda:retrofunctions.openImageFile(self))
-        self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.exportASMFile(self))
-
+        self.filemenu.add_command(label="Open ROM", command=lambda:retrofunctions.openROMFile(self))
         self.filemenu.add_command(label="Open Project", command=lambda:retrofunctions.loadProject(self))
+        self.filemenu.add_command(label="New Project", command=lambda:retrofunctions.newProject(self))
+        self.filemenu.add_command(label="Preferences", command=lambda:retrofunctions.showPreferences(self))
+        self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.exportASMFile(self))
         self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
 
 
@@ -77,7 +90,9 @@ class App:
             self.filemenu.add_checkbutton(label=system, onvalue=config.systems.index(system), offvalue=False, variable=self.targetSystem)
         self.menubar.add_cascade(label="Target System", menu=self.filemenu)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Sprite Editor", command=lambda:retrofunctions.showSprites(self))
+        self.filemenu.add_command(label="Sprite Viewer/Editor", command=lambda:retrofunctions.showSprites(self))
+        self.filemenu.add_command(label="Tiles Viewer/Editor", command=lambda:tiles.showTiles(self))
+        self.filemenu.add_command(label="View Tile Map", command=lambda:tiles.showTilesMap(self))
         self.filemenu.add_command(label="Animate", command=lambda:retrofunctions.animate(self))
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
@@ -86,7 +101,7 @@ class App:
 
         # DefineSpriteListWindow
         self.spwindow = None
-
+        self.tilwindow = None
         if config.default_filename != "":
             retrofunctions.openImageFile(self)
 
@@ -95,6 +110,9 @@ class App:
 
     def click (self,event):
         # need to consider scale!
+        if hasattr(self.img,'filename'):
+            if self.img.filename == config.logoimage :
+                return 1 #do not allow BG selection on loading screen!
         if self.spritephoto != "":
             zoom = self.scale.get() 
             width, height = self.img.size
@@ -113,7 +131,6 @@ class App:
                 self.bgcolor = (r,g,b)
                 retrofunctions.getColors(self)
                 retrofunctions.getPixels(self)
-                retrofunctions.createTempSprites(self)
 
     def exit(self):
         self.root.destroy()

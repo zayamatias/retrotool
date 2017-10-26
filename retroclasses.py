@@ -42,7 +42,7 @@ class sprite:
                 line = line + ","
         return line
 
-    def getAsmPattern (self):
+    def getAsmPattern (self,width):
         #get the pattern of a sprite in ASM mode (db %xxxxxxxxxxxxxxxx)
         #attention: for 16bit sprites, msx splits into 2 8x16 patterns
         line = ""
@@ -52,7 +52,9 @@ class sprite:
         for row in rows:
             pat1=pat1+"\tdb %"+str(row)[:8]+"\n"
             pat2=pat2+"\tdb %"+str(row)[8:]+"\n"
-        line = pat1 + pat2
+        line = pat1
+        if width > 8:
+            line = line + pat2
         return line
 
     def getAsmColors (self,ysize):
@@ -93,3 +95,76 @@ class animation:
     def numFrames(self):
         return (len(self.characters))
         
+class tile:
+    # Sprite class, to make it easier to manipulate afterwards
+    tileCount = 0
+
+    def __init__ (self,pattern,colors,ored):
+
+        self.pattern=pattern   #binary pattern of the sprite
+        self.number = tile.tileCount   #Sprite index
+        tile.tileCount = tile.tileCount+1 #add one to the index for next sprite
+
+    def displayPattern (self):
+        #for testing purposes, show the pattern on console
+        rows = self.pattern
+        for row in rows:
+            print (row)
+
+    def displayColors (self):
+        #for testing purposes, show the color on console
+        rows = self.colors
+        for row in rows:
+            print (row)
+
+    def getPattern (self):
+        #retruns the pattern of a sprite
+        line = ""
+        rows = self.pattern
+        for row in rows:
+            line = line + str(row) + "\n"
+        return line
+
+    def getColors (self,ysize):
+        #returns the colors of a sprite
+        line = ""
+        count = 1
+        rows = self.colors
+        for row in rows:
+            line = line + str(row)
+            if count < ysize :
+                count = count + 1
+                line = line + ","
+        return line
+
+    def getAsmPattern (self,width):
+        #get the pattern of a sprite in ASM mode (db %xxxxxxxxxxxxxxxx)
+        #attention: for 16bit sprites, msx splits into 2 8x16 patterns
+        line = ""
+        rows = self.pattern
+        pat1 =""
+        pat2 =""
+        for row in rows:
+            pat1=pat1+"\tdb %"+str(row)[:8]+"\n"
+            pat2=pat2+"\tdb %"+str(row)[8:]+"\n"
+        line = pat1
+        if width > 8:
+            line = line + pat2
+        return line
+
+    def getAsmColors (self,ysize):
+        #get the colors of a sprite in ASM mode (db 1,2,3....) each byte represents the # of the color in the palette
+        #for ored colors, bit #7 should be set, thus the +64
+        line = "\tdb "
+        rows = self.colors
+        count = 1
+        for row in rows:
+            if self.ored :
+                if (row!=0):
+                   row = row + 64
+            line = line + str(row)
+            if count < ysize :
+                count = count + 1
+                line = line + ","
+        line = line + "\n"
+        return line
