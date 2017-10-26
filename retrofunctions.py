@@ -23,22 +23,23 @@ def newProject(app):
 
 def writeASMFile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
-    createTempSprites (app)
-    createFinalSprites(app)
+    #createTempSprites (app)
+    #createFinalSprites(app)
     f = open(app.outfile, 'w')
-    f.write ("SPRITE_DATA:\n")
-    idx = 0
-    for fsprite in app.finalsprites:
-        line = fsprite.getAsmPattern(app.spritexsize)
-        f.write (";Sprite"+str(idx)+"\n")
-        f.write (line)
-        idx = idx + 1
-    f.write("SPRITE_COLORS:\n")
-    idx = 0
-    for fsprite in app.finalsprites:
-        line = fsprite.getAsmColors(app.spriteysize)
-        f.write (";Sprite"+str(idx)+"\n")
-        f.write (line)
+    if len (app.finalsprites)>0:
+        f.write ("SPRITE_DATA:\n")
+        idx = 0
+        for fsprite in app.finalsprites:
+            line = fsprite.getAsmPattern(app.spritexsize)
+            f.write (";Sprite"+str(idx)+"\n")
+            f.write (line)
+            idx = idx + 1
+        f.write("SPRITE_COLORS:\n")
+        idx = 0
+        for fsprite in app.finalsprites:
+            line = fsprite.getAsmColors(app.spriteysize)
+            f.write (";Sprite"+str(idx)+"\n")
+            f.write (line)
         idx = idx +1
     f.write ("PALETTE:\n")
     cindex =0;
@@ -48,17 +49,34 @@ def writeASMFile(app):
         f.write ("\tdb $"+str(hex(int(color[1]))[2:])+str(hex(int(color[2]))[2:])+",$"+str(color[0])+"\n")
         cindex = cindex+1
         # fill in dummy colors
-
-    for dindex in range (cindex,16):
-        f.write ("\tdb $77,$7\n")
-
+    if (len(app.FinalTiles)>0):
+        for dindex in range (cindex,16):
+            f.write ("\tdb $77,$7\n")
+        f.write ("TILE_DATA:\n")
+        for tile in app.FinalTiles:
+            f.write(tile.getAsmPattern(app.tilexsize)+"\n")
+        f.write ("TILE_COLORS:\n")
+        for tile in app.FinalTiles:
+            f.write(tile.getAsmColors(app.tilexsize)+"\n")
+        f.write ("TILE_MAP:\n\tdb ")
+        ntiles= 0
+        for idx in app.TileMap:
+            f.write(str(idx))
+            ntiles = ntiles +1
+            if ntiles ==32:
+                f.write("\n\tdb ")
+                ntiles = 0
+            else:
+                f.write(",")
+        f.write ("\n")
 
 def exportASMFile(app):
 
     #do the actual saving of the file
-    if app.usprites == []:
+    """if app.usprites == []:
         messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
+    """
     if (app.opfile == ""):
         app.outfile = filedialog.asksaveasfilename(parent=app.root)
     else:    
@@ -267,7 +285,6 @@ def getColors(app):
                        app.palette[app.paletteIndex]=(r,g,b)
             app.paletteIndex = app.paletteIndex + 1
     app.paletteIndex = 0
-
 def getPixels (app):
     #Read all the pixels and colorsin the image
     #scan each pixel (Width) in each row (height)
@@ -297,7 +314,12 @@ def getPixels (app):
                 if index >= 0:
                     app.pixels.append(index)
                 else:
-                    app.pixels.append('0')
+                    if index == -1: #Add color to palette
+                        app.palette.append(color)
+                        index = paletteIndex(app,color)
+                        app.pixels.append(index)
+                    else:
+                        app.pixels.append('0')
             else:
                     app.pixels.append('0')
         for x in range (0,extracols):

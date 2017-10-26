@@ -96,13 +96,14 @@ class animation:
         return (len(self.characters))
         
 class tile:
-    # Sprite class, to make it easier to manipulate afterwards
+    # Tile class, to make it easier to manipulate afterwards
     tileCount = 0
 
-    def __init__ (self,pattern,colors,ored):
+    def __init__ (self,pattern,colors):
 
         self.pattern=pattern   #binary pattern of the sprite
         self.number = tile.tileCount   #Sprite index
+        self.colors=colors     #colors of the sprite
         tile.tileCount = tile.tileCount+1 #add one to the index for next sprite
 
     def displayPattern (self):
@@ -138,33 +139,27 @@ class tile:
         return line
 
     def getAsmPattern (self,width):
-        #get the pattern of a sprite in ASM mode (db %xxxxxxxxxxxxxxxx)
-        #attention: for 16bit sprites, msx splits into 2 8x16 patterns
+        #get the pattern of a tile in ASM mode (db %xxxxxxxxxxxxxxxx)
+        #Normally width is always 8, but let's keep it system agnostic
         line = ""
         rows = self.pattern
-        pat1 =""
-        pat2 =""
+        line =""
         for row in rows:
-            pat1=pat1+"\tdb %"+str(row)[:8]+"\n"
-            pat2=pat2+"\tdb %"+str(row)[8:]+"\n"
-        line = pat1
-        if width > 8:
-            line = line + pat2
+            line = line + "\tdb %"+str(row)+"\n"
         return line
 
     def getAsmColors (self,ysize):
         #get the colors of a sprite in ASM mode (db 1,2,3....) each byte represents the # of the color in the palette
         #for ored colors, bit #7 should be set, thus the +64
-        line = "\tdb "
         rows = self.colors
-        count = 1
+        line =""
         for row in rows:
-            if self.ored :
-                if (row!=0):
-                   row = row + 64
-            line = line + str(row)
-            if count < ysize :
-                count = count + 1
-                line = line + ","
-        line = line + "\n"
+            line = line + "\tdb "
+            count = 1
+            for col in row:
+                line = line + str(col)
+                if count < len(row) :
+                    count = count + 1
+                    line = line + ","
+            line = line + "\n"
         return line
