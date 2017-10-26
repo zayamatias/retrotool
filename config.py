@@ -48,7 +48,7 @@ paletteColorBoxSize= 64 #size x&y of the box of the color in the palettes
 
 
 ## The parameters below should be updatabe via "preferences"
-pixelsize = 4 #pixel size on screen for editing purposes (value will be multiplied x & y)
+pixelsize = 2 #pixel size on screen for editing purposes (value will be multiplied x & y)
 spriteeditorbgcolor = "white" #BG color for the sprite editor.
 spritexsize = 8 # default sprite width
 spriteysize = 8 #default sprite height

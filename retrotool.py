@@ -24,6 +24,7 @@ class App:
         # Objects to be saved/loaded to/from project file
         self.pixels = []
         self.finalsprites = []
+        self.FinalTiles = []
         self.usprites = []
         self.csprites = []
         self.palette=config.palettes[self.targetSystem][2]

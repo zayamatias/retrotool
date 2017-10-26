@@ -3,6 +3,8 @@ import config
 import math
 from tkinter import *
 import retrofunctions
+import retroclasses
+
 
 def showTilesMap (app):
     if app.TileMap==[]:
@@ -59,7 +61,7 @@ def showTiles (app):
     if set(app.bgcolor) == set((-1,-1,-1)):
         messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
-    createTempTiles(app)
+    createTiles(app)
     if (app.tilwindow!=None):
         if (app.tilesCanvas != None) and (app.tilwindow.winfo_exists()!=0):    
             for child in app.tilwindow.winfo_children():
@@ -126,7 +128,7 @@ def showTiles (app):
             shownTiles=0
     retrofunctions.displayPalette(app)
     
-def createTempTiles(app):
+def createTiles(app):
     #Goal is to go trhough pixels in tilex*tiley and extract tiles
     #find duplicate tiles and skip them so at the end you only have the minimum needed tiles
     currentTile = 0
@@ -160,8 +162,23 @@ def createTempTiles(app):
                 thistile.append(srow)
             tileIndex = getTileIndex(thistile,app.Tiles,currentTile)
             app.TileMap.append(tileIndex)
+
             if tileIndex == currentTile:
                 currentTile = currentTile +1
+                tilepattern = []
+                colorpattern = []
+                for row in thistile:
+                    splitrow = row.split('%')
+                    colrow = []
+                    binpattern = ""
+                    for bit in splitrow:
+                        if bit !="":
+                            if not bit in colrow:
+                                colrow.append(bit)
+                            binpattern = binpattern + str(colrow.index(bit))
+                    colorpattern.append(colrow)
+                    tilepattern.append(binpattern)
+                app.FinalTiles.append(retroclasses.tile(tilepattern,colorpattern))
                 app.Tiles.append(thistile)
 #    print ("Finsihed creating tiles, found a total of "+str(len(app.Tiles)))           
 
