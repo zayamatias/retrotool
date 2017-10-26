@@ -285,7 +285,6 @@ def getColors(app):
                        app.palette[app.paletteIndex]=(r,g,b)
             app.paletteIndex = app.paletteIndex + 1
     app.paletteIndex = 0
-    print (app.palette)
 def getPixels (app):
     #Read all the pixels and colorsin the image
     #scan each pixel (Width) in each row (height)
