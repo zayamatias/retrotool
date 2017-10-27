@@ -53,6 +53,7 @@ def showTilesMap (app):
             shownTiles=0
         
 def showTiles (app):
+    retrofunctions.getPixels(app,app.tpixels)
     #display the sprites grid, initializing everything first
     if hasattr(app.img,'filename'):
         if app.img.filename == config.logoimage :
@@ -152,8 +153,8 @@ def createTiles(app):
                     lowerlimit = (app.imgwidth)*extraRowLower
                     position = position + app.tileImgOffset
                     ### We need to calculate the offset
-                    if ((position < len(app.pixels)) and (position >= 0) and (position < upperlimit) and (position >= lowerlimit)):
-                        color = str(app.pixels[position])
+                    if ((position < len(app.tpixels)) and (position >= 0) and (position < upperlimit) and (position >= lowerlimit)):
+                        color = str(app.tpixels[position])
                     else:
                         color = "0"
                     if (color not in thiscolors) and (int(color) != 0):
