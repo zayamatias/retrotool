@@ -13,6 +13,7 @@ from functools import partial
 import config
 import retroclasses
 import tiles
+import sprites
 
 
 class App:
@@ -22,7 +23,8 @@ class App:
         self.targetSystem = 0
         self.projfile =""
         # Objects to be saved/loaded to/from project file
-        self.pixels = []
+        self.spixels = []
+        self.tpixels = []
         self.finalsprites = []
         self.FinalTiles = []
         self.usprites = []
@@ -91,10 +93,10 @@ class App:
             self.filemenu.add_checkbutton(label=system, onvalue=config.systems.index(system), offvalue=False, variable=self.targetSystem)
         self.menubar.add_cascade(label="Target System", menu=self.filemenu)
         self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Sprite Viewer/Editor", command=lambda:retrofunctions.showSprites(self))
+        self.filemenu.add_command(label="Sprite Viewer/Editor", command=lambda:sprites.showSprites(self))
         self.filemenu.add_command(label="Tiles Viewer/Editor", command=lambda:tiles.showTiles(self))
         self.filemenu.add_command(label="View Tile Map", command=lambda:tiles.showTilesMap(self))
-        self.filemenu.add_command(label="Animate", command=lambda:retrofunctions.animate(self))
+        self.filemenu.add_command(label="Animate", command=lambda:sprites.animate(self))
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
@@ -131,7 +133,6 @@ class App:
                 b=int(int(color[2])/config.msxcolordivider)
                 self.bgcolor = (r,g,b)
                 retrofunctions.getColors(self)
-                retrofunctions.getPixels(self)
 
     def exit(self):
         self.root.destroy()
