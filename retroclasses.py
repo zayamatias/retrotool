@@ -153,13 +153,10 @@ class tile:
         #for ored colors, bit #7 should be set, thus the +64
         rows = self.colors
         line =""
+        line = line + "\tdb "
+        count = 0
         for row in rows:
-            line = line + "\tdb "
-            count = 1
-            for col in row:
-                line = line + str(col)
-                if count < len(row) :
-                    count = count + 1
-                    line = line + ","
-            line = line + "\n"
+            if count < 2:
+               line = line + '{0:02x}'.format(int(row))
+            count = count + 1
         return line
