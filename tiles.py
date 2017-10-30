@@ -170,13 +170,19 @@ def createTiles(app):
                 colorpattern = []
                 for row in thistile:
                     splitrow = row.split('%')
-                    colrow = []
+                    colrow = [-1,-1]
                     binpattern = ""
+                    colidx = 0
                     for bit in splitrow:
-                        if bit !="":
-                            if not bit in colrow:
-                                colrow.append(bit)
-                            binpattern = binpattern + str(colrow.index(bit))
+                        if (bit !="") and (colidx<2) and (bit not in colrow):
+                            colrow[colidx]=bit
+                            colidx = colidx + 1
+                        if (bit!=""):
+                            if (bit in colrow):
+                                binpattern = binpattern + str(colrow.index(bit))
+                            else:
+                                binpattern = binpattern + "0"
+
                     colorpattern.append(colrow)
                     tilepattern.append(binpattern)
                 app.FinalTiles.append(retroclasses.tile(tilepattern,colorpattern))

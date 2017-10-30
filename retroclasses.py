@@ -149,14 +149,22 @@ class tile:
         return line
 
     def getAsmColors (self,ysize):
-        #get the colors of a sprite in ASM mode (db 1,2,3....) each byte represents the # of the color in the palette
-        #for ored colors, bit #7 should be set, thus the +64
+        #get the colors of a tile in ASM mode
+        #things get tricky, 2 colors are saved on a single byte
+        #bg color is stored in 4 less significant bits (0000XXXX)
+        #fg color is stored in 4 most significant bits (XXXX0000)
+        #so final byte is $fgbg
+        #I could have done it by simply sticking the values together, but shifting is fun!
         rows = self.colors
-        line =""
-        line = line + "\tdb "
+        line = "\tdb "
         count = 0
         for row in rows:
-            if count < 2:
-               line = line + '{0:02x}'.format(int(row))
-            count = count + 1
+            msb = 0 if (int(row[1])==-1) else int(row[1])
+            lsb = 0 if (int(row[0])==-1) else int(row[0])
+            msb = msb << 4
+            byte = msb|lsb
+            line = line + "$"+"{0:02x}".format(byte)
+            count = count +1 
+            if count < len(rows):
+                line = line + ","
         return line
