@@ -72,7 +72,8 @@ def getSplits(csprites):
 def createTempSprites (app):
     #Creates two arrays, uspritrs, which holds the pattern in colors (1,2,3....)
     #Csprites which holds the colors that are used in each line of the sprite
-    retrofunctions.getPixels(app,app.spixels)
+    if (app.spixels == []):
+        retrofunctions.getPixels(app,app.spixels)
     app.usprites = []
     app.csprites = []
     app.spritesPerRow = int(app.imgwidth/app.spritexsize)
@@ -147,10 +148,10 @@ def createFinalSprites(app):
 def showSprites (app):
     #display the sprites grid, initializing everything first
     if hasattr(app.img,'filename'):
-        if app.img.filename == config.logoimage :
+        if (app.img.filename == config.logoimage) and (app.spixels ==[]) and (app.tpixels==[]) :
             messagebox.showinfo("Error","Please, load an image or start a new project first")
             return 1
-    if set(app.bgcolor) == set((-1,-1,-1)):
+    if set(app.bgcolor) == set((-1,-1,-1)) and (app.spixels ==[]) and (app.tpixels==[]):
         messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
     if (app.spwindow!=None):

@@ -99,7 +99,7 @@ def resetProject(app):
 
 
 def openROMFile(app):
-    app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms")])
+    app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms;*.sr5")])
     if (app.romfile==""):
         return 1
     resetProject(app)
@@ -113,13 +113,14 @@ def openROMFile(app):
         #( bin(int(sbyte, 16))[2:] ).zfill(16)
         for bit in range(8):
             cols = cols + 1
-            app.pixels.append (binbyte[bit])   
+            app.spixels.append (binbyte[bit])   
             if cols==config.ROMWidth:
                 rows = rows+1
                 cols = 1
                 
     app.imgheight=rows
-    createTempSprites (app)
+    app.bgcolor = (0,0,0)
+    sprites.createTempSprites (app)
 
     
 def openImageFile(app):
