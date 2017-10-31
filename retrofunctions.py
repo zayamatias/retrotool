@@ -61,15 +61,111 @@ def writeASMFile(app):
             f.write(tile.getAsmColors(app.tilexsize)+"\n")
         f.write ("TILE_MAP:\n\tdb ")
         ntiles= 0
+        ttiles = 0
         for idx in app.TileMap:
-            f.write(str(idx))
-            ntiles = ntiles +1
-            if ntiles ==32:
+            f.write("$"+"{0:02x}".format(idx))
+            ntiles = ntiles +1 #These are the tiles per line (just to keep it tidy)
+            ttiles = ttiles + 1 #These are the total tiles
+            if (ntiles ==32) and (ttiles < len(app.TileMap)):
                 f.write("\n\tdb ")
                 ntiles = 0
-            else:
+            elif (ntiles != 32):
                 f.write(",")
         f.write ("\n")
+
+def exportMSXScreen(app):
+    header = [254,0,0,255,105,0,0]
+    filebytes = bytearray(header)
+    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc5")])
+    extension = outfile[len(app.opfile)-3:]
+    f = open(outfile, 'wb')
+    # First write the tiles themselves
+    """
+    for tile in app.TileMap:
+        thistile = app.FinalTiles[tile]
+        for row in thistile.pattern:
+            byte = int(row, 2)
+            filebytes.append(byte)
+    # Then write the colors
+        totalbytes
+    nibbc = 0
+    for tile in app.TileMap:
+        thistile = app.FinalTiles[tile]
+        colors = thistile.colors
+        pattern = thistile.pattern
+        for row in pattern:
+            idx = 0
+            for bit in row:
+                fgcolor = (int(colors[idx]) & 240) >> 4
+                bgcolor = int(colors[idx]) & 15
+                idx = idx + 1
+                if nibbc == 0:
+                    if bit == 1:
+                        byte = fgcolor
+                    else:
+                        byte = bgcolor
+                    byte = byte << 4
+                else:
+                    if bit == 1:
+                        byte = byte | fgcolor
+                    else:
+                        byte = byte | bgcolor
+                nibbc = nibbc +1 
+                if nibbc == 2:
+                    filebytes.append(byte)
+                    nibbc = 0
+                    print (byte)
+    
+    """
+    cols = 32
+    rows = 27
+    nibbc = 0
+    for trow in range (0,rows):
+        for row in range (0,app.tileysize):
+            for tcol in range (0,cols):
+                tileidx =(trow*cols)+tcol
+                try:
+                    tile = app.ColorTiles[tileidx]
+                except:
+                    tile = ['0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0']
+                cpattern = tile[row].split("%")
+                if cpattern [0] == "":
+                    del cpattern[0]
+                for col in range (0,app.tilexsize):
+                    bit =  cpattern[col]
+                    if bit !="":
+                        bit =  int(cpattern[col]) & 15
+                        msbcolor = bit << 4
+                        lsbcolor = bit 
+                        if nibbc == 0:
+                            byte = msbcolor
+                        else:
+                            byte = byte | lsbcolor
+                        nibbc = nibbc +1 
+                        if nibbc == 2:
+                            filebytes.append(byte)
+                            nibbc = 0
+    f.write(filebytes)
+    ## Output palette to console in BASIC mode for testing purposes
+    print ("10 SCREEN 5")
+    line1 = "20 DATA 0,0,0,0,"
+    line2 = "\n30 DATA "
+    idx = 0
+    for color in app.palette:
+        if idx == 0:
+            print (line1, end="")
+        if idx == 8:
+            print (line2, end="")
+        if idx > 0:
+            if idx == 8:
+                print (str(color[0])+","+str(color[1])+","+str(color[2]), end="")
+            else:
+                print (","+str(color[0])+","+str(color[1])+","+str(color[2]), end="")
+                
+        idx = idx +1
+    print ("\n40 FOR C=0 TO 15:READ R,G,B:COLOR=(C,R,G,B):NEXT")
+    print ("50 BLOAD \""+outfile+"\",S")
+    print ("60 GOTO 60")
 
 def exportASMFile(app):
 

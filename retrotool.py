@@ -26,6 +26,7 @@ class App:
         self.spixels = []
         self.tpixels = []
         self.finalsprites = []
+        self.ColorTiles = []
         self.FinalTiles = []
         self.usprites = []
         self.csprites = []
@@ -82,6 +83,7 @@ class App:
         self.filemenu.add_command(label="New Project", command=lambda:retrofunctions.newProject(self))
         self.filemenu.add_command(label="Preferences", command=lambda:retrofunctions.showPreferences(self))
         self.filemenu.add_command(label="Export asm", command=lambda:retrofunctions.exportASMFile(self))
+        self.filemenu.add_command(label="Export MSX screen", command=lambda:retrofunctions.exportMSXScreen(self))
         self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
 
 

@@ -47,7 +47,7 @@ def showTilesMap (app):
         currX = currX+(xsize+spacing)
         currentTile = currentTile + 1
         shownTiles = shownTiles + 1
-        if shownTiles == tilesPerRow:
+        if int(shownTiles) == int(tilesPerRow):
             currX = 1
             currY = currY + (ysize+spacing)
             shownTiles=0
@@ -123,7 +123,7 @@ def showTiles (app):
         currX = currX+(xsize+spacing)
         currentTile = currentTile + 1
         shownTiles = shownTiles + 1
-        if shownTiles == app.tilesPerRow:
+        if int(shownTiles) == int(app.tilesPerRow):
             currX = 1
             currY = currY + (ysize+spacing)
             shownTiles=0
@@ -134,6 +134,7 @@ def createTiles(app):
     #find duplicate tiles and skip them so at the end you only have the minimum needed tiles
     currentTile = 0
     app.TileMap = []
+    app.ColorTiles = []
     app.Tiles = []
     app.tilesPerRow = int(app.imgwidth/app.tilexsize)
     app.tilesPerCol = int(app.imgheight/app.tileysize)
@@ -163,8 +164,8 @@ def createTiles(app):
                 thistile.append(srow)
             tileIndex = getTileIndex(thistile,app.Tiles,currentTile)
             app.TileMap.append(tileIndex)
-
-            if tileIndex == currentTile:
+            app.ColorTiles.append(thistile)
+            if int(tileIndex) == int(currentTile):
                 currentTile = currentTile +1
                 tilepattern = []
                 colorpattern = []
@@ -183,7 +184,11 @@ def createTiles(app):
                             else:
                                 binpattern = binpattern + "0"
 
-                    colorpattern.append(colrow)
+                    msb = 0 if (int(colrow[1])==-1) else int(colrow[1])
+                    lsb = 0 if (int(colrow[0])==-1) else int(colrow[0])
+                    msb = msb << 4
+                    byte = msb|lsb
+                    colorpattern.append(byte)
                     tilepattern.append(binpattern)
                 app.FinalTiles.append(retroclasses.tile(tilepattern,colorpattern))
                 app.Tiles.append(thistile)

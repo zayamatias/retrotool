@@ -159,11 +159,7 @@ class tile:
         line = "\tdb "
         count = 0
         for row in rows:
-            msb = 0 if (int(row[1])==-1) else int(row[1])
-            lsb = 0 if (int(row[0])==-1) else int(row[0])
-            msb = msb << 4
-            byte = msb|lsb
-            line = line + "$"+"{0:02x}".format(byte)
+            line = line + "$"+"{0:02x}".format(row)
             count = count +1 
             if count < len(rows):
                 line = line + ","
