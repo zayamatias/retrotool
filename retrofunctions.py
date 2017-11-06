@@ -1,16 +1,9 @@
-import sys
 import pickle
 import PIL.Image
 import PIL.ImageTk
-from tkinter import *
-from tkinter import messagebox
-from tkinter import Canvas
-from tkinter.filedialog import askopenfilename
 import config
 import tkinter as tk
 import math
-import retroclasses
-import time
 import sprites
 
 def newProject(app):
@@ -19,7 +12,7 @@ def newProject(app):
     app.imgheight = app.spriteysize*math.ceil(math.sqrt(app.newSprites))
     app.pixels = [0]*(app.imgwidth*app.imgheight)
     app.img.filename=""
-    createTempSprites (app)
+    sprites.createTempSprites (app)
 
 
 def writeASMFile(app):
@@ -76,7 +69,7 @@ def writeASMFile(app):
 def exportMSXScreen(app):
     header = [254,0,0,255,105,0,0]
     filebytes = bytearray(header)
-    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc5")])
+    outfile = tk.filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc5")])
     #extension = outfile[len(app.opfile)-3:]
     f = open(outfile, 'wb')
     # First write the tiles themselves
@@ -182,7 +175,7 @@ def exportASMFile(app):
         messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
     """
-    app.outfile = filedialog.asksaveasfilename(parent=app.root)
+    app.outfile = tk.filedialog.asksaveasfilename(parent=app.root)
     writeASMFile(app)
 
     
@@ -203,7 +196,7 @@ def resetProject(app):
 
 
 def openROMFile(app):
-    app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms;*.sr5")])
+    app.romfile = tk.filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms;*.sr5")])
     if (app.romfile==""):
         return 1
     resetProject(app)
@@ -231,7 +224,7 @@ def openImageFile(app):
     #ask for a file to open
     #to speed up testing, if a file is set in the config it will not ask to open but will open directly this one
     if config.default_filename == "":
-        app.opfile = filedialog.askopenfilename(parent=app.root,filetypes=[("Image Files","*.jpg;*.gif;*.png;*.bmp")])
+        app.opfile = tk.filedialog.askopenfilename(parent=app.root,filetypes=[("Image Files","*.jpg;*.gif;*.png;*.bmp")])
     else:
         app.opfile = config.default_filename
     if (app.opfile==""):
@@ -255,25 +248,19 @@ def openImageFile(app):
     app.scale.set(1)
     app.scale.pack()
     app.root.update()
-    #to be used in the futrue for automatic adjustment of the palette
-    swappedpalette = [(0,(0,0,0))]
-    #positions that are vailable for swapping:
-    # 1 or 2 = 3 etc....
-    availableswaps =[3,5,7,9,11,13,15]
-    #prepareOrs(app)
     app.bgcolor=(-1,-1,-1) # for some reason color is changed when double ckicking on filename, maybe a canvas thing;...
 def saveProject (app):
     if (app.projfile==""):
         if app.opfile!="":
             app.projfile = app.opfile[:len(app.opfile)-3]+"prj"
         else:
-            app.projfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
+            app.projfile = tk.filedialog.asksaveasfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
 
     with open(app.projfile,"wb") as f:
         pickle.dump ((app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette),f,pickle.HIGHEST_PROTOCOL)
     
 def loadProject (app):
-    loadprojfile = filedialog.askopenfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
+    loadprojfile = tk.filedialog.askopenfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
     if (loadprojfile!=""):
         resetProject(app)
         app.projfile = loadprojfile
@@ -281,7 +268,7 @@ def loadProject (app):
             with open(app.projfile,"rb") as f:
                 (app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette)=pickle.load(f)
         except:
-            messagebox.showinfo("Error","The file you tried to open is not compatible")
+            tk.messagebox.showinfo("Error","The file you tried to open is not compatible")
 
             
 def zoomimage(app):
@@ -301,7 +288,7 @@ def checkColors(app):
         app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
     if numcolors > (config.syslimits[app.targetSystem][2] -1) :
-        messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
+        tk.messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
         return False
     else:
         return True
@@ -310,7 +297,7 @@ def checkSize(app):
     #check if the colors of the image are within the limits of the system
     width = app.imgwidth
     if (width/app.spritexsize) != int (width/app.spritexsize):
-        messagebox.showinfo("Error","Image width is not a multiple of sprite width ( currently set in config to "+str(app.spritexsize)+"px)")
+        tk.messagebox.showinfo("Error","Image width is not a multiple of sprite width ( currently set in config to "+str(app.spritexsize)+"px)")
         return False
     else:
         return True
@@ -342,7 +329,6 @@ def getPixels (app,pixelArray):
         extracols = ((math.ceil(app.imgwidth/app.spritexsize))*app.spritexsize)-app.imgwidth
     else:
         extracols = 0
-    extrarows = 0
     app.prcanvas.pack()
     for y in range (0,app.imgheight):
         for x in range (0,app.imgwidth):
@@ -410,7 +396,7 @@ def udpateTargetSystem(app,chgsystem):
 
 
 def updateDrawColor (canvas,app):
-    tags = canvas.gettags(CURRENT)
+    tags = canvas.gettags(tk.CURRENT)
     for rectangle in canvas.find_all():
        compare = canvas.itemcget(rectangle,"tags")
        if "current" not in compare :
@@ -483,31 +469,31 @@ def createPreferencesWindow(app):
     app.prefwindow.geometry(str(config.preferencesWxSize)+"x"+str(config.preferencesWySize))
     app.prefwindow.protocol("WM_DELETE_WINDOW", lambda:closePreferencesWindow(app))
     
-    pixlabel = Label(app.prefwindow, text="Pixel size in sprite editor")
-    pixlabel.grid(row=0, sticky=W)
-    pixsizes = StringVar(app.prefwindow)
+    pixlabel = tk.Label(app.prefwindow, text="Pixel size in sprite editor")
+    pixlabel.grid(row=0, sticky=tk.W)
+    pixsizes = tk.StringVar(app.prefwindow)
     pixsizes.set(app.pixelsize) # default value
-    pixelsize = OptionMenu(app.prefwindow, pixsizes, 2,4,6,8,10,12,14,16,command= lambda x:chgPixelSize(pixsizes,app))
-    pixelsize.grid(row=0, column=1, sticky=W)
+    pixelsize = tk.OptionMenu(app.prefwindow, pixsizes, 2,4,6,8,10,12,14,16,command= lambda x:chgPixelSize(pixsizes,app))
+    pixelsize.grid(row=0, column=1, sticky=tk.W)
   
-    sprXSizelabel = Label(app.prefwindow, text="Sprite width in pixels")
-    sprXSizelabel.grid(row=1, sticky=W)
-    sprXSizes = StringVar(app.prefwindow)
+    sprXSizelabel = tk.Label(app.prefwindow, text="Sprite width in pixels")
+    sprXSizelabel.grid(row=1, sticky=tk.W)
+    sprXSizes = tk.StringVar(app.prefwindow)
     sprXSizes.set(app.spritexsize) # default value
-    sprXSize = OptionMenu(app.prefwindow, sprXSizes, 8,16,command= lambda x:chgSprXSize(sprXSizes,app))
-    sprXSize.grid(row=1, column=1, sticky=W)
+    sprXSize = tk.OptionMenu(app.prefwindow, sprXSizes, 8,16,command= lambda x:chgSprXSize(sprXSizes,app))
+    sprXSize.grid(row=1, column=1, sticky=tk.W)
 
-    sprYSizelabel = Label(app.prefwindow, text="Sprite height in pixels")
-    sprYSizelabel.grid(row=2, sticky=W)
-    sprYSizes = StringVar(app.prefwindow)
+    sprYSizelabel = tk.Label(app.prefwindow, text="Sprite height in pixels")
+    sprYSizelabel.grid(row=2, sticky=tk.W)
+    sprYSizes = tk.StringVar(app.prefwindow)
     sprYSizes.set(app.spriteysize) # default value
-    sprYSize = OptionMenu(app.prefwindow, sprYSizes, 8,16,command= lambda x:chgSprYSize(sprXSizes,app))
-    sprYSize.grid(row=2, column=1, sticky=W)
+    sprYSize = tk.OptionMenu(app.prefwindow, sprYSizes, 8,16,command= lambda x:chgSprYSize(sprXSizes,app))
+    sprYSize.grid(row=2, column=1, sticky=tk.W)
  
-    nbrSpriteslabel = Label(app.prefwindow, text="Number of sprites for new project")
-    nbrSpriteslabel.grid(row=3, sticky=W)
-    nbrSprites = Entry(app.prefwindow)
-    nbrSprites.grid(row=3, column=1, sticky=W)
+    nbrSpriteslabel = tk.Label(app.prefwindow, text="Number of sprites for new project")
+    nbrSpriteslabel.grid(row=3, sticky=tk.W)
+    nbrSprites = tk.Entry(app.prefwindow)
+    nbrSprites.grid(row=3, column=1, sticky=tk.W)
 
     #    applybutton = Button (app.prefwindow,"Apply",command= lambda:applyPrefs(app)).grid(row=10)
     
@@ -555,7 +541,7 @@ def displayPalette(app):
     numRows = int (math.ceil(numColors/maxColorsPerRow))
     paletteWySize = numRows*config.paletteColorBoxSize
     createPaletteWindow (app,paletteWySize)
-    app.paletteCanvas = Canvas (app.palwindow,width=config.paletteWxSize,height=paletteWySize)
+    app.paletteCanvas = tk.Canvas (app.palwindow,width=config.paletteWxSize,height=paletteWySize)
     app.paletteCanvas.bind('<Button-1>', lambda x:updateDrawColor(app.paletteCanvas,app))
     x=1
     y=1

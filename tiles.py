@@ -1,14 +1,13 @@
 import tkinter as tk
 import config
 import math
-from tkinter import *
 import retrofunctions
 import retroclasses
 
 
 def showTilesMap (app):
     if app.TileMap==[]:
-         messagebox.showinfo("Error","Please, create some tiles from an image first")
+         tk.messagebox.showinfo("Error","Please, create some tiles from an image first")
          return 1
     tilesPerRow = math.ceil(app.imgwidth/app.tilexsize)
     tilesPerCol = math.ceil(len(app.TileMap)/tilesPerRow)
@@ -21,17 +20,17 @@ def showTilesMap (app):
     spacing = 4
     canvasWidth = tilesPerRow *(xsize+spacing)
     canvasHeight = tilesPerCol*(ysize+spacing)
-    app.tilesMapCanvas = Canvas (app.tilmwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
+    app.tilesMapCanvas = tk.Canvas (app.tilmwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
     if canvasWidth>config.appxsize:
         #add horizontal scroll
-        xscrollbar = Scrollbar(app.tilmwindow,orient=HORIZONTAL)
-        xscrollbar.pack (side=BOTTOM, fill=X)
+        xscrollbar = tk.Scrollbar(app.tilmwindow,orient=tk.HORIZONTAL)
+        xscrollbar.pack (side=tk.BOTTOM, fill=tk.X)
         app.tilesMapCanvas.config(xscrollcommand=xscrollbar.set)
         xscrollbar.config(command=app.tilesMapCanvas.xview)
     if canvasHeight>config.appysize:
         #add vertical scroll
-        yscrollbar = Scrollbar(app.tilmwindow)
-        yscrollbar.pack (side=RIGHT, fill=Y)
+        yscrollbar = tk.Scrollbar(app.tilmwindow)
+        yscrollbar.pack (side=tk.RIGHT, fill=tk.Y)
         app.tilesMapCanvas.config(yscrollcommand=yscrollbar.set)
         yscrollbar.config(command=app.tilesMapCanvas.yview)
     shownTiles = 0
@@ -57,10 +56,10 @@ def showTiles (app):
     #display the sprites grid, initializing everything first
     if hasattr(app.img,'filename'):
         if app.img.filename == config.logoimage :
-            messagebox.showinfo("Error","Please, load an image or start a new project first")
+            tk.messagebox.showinfo("Error","Please, load an image or start a new project first")
             return 1
     if set(app.bgcolor) == set((-1,-1,-1)):
-        messagebox.showinfo("Error","Please, click on the background color of the image first")
+        tk.messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
     createTiles(app)
     if (app.tilwindow!=None):
@@ -85,7 +84,7 @@ def showTiles (app):
     canvasWidth = app.tilesPerRow *(xsize+spacing)
     canvasHeight = app.tilesPerCol*(ysize+spacing)
     shownTiles = 0
-    app.tilesCanvas = Canvas (app.tilwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
+    app.tilesCanvas = tk.Canvas (app.tilwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
     # Mous click actions left-> Put pixel, Right-> Remove pixel
     app.tilesCanvas.bind('<Button-1>', lambda x:updateTilePixel(app.tilesCanvas,True,app))
     #app.spritesCanvas.bind("<B1-Motion>",lambda event: moveSpriteCanvas(app.spritesCanvas,x = event.x,y = event.y))
@@ -96,14 +95,14 @@ def showTiles (app):
 
     if canvasWidth>config.appxsize:
         #add horizontal scroll
-        xscrollbar = Scrollbar(app.tilwindow,orient=HORIZONTAL)
-        xscrollbar.pack (side=BOTTOM, fill=X)
+        xscrollbar = tk.Scrollbar(app.tilwindow,orient=tk.HORIZONTAL)
+        xscrollbar.pack (side=tk.BOTTOM, fill=tk.X)
         app.tilesCanvas.config(xscrollcommand=xscrollbar.set)
         xscrollbar.config(command=app.tilesCanvas.xview)
     if canvasHeight>config.appysize:
         #add vertical scroll
-        yscrollbar = Scrollbar(app.tilwindow)
-        yscrollbar.pack (side=RIGHT, fill=Y)
+        yscrollbar = tk.Scrollbar(app.tilwindow)
+        yscrollbar.pack (side=tk.RIGHT, fill=tk.Y)
         app.tilesCanvas.config(yscrollcommand=yscrollbar.set)
         yscrollbar.config(command=app.tilesCanvas.yview)
 
