@@ -6,6 +6,7 @@ tooltitle = "MSX Retro Tool"  #title of the app
 transcolor = ('0','0','0') #RGB for color to consider transparent
 msxcolordivider = 32 # Number to use as divider to go from 16bit palette to 7bit msx palette
 msxpalette = [(-1,-1,-1),
+(0,0,0),
 (int(62/msxcolordivider), int(184/msxcolordivider),int(73/msxcolordivider)),
 (int(116/msxcolordivider),int(208/msxcolordivider),int(125/msxcolordivider)),
 (int(89/msxcolordivider),int(85/msxcolordivider),int(224/msxcolordivider)),
@@ -19,8 +20,7 @@ msxpalette = [(-1,-1,-1),
 (int(58/msxcolordivider),int(162/msxcolordivider),int(65/msxcolordivider)),
 (int(183/msxcolordivider),int(102/msxcolordivider),int(181/msxcolordivider)),
 (int(204/msxcolordivider),int(204/msxcolordivider),int(204/msxcolordivider)),
-(int(255/msxcolordivider),int(255/msxcolordivider),int(255/msxcolordivider)),
-(0,0,0)
+(int(255/msxcolordivider),int(255/msxcolordivider),int(255/msxcolordivider))
 ] # Msx palette in MSX values
 #Below will hold palettes for different systems
 palettes = [("MSX",msxcolordivider,msxpalette),("MSX2",msxcolordivider,msxpalette),("MSX2+",msxcolordivider,msxpalette)]

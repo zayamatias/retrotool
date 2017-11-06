@@ -147,8 +147,12 @@ def exportMSXScreen(app):
                             nibbc = 0
     f.write(filebytes)
     ## Output palette to console in BASIC mode for testing purposes
-    print ("10 SCREEN 5")
-    line1 = "20 DATA 0,0,0,0,"
+    try:
+        bgcolor = str(app.palette.index(app.bgcolor))
+    except:
+        bgcolor = "0"
+    print ("10 SCREEN 5:COLOR 15,"+bgcolor+","+bgcolor)
+    line1 = "20 DATA 0,0,0"
     line2 = "\n30 DATA "
     idx = 0
     for color in app.palette:
@@ -164,7 +168,9 @@ def exportMSXScreen(app):
                 
         idx = idx +1
     print ("\n40 FOR C=0 TO 15:READ R,G,B:COLOR=(C,R,G,B):NEXT")
-    print ("50 BLOAD \""+outfile+"\",S")
+    filesplit = outfile.split("/")
+    filename = filesplit[len(filesplit)-1]
+    print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
 
 def exportASMFile(app):
