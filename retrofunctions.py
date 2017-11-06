@@ -147,10 +147,12 @@ def exportMSXScreen(app):
                             nibbc = 0
     f.write(filebytes)
     ## Output palette to console in BASIC mode for testing purposes
-    try:
-        bgcolor = str(app.palette.index(app.bgcolor))
-    except:
-        bgcolor = "0"
+    idx = 0
+    bgcolor = "0"
+    for color in app.palette:
+        if colorCompare (app.bgcolor,color):
+              bgcolor = str(idx)     
+        idx = idx +1
     print ("10 SCREEN 5:COLOR 15,"+bgcolor+","+bgcolor)
     line1 = "20 DATA 0,0,0"
     line2 = "\n30 DATA "
