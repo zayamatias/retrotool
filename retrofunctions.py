@@ -77,7 +77,7 @@ def exportMSXScreen(app):
     header = [254,0,0,255,105,0,0]
     filebytes = bytearray(header)
     outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc5")])
-    extension = outfile[len(app.opfile)-3:]
+    #extension = outfile[len(app.opfile)-3:]
     f = open(outfile, 'wb')
     # First write the tiles themselves
     """
