@@ -144,7 +144,7 @@ def exportMSXScreen(app):
     bgcolor = "0"
     for color in app.palette:
         if colorCompare (app.bgcolor,color):
-              bgcolor = str(idx)     
+              bgcolor = str(idx)
         idx = idx +1
     print ("10 SCREEN 5:COLOR 15,"+bgcolor+","+bgcolor)
     line1 = "20 DATA 0,0,0"
@@ -160,7 +160,7 @@ def exportMSXScreen(app):
                 print (str(color[0])+","+str(color[1])+","+str(color[2]), end="")
             else:
                 print (","+str(color[0])+","+str(color[1])+","+str(color[2]), end="")
-                
+
         idx = idx +1
     print ("\n40 FOR C=0 TO 15:READ R,G,B:COLOR=(C,R,G,B):NEXT")
     filesplit = outfile.split("/")
@@ -178,7 +178,7 @@ def exportASMFile(app):
     app.outfile = tk.filedialog.asksaveasfilename(parent=app.root)
     writeASMFile(app)
 
-    
+
 def resetProject(app):
         app.projfile =""
         # Objects to be saved/loaded to/from project file
@@ -210,16 +210,16 @@ def openROMFile(app):
         #( bin(int(sbyte, 16))[2:] ).zfill(16)
         for bit in range(8):
             cols = cols + 1
-            app.spixels.append (binbyte[bit])   
+            app.spixels.append (binbyte[bit])
             if cols==config.ROMWidth:
                 rows = rows+1
                 cols = 1
-                
+
     app.imgheight=rows
     app.bgcolor = (0,0,0)
     sprites.createTempSprites (app)
 
-    
+
 def openImageFile(app):
     #ask for a file to open
     #to speed up testing, if a file is set in the config it will not ask to open but will open directly this one
@@ -258,7 +258,7 @@ def saveProject (app):
 
     with open(app.projfile,"wb") as f:
         pickle.dump ((app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette),f,pickle.HIGHEST_PROTOCOL)
-    
+
 def loadProject (app):
     loadprojfile = tk.filedialog.askopenfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
     if (loadprojfile!=""):
@@ -584,5 +584,18 @@ def colorCompare(colora,colorb):
     if abs(ga-gb)==1 and abs(ba-bb)==1 and (ra==rb):
         return True
     return False
+
+def colorFind (color,palette)
+    idx = 0
+    for pcolor in palette
+        if set(color)==set(pcolor):
+           return idx
+        idx = idx + 1
+    idx = 0
+    for pcolor in palette
+        if colorCompare(color,pcolor):
+           return idx
+        idx = idx + 1
+    return -1
 
 
