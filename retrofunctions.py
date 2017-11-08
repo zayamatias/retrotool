@@ -140,12 +140,9 @@ def exportMSXScreen(app):
                             nibbc = 0
     f.write(filebytes)
     ## Output palette to console in BASIC mode for testing purposes
-    idx = 0
-    bgcolor = "0"
-    for color in app.palette:
-        if colorCompare (app.bgcolor,color):
-              bgcolor = str(idx)
-        idx = idx +1
+    bgcolor = str(findColor (app.bgcolor,app.palette))
+    if bgcolor == "-1":
+        bgcolor = "0"
     print ("10 SCREEN 5:COLOR 15,"+bgcolor+","+bgcolor)
     line1 = "20 DATA 0,0,0"
     line2 = "\n30 DATA "
@@ -325,6 +322,9 @@ def getPixels (app,pixelArray):
     #scan each pixel (Width) in each row (height)
     pixelScale = int(app.imgwidth* app.imgheight/100)
     pixelCount = 1
+    newColors = []
+    newColorsidx = []
+    usedColors = []
     if (app.imgwidth/app.spritexsize != int(app.imgwidth/app.spritexsize)):
         extracols = ((math.ceil(app.imgwidth/app.spritexsize))*app.spritexsize)-app.imgwidth
     else:
@@ -344,13 +344,22 @@ def getPixels (app,pixelArray):
             color = (int(r/config.palettes[app.targetSystem][1]),int(g/config.palettes[app.targetSystem][1]),int(b/config.palettes[app.targetSystem][1]))
             if set(color) != set(app.bgcolor): # color chosen by user
                 #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
-                index = paletteIndex(app,color)
+                index = findColor(color,app.palette)
                 if index >= 0:
                     pixelArray.append(index)
+                    try:
+                        a = usedColors.index(index)
+                    except:
+                       usedColors.append(index) 
                 else:
                     if index == -1: #Add color to palette
-                        app.palette.append(color)
-                        index = paletteIndex(app,color)
+                        newcolindex = findColor(color,newColors)
+                        if newcolindex == -1:#app.palette.append(color)
+                            index = len(app.palette)+len(newColors)
+                            newColorsidx.append(index)
+                            newColors.append(color)
+                        else:
+                            index = newcolindex + len(app.palette)
                         pixelArray.append(index)
                     else:
                         pixelArray.append('0')
@@ -358,16 +367,35 @@ def getPixels (app,pixelArray):
                     pixelArray.append('0')
         for x in range (0,extracols):
                 pixelArray.append('0')
+
+                
+    idx = 0
+    for ncolor in newColors:
+        swpidx = 1
+        for color in app.palette:
+            if swpidx not in usedColors:
+                app.palette[swpidx]=newColors[idx]
+                pxidx = 0
+                for pixel in pixelArray:
+                    if pixel == len(app.palette)+idx:
+                        pixelArray[pxidx]=swpidx
+                    pxidx = pxidx + 1
+                usedColors.append(swpidx)
+            else:
+                swpidx = swpidx + 1
+        idx = idx + 1
+
+            
+                    
+                
     app.imgwidth= app.imgwidth+extracols
     app.prcanvas.pack_forget()
     app.progress['value']=0
+
+
+
 def paletteIndex(app,color):
-    index = 0
-    for palColor in app.palette:
-        if (colorCompare(color,palColor)) and (index != 0):
-            return index
-        index = index + 1
-    return -1
+    return findColor (color,app.palette)
 
 
 def getTempColor (row,position):
@@ -522,9 +550,9 @@ def closeAnimationWindow(app):
 def isColorInPalette(app,color):
     
     iscolorinpalette = False
-    for palColor in app.palette:
-        if colorCompare (color,palColor):
-            iscolorinpalette = True
+    idx = findColor (color,app.palette)
+    if idx != -1:
+        iscolorinpalette = True
     return iscolorinpalette
     
     
@@ -568,34 +596,51 @@ def colorCompare(colora,colorb):
     gb=int(colorb[1])
     bb=int(colorb[2])
     if (ra==rb) and (ga==gb) and (ba==bb):
-        return True
+        return 7
+    """
     if (abs(ra-rb)==1) and (ga==gb) and (ba==bb):
-        return True
+        return 6
     if (ra==rb) and (abs(ga-gb)==1) and (ba==bb):
-        return True
+        return 6
     if (ra==rb) and (abs(ba-bb)==1) and (ga==gb):
-        return True
+        return 6
     if abs(ra-rb)==1 and abs(ga-gb)==1 and abs(ba-bb)==1:
-        return True
+        return 4
     if abs(ra-rb)==1 and abs(ga-gb)==1 and (ba==bb):
-        return True
+        return 5
     if abs(ra-rb)==1 and abs(ba-bb)==1 and (ga==gb):
-        return True
+        return 5
     if abs(ga-gb)==1 and abs(ba-bb)==1 and (ra==rb):
-        return True
-    return False
+        return 5
+         
+    if (abs(ra-rb)==2) and (ga==gb) and (ba==bb):
+        return 3
+    if (ra==rb) and (abs(ga-gb)==2) and (ba==bb):
+        return 3
+    if (ra==rb) and (abs(ba-bb)==2) and (ga==gb):
+        return 3
+    if abs(ra-rb)==2 and abs(ga-gb)==2 and abs(ba-bb)==2:
+        return 1
+    if abs(ra-rb)==2 and abs(ga-gb)==2 and (ba==bb):
+        return 2
+    if abs(ra-rb)==2 and abs(ba-bb)==2 and (ga==gb):
+        return 2
+    if abs(ga-gb)==2 and abs(ba-bb)==2 and (ra==rb):
+        return 2
+    """
+    return 0
 
-def colorFind (color,palette)
+def findColor(color,palette):
     idx = 0
-    for pcolor in palette
-        if set(color)==set(pcolor):
-           return idx
-        idx = idx + 1
-    idx = 0
-    for pcolor in palette
-        if colorCompare(color,pcolor):
-           return idx
-        idx = idx + 1
-    return -1
+    cw = 0
+    retcol = -1
+    if len(palette)>0:
+        for pcolor in palette:
+            weight = colorCompare(color,pcolor)
+            if weight > cw:
+                cw = weight
+                retcol = idx
+            idx = idx + 1
+    return retcol
 
 
