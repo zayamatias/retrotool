@@ -436,7 +436,33 @@ def updateDrawColor (canvas,app):
         return
     app.drawColor = int(tags[0])-1
 
-      
+def swapColor (canvas,app):
+    tags = canvas.gettags(tk.CURRENT)
+    if len(tags)<1:
+        return
+    newColor = int(tags[0])-1
+    if (app.drawColor == 0) or (newColor == 0):
+        tk.messagebox.showinfo ("Error","Cannot swap with background color '0'")
+    if (app.drawColor == newColor):
+        tk.messagebox.showinfo ("Error","Cannot swap with color with itself")
+    ## Update Pixels
+    idx= 0
+    for pixel in app.tpixels:
+        if str(pixel)== str(app.drawColor):
+            app.tpixels[idx]=str(newColor)
+        elif str(pixel) == str(newColor):
+            app.tpixels[idx]=str(app.drawColor)
+        idx = idx + 1
+    ## Update Palette
+    oldColors = app.palette[app.drawColor]
+    newColors = app.palette[newColor]
+    app.palette[app.drawColor]=newColors
+    app.palette[newColor]=oldColors
+    app.paletteCanvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,newColor))
+    app.paletteCanvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,app.drawColor))
+    app.paletteCanvas.update_idletasks()
+    app.palwindow.update()
+
 def drawboxel (app,canvas,sprite,x,y,index,width):
     border = 1
     if (app.pixelsize==2):
@@ -564,6 +590,7 @@ def displayPalette(app):
     if not skip:
         if app.paletteCanvas.winfo_exists()!=0:
             return 1
+    app.paletteColorBoxes = []
     numColors= len(app.palette)
     maxColorsPerRow = int(math.ceil(config.paletteWxSize/config.paletteColorBoxSize))
     numRows = int (math.ceil(numColors/maxColorsPerRow))
@@ -571,6 +598,7 @@ def displayPalette(app):
     createPaletteWindow (app,paletteWySize)
     app.paletteCanvas = tk.Canvas (app.palwindow,width=config.paletteWxSize,height=paletteWySize)
     app.paletteCanvas.bind('<Button-1>', lambda x:updateDrawColor(app.paletteCanvas,app))
+    app.paletteCanvas.bind('<Button-3>', lambda x:swapColor(app.paletteCanvas,app))
     x=1
     y=1
     color = 0
@@ -581,12 +609,13 @@ def displayPalette(app):
                 color = color + 1
                 dx = x+config.paletteColorBoxSize
                 dy = y+config.paletteColorBoxSize
-                app.paletteCanvas.create_rectangle (x,y,dx,dy,fill=boxColor,tag=str(color))
+                app.paletteColorBoxes.append(app.paletteCanvas.create_rectangle (x,y,dx,dy,fill=boxColor,tag=str(color)))
                 x = x + config.paletteColorBoxSize
         x = 1
         y = y + config.paletteColorBoxSize
     app.paletteCanvas.pack()
     app.palwindow.deiconify()
+
     
 def colorCompare(colora,colorb):
     ra=int(colora[0])

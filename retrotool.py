@@ -49,6 +49,7 @@ class App:
         self.root.withdraw()
         self.paletteIndex = 1 # We cannot change the "0" colour, ever!
         self.drawColor = 0 # Color selected in the palette
+        self.paletteColorBoxes = []
         self.opfile = ""
         self.colors = []
         self.maxcolors = 16
