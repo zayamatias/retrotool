@@ -312,13 +312,13 @@ def getColors(app):
                if not isColorInPalette (app,(r,g,b)):
                    if app.paletteIndex>(len(app.palette)-1):
                        app.palette.append((r,g,b))
-                   else:  
+                   else:
                        app.palette[app.paletteIndex]=(r,g,b)
             app.paletteIndex = app.paletteIndex + 1
     app.paletteIndex = 0
 
 def getPixels (app,pixelArray):
-    #Read all the pixels and colorsin the image
+    #Read all the pixels and colors in the image
     #scan each pixel (Width) in each row (height)
     pixelScale = int(app.imgwidth* app.imgheight/100)
     pixelCount = 1
@@ -580,7 +580,7 @@ def isColorInPalette(app,color):
     if idx != -1:
         iscolorinpalette = True
     return iscolorinpalette
-    
+
     
 def displayPalette(app):
     

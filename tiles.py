@@ -50,9 +50,8 @@ def showTilesMap (app):
             currX = 1
             currY = currY + (ysize+spacing)
             shownTiles=0
-        
+
 def showTiles (app):
-    retrofunctions.getPixels(app,app.tpixels)
     #display the sprites grid, initializing everything first
     if hasattr(app.img,'filename'):
         if app.img.filename == config.logoimage :
@@ -61,6 +60,7 @@ def showTiles (app):
     if set(app.bgcolor) == set((-1,-1,-1)):
         tk.messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
+    retrofunctions.getPixels(app,app.tpixels)
     createTiles(app)
     if (app.tilwindow!=None):
         if (app.tilesCanvas != None) and (app.tilwindow.winfo_exists()!=0):    
