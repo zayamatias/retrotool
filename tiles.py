@@ -9,8 +9,8 @@ def showTilesMap (app):
     if app.TileMap==[]:
          tk.messagebox.showinfo("Error","Please, create some tiles from an image first")
          return 1
-    tilesPerRow = math.ceil(app.imgwidth/app.tilexsize)
-    tilesPerCol = math.ceil(len(app.TileMap)/tilesPerRow)
+    tilesPerRow = int(app.imgwidth/app.tilexsize)
+    tilesPerCol = int(len(app.TileMap)/tilesPerRow)
     currX = 0
     currY = 0
     createTilesMapWindow(app)

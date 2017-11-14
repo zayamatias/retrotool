@@ -66,6 +66,64 @@ def writeASMFile(app):
                 f.write(",")
         f.write ("\n")
 
+def exportToTiled(app):
+    cols = config.tilesPerRow
+    rows = math.ceil(len(app.FinalTiles)/cols)
+    img = PIL.Image.new('RGB',(cols*app.tilexsize, rows*app.tileysize))
+    pixels = img.load()    
+    y= 0
+    tileidx = 0
+    for trow in range (0,rows):
+         for row in range (0,app.tileysize):
+           x = 0
+           for tcol in range (0,cols):
+                tileidx = (trow*cols)+tcol
+                try:
+                    tile = app.Tiles[tileidx]
+                except:
+                    tile =[]
+                    tilex = ""
+                    for a in range (0,app.tilexsize):
+                        tilex= tilex+"%0"
+                    for a in range (0,app.tileysize):
+                        tile.append(tilex)
+                cpattern = tile[row].split("%")
+                if cpattern [0] == "":
+                    del cpattern[0]
+                for col in range (0,app.tilexsize):
+                    pcolor =  int(cpattern[col])
+                    
+                    if pcolor !="":
+                        coltuple = app.palette[pcolor]
+                        if pcolor == 0:
+                            coltuple = (0,0,0)
+                        pixels[x,y]=(coltuple[0]*32,coltuple[1]*32,coltuple[2]*32)#coltuple
+                        x = x +1
+           y = y + 1
+    imgfile = app.opfile[:app.opfile.rindex('.')]
+    imgfile = imgfile+"_tiles.png"
+    tiledfile = imgfile+".tmx"
+    img.save(imgfile)
+    outfile = "test.tmx"
+    tilemap = ""
+    for tile in app.TileMap:
+        tilemap = tilemap+str(tile+1)+","
+    tilemap = tilemap[:-1]
+    f = open(tiledfile, 'w')
+    output = config.tiled_xml
+    output = output.replace("__TILESX__",str(int(app.imgwidth/app.tilexsize)))
+    output = output.replace("__TILESY__",str(int(app.imgheight/app.tileysize)))
+    output = output.replace("__TILEXSIZE__",str(app.tilexsize))
+    output = output.replace("__TILEYSIZE__",str(app.tileysize))
+    output = output.replace("__NUMTILES__",str(int(cols*rows)))
+    output = output.replace("__IMGWIDTH__",str(int(cols*app.tilexsize)))
+    output = output.replace("__IMGHEIGHT__",str(int(rows*app.tileysize)))
+    output = output.replace("__NUMTILES__",str(cols*rows))
+    output = output.replace("__TILEMAP__",tilemap)
+    output = output.replace("__FILENAME__",imgfile)
+    f.write(output)
+
+                        
 def exportMSXScreen(app):
     header = [254,0,0,255,105,0,0]
     filebytes = bytearray(header)
@@ -370,20 +428,22 @@ def getPixels (app,pixelArray):
 
                 
     idx = 0
+    swpidx = 1
     for ncolor in newColors:
-        swpidx = 1
-        for color in app.palette:
-            if swpidx not in usedColors:
-                app.palette[swpidx]=newColors[idx]
-                pxidx = 0
-                for pixel in pixelArray:
-                    if pixel == len(app.palette)+idx:
-                        pixelArray[pxidx]=swpidx
-                    pxidx = pxidx + 1
-                usedColors.append(swpidx)
-            else:
-                swpidx = swpidx + 1
-        idx = idx + 1
+        while swpidx in usedColors:
+            swpidx = swpidx + 1
+        if (swpidx<len(app.palette)):
+            app.palette[swpidx]=newColors[idx]
+            usedColors.append(swpidx)
+        else:
+            app.palette.append(newColors[idx])
+            usedColors.append(swpidx)
+        pxidx = 0
+        for pixel in pixelArray:
+            if int(pixel) == int(newColorsidx[idx]):
+                pixelArray[pxidx]=swpidx
+            pxidx = pxidx + 1
+        idx = idx+1
 
             
                     
@@ -432,6 +492,7 @@ def updateDrawColor (canvas,app):
        else:
             canvas.itemconfig (rectangle, outline="white")
     canvas.update_idletasks()
+    canvas.focus_set()
     if len(tags)<1:
         return
     app.drawColor = int(tags[0])-1
@@ -454,14 +515,20 @@ def swapColor (canvas,app):
             app.tpixels[idx]=str(app.drawColor)
         idx = idx + 1
     ## Update Palette
+    print(app.palette[app.drawColor])
+    print(app.palette[newColor])
     oldColors = app.palette[app.drawColor]
     newColors = app.palette[newColor]
     app.palette[app.drawColor]=newColors
     app.palette[newColor]=oldColors
+    print(app.palette[app.drawColor])
+    print(app.palette[newColor])
+    app.paletteCanvas.focus_set()
+    app.paletteCanvas.update_idletasks()
     app.paletteCanvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,newColor))
+    app.paletteCanvas.update_idletasks()
     app.paletteCanvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,app.drawColor))
     app.paletteCanvas.update_idletasks()
-    app.palwindow.update()
 
 def drawboxel (app,canvas,sprite,x,y,index,width):
     border = 1
@@ -490,7 +557,10 @@ def drawboxel (app,canvas,sprite,x,y,index,width):
         py = py + 1
 
 def transformColor (app,paletteIndex):
-    palettecolor = app.palette[paletteIndex]
+    try:
+        palettecolor = app.palette[paletteIndex]
+    except:
+        print ("exception at ",paletteIndex)
     r = palettecolor[0]
     g = palettecolor[1]
     b = palettecolor[2]
@@ -506,7 +576,7 @@ def transformColor (app,paletteIndex):
 
 def createPaletteWindow(app,ysize):
     #window to show the sprites in
-    app.palwindow =  tk.Toplevel(app.spwindow)
+    app.palwindow =  tk.Toplevel(app.root)
     app.palwindow.title("ColorPalette")
     app.palwindow.iconbitmap(config.iconfile)
     app.palwindow.geometry(str(config.paletteWxSize)+"x"+str(ysize))
@@ -641,7 +711,6 @@ def colorCompare(colora,colorb):
         return 5
     if abs(ga-gb)==1 and abs(ba-bb)==1 and (ra==rb):
         return 5
-         
     if (abs(ra-rb)==2) and (ga==gb) and (ba==bb):
         return 3
     if (ra==rb) and (abs(ga-gb)==2) and (ba==bb):

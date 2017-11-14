@@ -55,7 +55,7 @@ spriteysize = 16 #default sprite height
 tilexsize = 8 # default sprite width
 tileysize = 8 #default sprite height
 newSprites = 2 # Number of sprites for new project
-tilesPerRow = 10
+tilesPerRow = 256/tilexsize
 # Animation Section
 
 animCols = 3 # Number of columns for the sprite animation
@@ -63,3 +63,4 @@ animRows = 4 # Number of rows for the sprite animation
 animArray = [14,15,16]  # "character" list to show in animation
 
 ROMWidth = 256
+tiled_xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><map version=\"1.0\" orientation=\"orthogonal\" renderorder=\"right-down\" width=\"__TILESX__\" height=\"__TILESY__\" tilewidth=\"__TILEXSIZE__\" tileheight=\"__TILEYSIZE__\" nextobjectid=\"__NUMTILES__\" backgroundcolor=\"#000000\"> <tileset firstgid=\"1\" name=\"map00_1\" tilewidth=\"__TILEXSIZE__\" tileheight=\"__TILEYSIZE__\" tilecount=\"__NUMTILES__\">  <image source=\"__FILENAME__\" width=\"__IMGWIDTH__\" height=\"__IMGHEIGHT__\"/></tileset> <layer name=\"background\" width=\"__TILESX__\" height=\"__TILESY__\"><data encoding=\"csv\">__TILEMAP__</data></layer></map>"
