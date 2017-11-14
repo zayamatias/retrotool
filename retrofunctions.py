@@ -69,7 +69,7 @@ def writeASMFile(app):
 def exportToTiled(app):
     cols = config.tilesPerRow
     rows = math.ceil(len(app.FinalTiles)/cols)
-    img = PIL.Image.new('RGB',(cols*app.tilexsize, rows*app.tileysize))
+    img = PIL.Image.new('RGB',(int(cols*app.tilexsize), int(rows*app.tileysize)))
     pixels = img.load()    
     y= 0
     tileidx = 0

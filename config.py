@@ -55,7 +55,7 @@ spriteysize = 16 #default sprite height
 tilexsize = 8 # default sprite width
 tileysize = 8 #default sprite height
 newSprites = 2 # Number of sprites for new project
-tilesPerRow = 256/tilexsize
+tilesPerRow = int(256/tilexsize)
 # Animation Section
 
 animCols = 3 # Number of columns for the sprite animation
