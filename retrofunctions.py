@@ -504,8 +504,10 @@ def swapColor (canvas,app):
     newColor = int(tags[0])-1
     if (app.drawColor == 0) or (newColor == 0):
         tk.messagebox.showinfo ("Error","Cannot swap with background color '0'")
+        return 1
     if (app.drawColor == newColor):
         tk.messagebox.showinfo ("Error","Cannot swap with color with itself")
+        return 1
     ## Update Pixels
     idx= 0
     for pixel in app.tpixels:
@@ -524,11 +526,11 @@ def swapColor (canvas,app):
     print(app.palette[app.drawColor])
     print(app.palette[newColor])
     app.paletteCanvas.focus_set()
-    app.paletteCanvas.update_idletasks()
     app.paletteCanvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,newColor))
     app.paletteCanvas.update_idletasks()
     app.paletteCanvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,app.drawColor))
     app.paletteCanvas.update_idletasks()
+    app.paletteCanvas.update()
 
 def drawboxel (app,canvas,sprite,x,y,index,width):
     border = 1
