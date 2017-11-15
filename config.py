@@ -23,8 +23,19 @@ msxpalette = [(-1,-1,-1),
 (int(255/msxcolordivider),int(255/msxcolordivider),int(255/msxcolordivider))
 ] # Msx palette in MSX values
 #Below will hold palettes for different systems
-palettes = [("MSX",msxcolordivider,msxpalette),("MSX2",msxcolordivider,msxpalette),("MSX2+",msxcolordivider,msxpalette)]
+palettes = [("MSX",msxcolordivider,msxpalette),
+            ("MSX",msxcolordivider,msxpalette),
+            ("MSX2",msxcolordivider,msxpalette),
+            ("MSX2",msxcolordivider,msxpalette),
+            ("MSX2",msxcolordivider,msxpalette),
+            ("MSX2",msxcolordivider,msxpalette),
+            ("MSX2",msxcolordivider,msxpalette),
+            ("MSX2+",msxcolordivider,msxpalette),
+            ("MSX2+",msxcolordivider,msxpalette),
+            ("MSX2+",msxcolordivider,msxpalette)]
 #Systems of choice, maybe beyond MSX one day?
+activeSystems = [3]
+defaultSystem = 3
 systems = ["MSX - Screen 2",
            "MSX - Screen 3",
            "MSX2 - Screen 4",
@@ -36,7 +47,16 @@ systems = ["MSX - Screen 2",
            "MSX2+ - Screen 11",
            "MSX2+ - Screen 12"]
 #System Limits => System name, max colors per sprite
-syslimits = [("MSX",1,256),("MSX2",3,256),("MSX2+",3,256)]
+syslimits = [("MSX",1,256),
+             ("MSX",1,256),
+             ("MSX2",3,256),
+             ("MSX2",3,256),
+             ("MSX2",3,256),
+             ("MSX2",3,256),
+             ("MSX2",3,256),
+             ("MSX2+",3,256),
+             ("MSX2+",3,256),
+             ("MSX2+",3,256)]
 preferencesWxSize = 400
 preferencesWySize = 400
 animWxSize = 400

@@ -244,7 +244,7 @@ def resetProject(app):
         app.usprites = []
         app.csprites = []
         app.bgcolor = (-1,-1,-1)
-        app.palette=config.palettes[app.targetSystem][2]
+        app.palette=config.palettes[app.targetSystem.get()][2]
         app.imgwidth = 0
         app.imgheight = 0
         app.sprImgOffset = 0
@@ -344,7 +344,7 @@ def checkColors(app):
     if (app.colors==None):
         app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
-    if numcolors > (config.syslimits[app.targetSystem][2] -1) :
+    if numcolors > (config.syslimits[app.targetSystem.get()][2] -1) :
         messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
         return False
     else:
@@ -364,9 +364,9 @@ def getColors(app):
     for color in app.colors:
         rgb = color[1]
         if not (isinstance( rgb, int )):
-            r=int(int(rgb[0])/config.palettes[app.targetSystem][1])
-            g=int(int(rgb[1])/config.palettes[app.targetSystem][1])
-            b=int(int(rgb[2])/config.palettes[app.targetSystem][1])
+            r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1])
+            g=int(int(rgb[1])/config.palettes[app.targetSystem.get()][1])
+            b=int(int(rgb[2])/config.palettes[app.targetSystem.get()][1])
             # make sure we do not add bgcolor
             if set((r,g,b)) != set (app.bgcolor):
                if not isColorInPalette (app,(r,g,b)):
@@ -404,7 +404,7 @@ def getPixels (app,pixelArray):
             r = pixel[0]
             g = pixel[1]
             b = pixel[2]
-            color = (int(r/config.palettes[app.targetSystem][1]),int(g/config.palettes[app.targetSystem][1]),int(b/config.palettes[app.targetSystem][1]))
+            color = (int(r/config.palettes[app.targetSystem.get()][1]),int(g/config.palettes[app.targetSystem.get()][1]),int(b/config.palettes[app.targetSystem.get()][1]))
             if set(color) != set(app.bgcolor): # color chosen by user
                 #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
                 index = findColor(color,app.palette)
@@ -480,7 +480,7 @@ def updateTempColor (row,position,color):
 
 def udpateTargetSystem(app,chgsystem):
     #Will be used when changing the target system
-    print (app.targetSystem)
+    print (app.targetSystem.get())
     print (chgsystem)
     app.targetSystem=config.systems.index(chgsystem)
     print (app.targetSystem)

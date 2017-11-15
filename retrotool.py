@@ -14,17 +14,18 @@ class App:
     def __init__(self):
 
         self.root = tk.Tk()
-        self.targetSystem = 0
+        self.targetSystem = tk.IntVar(self.root)
+        self.targetSystem.set(config.defaultSystem)
+        self.palette=[]
         self.projfile =""
         # Objects to be saved/loaded to/from project file
         self.spixels = []
         self.tpixels = []
         self.finalsprites = []
-        self.ColorTiles = []
+        self.ColorTiles = []    
         self.FinalTiles = []
         self.usprites = []
         self.csprites = []
-        self.palette=config.palettes[self.targetSystem][2]
         self.imgwidth = 0
         self.imgheight = 0
         self.pixelsize = config.pixelsize
@@ -80,14 +81,22 @@ class App:
         self.filemenu.add_command(label="Export to Tiled", command=lambda:retrofunctions.exportToTiled(self))
         self.filemenu.add_command(label="Export MSX screen", command=lambda:retrofunctions.exportMSXScreen(self))
         self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
-
+        
 
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=self.exit)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
+        
+        
+        idx = 0
         for system in config.systems:
-            self.filemenu.add_checkbutton(label=system, onvalue=config.systems.index(system), offvalue=False, variable=self.targetSystem)
+            if idx in config.activeSystems:
+                self.filemenu.add_radiobutton(label=system, value=idx, variable=self.targetSystem, state="normal",command=lambda menu=idx:self.updateSystemPalette(menu))
+            else:
+                self.filemenu.add_radiobutton(label=system, value=idx, variable=self.targetSystem, state="disabled")
+            idx = idx + 1
+        self.filemenu.invoke(config.defaultSystem)
         self.menubar.add_cascade(label="Target System", menu=self.filemenu)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
         self.filemenu.add_command(label="Sprite Viewer/Editor", command=lambda:sprites.showSprites(self))
@@ -97,17 +106,19 @@ class App:
         self.menubar.add_cascade(label="Tools", menu=self.filemenu)
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
-        
-
         # DefineSpriteListWindow
         self.spwindow = None
         self.tilwindow = None
         if config.default_filename != "":
             retrofunctions.openImageFile(self)
-
-       # Nothing gets executed after this statement!
+        # Nothing gets executed after this statement!
         self.root.mainloop()
 
+    def updateSystemPalette(self,value):
+        self.targetSystem.set(value)
+        self.palette=config.palettes[value][2]
+
+        
     def click (self,event):
         # need to consider scale!
         if hasattr(self.img,'filename'):
