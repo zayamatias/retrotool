@@ -528,7 +528,7 @@ def swapColor (canvas,app):
     canvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,app.drawColor))
     canvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,newColor))
 
-def drawboxel (app,canvas,sprite,x,y,index,width):
+def drawboxel (app,canvas,sprite,x,y,index,width,bgcolor):
     border = 1
     if (app.pixelsize==2):
         border = 0
@@ -540,8 +540,10 @@ def drawboxel (app,canvas,sprite,x,y,index,width):
         for pixel in range (0,width):
             ex = x +app.pixelsize
             pxColor = int(getTempColor(row,pixel))
-            #if pxColor != 0:
-            color = transformColor (app,pxColor)
+            if pxColor == 0:
+                color = bgcolor
+            else:
+                color = transformColor (app,pxColor)
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
             canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
             #else:

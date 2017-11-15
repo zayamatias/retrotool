@@ -42,7 +42,7 @@ def showTilesMap (app):
         destY = currY + (ysize)
         app.tilesMapCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="tile,til"+str(currentTile)+"canvas")
         #draw each "boxel" of the sprite
-        retrofunctions.drawboxel (app,app.tilesMapCanvas,app.Tiles[tile],currX,currY,currentTile,app.tilexsize)
+        retrofunctions.drawboxel (app,app.tilesMapCanvas,app.Tiles[tile],currX,currY,currentTile,app.tilexsize,retrofunctions.transformColor(app,0))
         currX = currX+(xsize+spacing)
         currentTile = currentTile + 1
         shownTiles = shownTiles + 1
@@ -118,7 +118,7 @@ def showTiles (app):
         destY = currY + (ysize)
         app.tilesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="tile,til"+str(currentTile)+"canvas")
         #draw each "boxel" of the sprite
-        retrofunctions.drawboxel (app,app.tilesCanvas,app.Tiles[currentTile],currX,currY,currentTile,app.tilexsize)
+        retrofunctions.drawboxel (app,app.tilesCanvas,app.Tiles[currentTile],currX,currY,currentTile,app.tilexsize,retrofunctions.transformColor(app,0))
         currX = currX+(xsize+spacing)
         currentTile = currentTile + 1
         shownTiles = shownTiles + 1
