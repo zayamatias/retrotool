@@ -741,4 +741,3 @@ def findColor(color,palette):
             idx = idx + 1
     return retcol
 
-
