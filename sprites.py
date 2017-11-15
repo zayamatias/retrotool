@@ -1,15 +1,5 @@
-import sys
-import PIL.Image
-import PIL.ImageTk
-import tkinter
-from tkinter import *
-from tkinter import messagebox
-from tkinter import Canvas
-from tkinter.ttk import *
-from tkinter.filedialog import askopenfilename
 import tkinter as tk
 import retrofunctions
-from functools import partial
 import config
 import retroclasses
 import math
@@ -149,10 +139,10 @@ def showSprites (app):
     #display the sprites grid, initializing everything first
     if hasattr(app.img,'filename'):
         if (app.img.filename == config.logoimage) and (app.spixels ==[]) and (app.tpixels==[]) :
-            messagebox.showinfo("Error","Please, load an image or start a new project first")
+            tk.messagebox.showinfo("Error","Please, load an image or start a new project first")
             return 1
     if set(app.bgcolor) == set((-1,-1,-1)) and (app.spixels ==[]) and (app.tpixels==[]):
-        messagebox.showinfo("Error","Please, click on the background color of the image first")
+        tk.messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
     if (app.spwindow!=None):
         if (app.spritesCanvas != None) and (app.spwindow.winfo_exists()!=0):    
@@ -178,7 +168,7 @@ def showSprites (app):
     canvasWidth = app.spritesPerRow *(xsize+spacing)
     canvasHeight = app.spritePerCol*(ysize+spacing)
     shownSprites = 0
-    app.spritesCanvas = Canvas (app.spwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
+    app.spritesCanvas = tk.Canvas (app.spwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
     # Mous click actions left-> Put pixel, Right-> Remove pixel
     app.spritesCanvas.bind('<Button-1>', lambda x:updatePixel(app.spritesCanvas,True,app))
     #app.spritesCanvas.bind("<B1-Motion>",lambda event: moveSpriteCanvas(app.spritesCanvas,x = event.x,y = event.y))
@@ -189,14 +179,14 @@ def showSprites (app):
 
     if canvasWidth>config.appxsize:
         #add horizontal scroll
-        xscrollbar = Scrollbar(app.spwindow,orient=HORIZONTAL)
-        xscrollbar.pack (side=BOTTOM, fill=X)
+        xscrollbar = tk.Scrollbar(app.spwindow,orient=tk.HORIZONTAL)
+        xscrollbar.pack (side=tk.BOTTOM, fill=tk.X)
         app.spritesCanvas.config(xscrollcommand=xscrollbar.set)
         xscrollbar.config(command=app.spritesCanvas.xview)
     if canvasHeight>config.appysize:
         #add vertical scroll
-        yscrollbar = Scrollbar(app.spwindow)
-        yscrollbar.pack (side=RIGHT, fill=Y)
+        yscrollbar = tk.Scrollbar(app.spwindow)
+        yscrollbar.pack (side=tk.RIGHT, fill=tk.Y)
         app.spritesCanvas.config(yscrollcommand=yscrollbar.set)
         yscrollbar.config(command=app.spritesCanvas.yview)
 
@@ -251,23 +241,21 @@ def selectSprite(canvas,app):
     print (canvas.gettags("sprite"))
 def updatePixel (canvas,switchon,app):
     fill = app.spriteeditorbgcolor
-    pixelcolor = 0
-    tags = canvas.gettags(CURRENT)
+    tags = canvas.gettags(tk.CURRENT)
     if len(tags)<2:
         return
     if (switchon) and (app.drawColor != 0):
-      fill = transformColor(app,app.drawColor)
-      pixelcolor = 1
+      fill = retrofunctions.transformColor(app,app.drawColor)
 
-    if canvas.find_withtag(CURRENT):
-      canvas.itemconfig(CURRENT, fill=fill)
+    if canvas.find_withtag(tk.CURRENT):
+      canvas.itemconfig(tk.CURRENT, fill=fill)
       coords = tags[0].split('/')
       spriteidx = int(coords[0])
       px = int(coords[1])
       py = int(coords[2])
       sprite = app.usprites[spriteidx]
       row = sprite[py]
-      row = updateTempColor (row,px,app.drawColor)
+      row = retrofunctions.updateTempColor (row,px,app.drawColor)
       map(str,row)
       row = ''.join(row)
       sprite[py]=row
@@ -309,13 +297,13 @@ def createAnimationWindow (app):
     app.animWindow.title("Character Animation")
     app.animWindow.iconbitmap(config.iconfile)
     app.animWindow.geometry(str(config.animWxSize)+"x"+str(config.animWySize))
-    app.animWindow.protocol("WM_DELETE_WINDOW", lambda:closeAnimationWindow(app))
+    app.animWindow.protocol("WM_DELETE_WINDOW", lambda:retrofunctions.closeAnimationWindow(app))
 
-    e = Entry(app.animWindow)
+    e = tk.Entry(app.animWindow)
     e.insert (0,app.animArray)
-    w = Entry(app.animWindow)
+    w = tk.Entry(app.animWindow)
     w.insert (0,app.animCols)
-    h = Entry(app.animWindow)
+    h = tk.Entry(app.animWindow)
     h.insert (0,app.animRows)
     b = tk.Button(app.animWindow, text="update sprites",command = lambda:updateAnimation(app,e,w,h))
     e.pack()
@@ -335,7 +323,7 @@ def updateAnimation(app,e,w,h):
         
 def animate (app):
     if (app.csprites == []):
-        messagebox.showinfo("Error","Please, create sprites before trying to animate them ;-)")
+        tk.messagebox.showinfo("Error","Please, create sprites before trying to animate them ;-)")
         return 1
    
     app.animation = retroclasses.animation()
@@ -357,7 +345,7 @@ def animate (app):
     if app.animWindow != "":
         app.animWindow.destroy()
     createAnimationWindow (app)
-    app.animCanvas = Canvas (app.animWindow,width=animWxSize,height=animWySize)
+    app.animCanvas = tk.Canvas (app.animWindow,width=animWxSize,height=animWySize)
     app.animCanvas.bind('<Key>', lambda event:animateSprite(event,app))
 
     app.animCanvas.pack()
@@ -391,7 +379,7 @@ def animateSprite (event,app):
             destY = currY + (ysize)
             app.animCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2))
             #draw each "boxel" of the sprite
-            drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY,fsdjhfsdfjksd)
+            retrofunctions.drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY)
             currX = currX+(xsize+spacing)
         currX = 1
         currY = currY + (ysize+spacing)

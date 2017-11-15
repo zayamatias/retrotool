@@ -3,6 +3,9 @@ import PIL.Image
 import PIL.ImageTk
 import config
 import tkinter as tk
+from tkinter import filedialog
+from tkinter import messagebox
+
 import math
 import sprites
 
@@ -104,7 +107,6 @@ def exportToTiled(app):
     imgfile = imgfile+"_tiles.png"
     tiledfile = imgfile+".tmx"
     img.save(imgfile)
-    outfile = "test.tmx"
     tilemap = ""
     for tile in app.TileMap:
         tilemap = tilemap+str(tile+1)+","
@@ -127,7 +129,7 @@ def exportToTiled(app):
 def exportMSXScreen(app):
     header = [254,0,0,255,105,0,0]
     filebytes = bytearray(header)
-    outfile = tk.filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc5")])
+    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc5")])
     #extension = outfile[len(app.opfile)-3:]
     f = open(outfile, 'wb')
     # First write the tiles themselves
@@ -230,7 +232,7 @@ def exportASMFile(app):
         messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
     """
-    app.outfile = tk.filedialog.asksaveasfilename(parent=app.root)
+    app.outfile = filedialog.asksaveasfilename(parent=app.root)
     writeASMFile(app)
 
 
@@ -251,7 +253,7 @@ def resetProject(app):
 
 
 def openROMFile(app):
-    app.romfile = tk.filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms;*.sr5")])
+    app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms;*.sr5")])
     if (app.romfile==""):
         return 1
     resetProject(app)
@@ -279,7 +281,7 @@ def openImageFile(app):
     #ask for a file to open
     #to speed up testing, if a file is set in the config it will not ask to open but will open directly this one
     if config.default_filename == "":
-        app.opfile = tk.filedialog.askopenfilename(parent=app.root,filetypes=[("Image Files","*.jpg;*.gif;*.png;*.bmp")])
+        app.opfile = filedialog.askopenfilename(parent=app.root,filetypes=[("Image Files","*.jpg;*.gif;*.png;*.bmp")])
     else:
         app.opfile = config.default_filename
     if (app.opfile==""):
@@ -309,13 +311,13 @@ def saveProject (app):
         if app.opfile!="":
             app.projfile = app.opfile[:len(app.opfile)-3]+"prj"
         else:
-            app.projfile = tk.filedialog.asksaveasfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
+            app.projfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
 
     with open(app.projfile,"wb") as f:
         pickle.dump ((app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette),f,pickle.HIGHEST_PROTOCOL)
 
 def loadProject (app):
-    loadprojfile = tk.filedialog.askopenfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
+    loadprojfile = filedialog.askopenfilename(parent=app.root,filetypes=[("Project Files","*.prj")])
     if (loadprojfile!=""):
         resetProject(app)
         app.projfile = loadprojfile
@@ -323,7 +325,7 @@ def loadProject (app):
             with open(app.projfile,"rb") as f:
                 (app.imgwidth,app.imgheight,app.pixels,app.finalsprites,app.usprites,app.csprites,app.palette)=pickle.load(f)
         except:
-            tk.messagebox.showinfo("Error","The file you tried to open is not compatible")
+            messagebox.showinfo("Error","The file you tried to open is not compatible")
 
             
 def zoomimage(app):
@@ -343,7 +345,7 @@ def checkColors(app):
         app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
     if numcolors > (config.syslimits[app.targetSystem][2] -1) :
-        tk.messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
+        messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
         return False
     else:
         return True
@@ -352,7 +354,7 @@ def checkSize(app):
     #check if the colors of the image are within the limits of the system
     width = app.imgwidth
     if (width/app.spritexsize) != int (width/app.spritexsize):
-        tk.messagebox.showinfo("Error","Image width is not a multiple of sprite width ( currently set in config to "+str(app.spritexsize)+"px)")
+        messagebox.showinfo("Error","Image width is not a multiple of sprite width ( currently set in config to "+str(app.spritexsize)+"px)")
         return False
     else:
         return True
@@ -395,7 +397,10 @@ def getPixels (app,pixelArray):
                 pixelCount = 0
                 app.progress['value']=app.progress['value']+1
                 app.root.update_idletasks()
-            pixel = app.img.getpixel((x,y))
+            try:
+                pixel = app.img.getpixel((x,y))
+            except:
+                pixel = (0,0,0)
             r = pixel[0]
             g = pixel[1]
             b = pixel[2]
@@ -425,8 +430,6 @@ def getPixels (app,pixelArray):
                     pixelArray.append('0')
         for x in range (0,extracols):
                 pixelArray.append('0')
-
-                
     idx = 0
     swpidx = 1
     for ncolor in newColors:
@@ -503,10 +506,10 @@ def swapColor (canvas,app):
         return
     newColor = int(tags[0])-1
     if (app.drawColor == 0) or (newColor == 0):
-        tk.messagebox.showinfo ("Error","Cannot swap with background color '0'")
+        messagebox.showinfo ("Error","Cannot swap with background color '0'")
         return 1
     if (app.drawColor == newColor):
-        tk.messagebox.showinfo ("Error","Cannot swap with color with itself")
+        messagebox.showinfo ("Error","Cannot swap with color with itself")
         return 1
     ## Update Pixels
     idx= 0
@@ -517,20 +520,13 @@ def swapColor (canvas,app):
             app.tpixels[idx]=str(app.drawColor)
         idx = idx + 1
     ## Update Palette
-    print(app.palette[app.drawColor])
-    print(app.palette[newColor])
     oldColors = app.palette[app.drawColor]
     newColors = app.palette[newColor]
     app.palette[app.drawColor]=newColors
     app.palette[newColor]=oldColors
-    print(app.palette[app.drawColor])
-    print(app.palette[newColor])
-    app.paletteCanvas.focus_set()
-    app.paletteCanvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,newColor))
-    app.paletteCanvas.update_idletasks()
-    app.paletteCanvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,app.drawColor))
-    app.paletteCanvas.update_idletasks()
-    app.paletteCanvas.update()
+    canvas.update_idletasks()
+    canvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,app.drawColor))
+    canvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,newColor))
 
 def drawboxel (app,canvas,sprite,x,y,index,width):
     border = 1

@@ -2,6 +2,7 @@ import sys
 import PIL.Image
 import PIL.ImageTk
 import tkinter as tk
+import tkinter.ttk as ttk
 import retrofunctions
 import config
 import tiles
@@ -12,6 +13,7 @@ class App:
     # the main application ;-)
     def __init__(self):
 
+        self.root = tk.Tk()
         self.targetSystem = 0
         self.projfile =""
         # Objects to be saved/loaded to/from project file
@@ -36,7 +38,6 @@ class App:
         self.spritesPerCol = 0
         self.animWindow = ""
         self.animCanvas = ""
-        self.root = tk.Tk()
         self.sprImgOffset = 0
         self.tileImgOffset = 0
         self.TileMap = []
@@ -59,7 +60,7 @@ class App:
         self.root.geometry(str(config.appxsize)+"x"+str(config.appysize))
         self.root.iconbitmap(config.iconfile)
         self.prcanvas = tk.Canvas(self.root)
-        self.progress = tk.ttk.Progressbar(self.prcanvas,orient=tk.HORIZONTAL,length=500,mode='determinate')
+        self.progress = ttk.Progressbar(self.prcanvas,orient=tk.HORIZONTAL,length=500,mode='determinate')
         self.progress.pack()
         self.img = PIL.Image.open (config.logoimage)
         self.spritephoto = PIL.ImageTk.PhotoImage(self.img)
