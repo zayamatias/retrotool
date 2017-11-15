@@ -60,9 +60,7 @@ def showTiles (app):
     if set(app.bgcolor) == set((-1,-1,-1)):
         tk.messagebox.showinfo("Error","Please, click on the background color of the image first")
         return 1
-    print ("---------------------------------- get Pixels")
     retrofunctions.getPixels(app,app.tpixels)
-    print ("---------------------------------- create Tiles")
     createTiles(app)
     if (app.tilwindow!=None):
         if (app.tilesCanvas != None) and (app.tilwindow.winfo_exists()!=0):    
