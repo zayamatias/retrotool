@@ -34,8 +34,8 @@ palettes = [("MSX",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette)]
 #Systems of choice, maybe beyond MSX one day?
-activeSystems = [3]
-defaultSystem = 3
+activeSystems = [0,3]
+defaultSystem = 0
 systems = ["MSX - Screen 2",
            "MSX - Screen 3",
            "MSX2 - Screen 4",
@@ -46,17 +46,23 @@ systems = ["MSX - Screen 2",
            "MSX2+ - Screen 10",
            "MSX2+ - Screen 11",
            "MSX2+ - Screen 12"]
-#System Limits => System name, max colors per sprite
-syslimits = [("MSX",1,256),
-             ("MSX",1,256),
-             ("MSX2",3,256),
-             ("MSX2",3,256),
-             ("MSX2",3,256),
-             ("MSX2",3,256),
-             ("MSX2",3,256),
-             ("MSX2+",3,256),
-             ("MSX2+",3,256),
-             ("MSX2+",3,256)]
+#System Limits => 
+#[0]System name
+#[1]max colors per sprite
+#[2]max colors of image to load
+#[3]can add colors to palette
+#[4] Can change colors of palette
+
+syslimits = [("MSX",1,256,False,False),
+             ("MSX",1,256,False,False),
+             ("MSX2",3,256,False,True),
+             ("MSX2",3,256,False,True),
+             ("MSX2",3,256,True,True),
+             ("MSX2",3,256,True,True),
+             ("MSX2",3,256,True,True),
+             ("MSX2+",3,256,True,True),
+             ("MSX2+",3,256,True,True),
+             ("MSX2+",3,256,True,True)]
 preferencesWxSize = 400
 preferencesWySize = 400
 animWxSize = 400
@@ -75,7 +81,7 @@ spriteysize = 16 #default sprite height
 tilexsize = 32 # default sprite width
 tileysize = 32 #default sprite height
 newSprites = 2 # Number of sprites for new project
-tilesPerRow = int(256/tilexsize)
+tilesPerRow = 10 #int(256/tilexsize)
 # Animation Section
 
 animCols = 3 # Number of columns for the sprite animation
