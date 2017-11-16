@@ -78,8 +78,8 @@ pixelsize = 4 #pixel size on screen for editing purposes (value will be multipli
 spriteeditorbgcolor = "white" #BG color for the sprite editor.
 spritexsize = 16 # default sprite width
 spriteysize = 16 #default sprite height
-tilexsize = 32 # default sprite width
-tileysize = 32 #default sprite height
+tilexsize = 8 # default sprite width
+tileysize = 8 #default sprite height
 newSprites = 2 # Number of sprites for new project
 tilesPerRow = 10 #int(256/tilexsize)
 # Animation Section
