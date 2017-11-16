@@ -748,4 +748,3 @@ def findColor(color,palette,extended):
             idx = idx + 1
     return retcol
 
-
