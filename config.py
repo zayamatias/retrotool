@@ -34,8 +34,8 @@ palettes = [("MSX",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette)]
 #Systems of choice, maybe beyond MSX one day?
-activeSystems = [0,3]
-defaultSystem = 0
+activeSystems = [0,1,3]
+defaultSystem = 1
 systems = ["MSX - Screen 2",
            "MSX - Screen 3",
            "MSX2 - Screen 4",
@@ -52,17 +52,19 @@ systems = ["MSX - Screen 2",
 #[2]max colors of image to load
 #[3]can add colors to palette
 #[4] Can change colors of palette
+#[5] override tile width (if not 0, value to use)
+#[6] override tile height (if not 0, value to use)
 
-syslimits = [("MSX",1,256,False,False),
-             ("MSX",1,256,False,False),
-             ("MSX2",3,256,False,True),
-             ("MSX2",3,256,False,True),
-             ("MSX2",3,256,True,True),
-             ("MSX2",3,256,True,True),
-             ("MSX2",3,256,True,True),
-             ("MSX2+",3,256,True,True),
-             ("MSX2+",3,256,True,True),
-             ("MSX2+",3,256,True,True)]
+syslimits = [("MSX",1,256,False,False,0,0),
+             ("MSX",1,256,False,True,2,2),
+             ("MSX2",3,256,False,True,0,0),
+             ("MSX2",3,256,False,True,0,0),
+             ("MSX2",3,256,True,True,0,0),
+             ("MSX2",3,256,True,True,0,0),
+             ("MSX2",3,256,True,True,0,0),
+             ("MSX2+",3,256,True,True,0,0),
+             ("MSX2+",3,256,True,True,0,0),
+             ("MSX2+",3,256,True,True,0,0)]
 preferencesWxSize = 400
 preferencesWySize = 400
 animWxSize = 400

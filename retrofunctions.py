@@ -8,6 +8,7 @@ from tkinter import messagebox
 import tiles
 import math
 import sprites
+import imageexport
 
 def newProject(app):
     # Create empty array of pixels
@@ -70,6 +71,9 @@ def writeASMFile(app):
         f.write ("\n")
 
 def exportToTiled(app):
+    if not app.Tiles:
+        messagebox.showinfo("Error","Please create some tiles first")
+        return 1        
     cols = config.tilesPerRow
     rows = math.ceil(len(app.FinalTiles)/cols)
     img = PIL.Image.new('RGB',(int(cols*app.tilexsize), int(rows*app.tileysize)))
@@ -127,124 +131,20 @@ def exportToTiled(app):
 
                         
 def exportMSXScreen(app):
-    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc5")])
+    if not app.Tiles:
+        messagebox.showinfo("Error","Please create some tiles first")
+        return 1        
+    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc3;*.sc5")])
     extension = outfile[outfile.index('.'):]
     f = open(outfile, 'wb')
     # First write the tiles themselves
     if extension.upper() == ".SC2":
-        header = [254,0,0,255,55,0,0]
-        #header = header + ([0]*249)
-        headerbytes = bytearray(header)
-        f.write(headerbytes)
-        filebytes = bytearray()
-        cols = 32
-        rows = 24
-        writtenbytes = 0
-        colorbytes = bytearray()
-        for tile in app.Tiles:
-            for row in range(0,app.tileysize):
-                cpattern = tile[row].split("%")
-                if cpattern [0] == "":
-                    del cpattern[0]
-                tilecols = list(set(cpattern))
-                if len(tilecols)==1:
-                    tilecols.append(tilecols[0])
-                    tilecols[0]=0
-
-                if len(tilecols)==0:
-                    tilecols.append(0)
-                    tilecols.append(0)
-                byte =""    
-                colorbyte = (int(tilecols[1])<<4) | int(tilecols[0])
-                for col in range (0,app.tilexsize):
-                    if int(cpattern[col])==int(tilecols[0]):
-                        byte = byte+"0"
-                    else:
-                        byte = byte+"1"
-                filebytes.append(int(byte,2))
-                colorbytes.append(colorbyte)
-        for x in range (0,3):
-            f.write(filebytes)
-            for wbyte in range (2048-len(filebytes)):
-                f.write(bytearray([0]))
-        for x in range (0,768):
-            try:
-                f.write(bytearray([app.TileMap[x]]))
-            except:
-                f.write(bytearray(0))
-        for wbyte in range (writtenbytes,1280):
-            f.write(bytearray([0]))
-        for x in range (0,3):
-            f.write(colorbytes)
-            for wbyte in range (len(colorbytes),2048):
-                f.write(bytearray([0]))
-        bgcolor = str(findColor (app.bgcolor,app.palette,config.syslimits[app.targetSystem.get()][4]))
-        if bgcolor == "-1":
-            bgcolor = "0"
-        print ("10 SCREEN 2:COLOR 15,"+bgcolor+","+bgcolor)
-        filesplit = outfile.split("/")
-        filename = filesplit[len(filesplit)-1]
-        print ("20 BLOAD \""+filename+"\",S")
-        print ("30 GOTO 30")
- 
-        
+        imageexport.Screen2(app,f,outfile)
     if extension.upper() == ".SC5":
-        header = [254,0,0,255,105,0,0]  
-        filebytes = bytearray(header)
-        cols = 32
-        rows = 27
-        nibbc = 0
-        for trow in range (0,rows):
-            for row in range (0,app.tileysize):
-                for tcol in range (0,cols):
-                    tileidx =(trow*cols)+tcol
-                    try:
-                        tile = app.ColorTiles[tileidx]
-                    except:
-                        tile = ['0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0']
-                    cpattern = tile[row].split("%")
-                    if cpattern [0] == "":
-                        del cpattern[0]
-                    for col in range (0,app.tilexsize):
-                        bit =  cpattern[col]
-                        if bit !="":
-                            bit =  int(cpattern[col]) & 15
-                            msbcolor = bit << 4
-                            lsbcolor = bit 
-                            if nibbc == 0:
-                                byte = msbcolor
-                            else:
-                                byte = byte | lsbcolor
-                            nibbc = nibbc +1 
-                            if nibbc == 2:
-                                filebytes.append(byte)
-                                nibbc = 0
-        f.write(filebytes)
-        ## Output palette to console in BASIC mode for testing purposes
-        bgcolor = str(findColor (app.bgcolor,app.palette,config.syslimits[app.targetSystem.get()][4]))
-        if bgcolor == "-1":
-            bgcolor = "0"
-        print ("10 SCREEN 5:COLOR 15,"+bgcolor+","+bgcolor)
-        line1 = "20 DATA 0,0,0"
-        line2 = "\n30 DATA "
-        idx = 0
-        for color in app.palette:
-            if idx == 0:
-                print (line1, end="")
-            if idx == 8:
-                print (line2, end="")
-            if idx > 0:
-                if idx == 8:
-                    print (str(color[0])+","+str(color[1])+","+str(color[2]), end="")
-                else:
-                    print (","+str(color[0])+","+str(color[1])+","+str(color[2]), end="")
+        imageexport.Screen2(app,f,outfile)
+    if extension.upper() == ".SC3":
+        imageexport.Screen3(app,f,outfile)
     
-            idx = idx +1
-        print ("\n40 FOR C=0 TO 15:READ R,G,B:COLOR=(C,R,G,B):NEXT")
-        filesplit = outfile.split("/")
-        filename = filesplit[len(filesplit)-1]
-        print ("50 BLOAD \""+filename+"\",S")
-        print ("60 GOTO 60")
 
 def exportASMFile(app):
 

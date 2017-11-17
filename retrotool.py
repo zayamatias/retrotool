@@ -22,6 +22,7 @@ class App:
         self.spixels = []
         self.tpixels = []
         self.finalsprites = []
+        self.Tiles=[]
         self.ColorTiles = []    
         self.FinalTiles = []
         self.usprites = []
@@ -32,8 +33,17 @@ class App:
         self.spriteeditorbgcolor = config.spriteeditorbgcolor
         self.spritexsize = config.spritexsize
         self.spriteysize = config.spriteysize
-        self.tilexsize = config.tilexsize
-        self.tileysize = config.tileysize
+        #Use config or overriding tile size
+        if config.syslimits[self.targetSystem.get()][5]==0:
+            self.tilexsize = config.tilexsize
+        else:
+            self.tilexsize = config.syslimits[self.targetSystem.get()][5]
+        
+        if config.syslimits[self.targetSystem.get()][6]==0:
+            self.tileysize = config.tileysize
+        else:
+            self.tileysize = config.syslimits[self.targetSystem.get()][6]
+            
         self.newSprites = config.newSprites
         self.spritesPerRow = 0
         self.spritesPerCol = 0
@@ -92,7 +102,7 @@ class App:
         idx = 0
         for system in config.systems:
             if idx in config.activeSystems:
-                self.filemenu.add_radiobutton(label=system, value=idx, variable=self.targetSystem, state="normal",command=lambda menu=idx:self.updateSystemPalette(menu))
+                self.filemenu.add_radiobutton(label=system, value=idx, variable=self.targetSystem, state="normal",command=lambda menu=idx:self.updateTargetSystem(menu))
             else:
                 self.filemenu.add_radiobutton(label=system, value=idx, variable=self.targetSystem, state="disabled")
             idx = idx + 1
@@ -114,10 +124,20 @@ class App:
         # Nothing gets executed after this statement!
         self.root.mainloop()
 
-    def updateSystemPalette(self,value):
+    def updateTargetSystem(self,value):
         self.targetSystem.set(value)
         self.palette=config.palettes[value][2]
-
+        #Use config or overriding tile size
+        if config.syslimits[self.targetSystem.get()][5]==0:
+            self.tilexsize = config.tilexsize
+        else:
+            self.tilexsize = config.syslimits[self.targetSystem.get()][5]
+        
+        if config.syslimits[self.targetSystem.get()][6]==0:
+            self.tileysize = config.tileysize
+        else:
+            self.tileysize = config.syslimits[self.targetSystem.get()][6]
+        self.pixelsize =32/self.tileysize
         
     def click (self,event):
         # need to consider scale!
