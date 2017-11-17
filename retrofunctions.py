@@ -5,7 +5,7 @@ import config
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-
+import tiles
 import math
 import sprites
 
@@ -530,6 +530,9 @@ def updateDrawColor (canvas,app):
     app.drawColor = int(tags[0])-1
 
 def swapColor (canvas,app):
+    if not (config.syslimits[app.targetSystem.get()][4]):
+        messagebox.showinfo ("Error","Your target system does not allow for palette changes")
+        return 1        
     tags = canvas.gettags(tk.CURRENT)
     if len(tags)<1:
         return
@@ -538,7 +541,7 @@ def swapColor (canvas,app):
         messagebox.showinfo ("Error","Cannot swap with background color '0'")
         return 1
     if (app.drawColor == newColor):
-        messagebox.showinfo ("Error","Cannot swap with color with itself")
+        messagebox.showinfo ("Error","Cannot swap color with itself")
         return 1
     ## Update Pixels
     idx= 0
@@ -548,6 +551,13 @@ def swapColor (canvas,app):
         elif str(pixel) == str(newColor):
             app.tpixels[idx]=str(app.drawColor)
         idx = idx + 1
+    
+    #TODO
+    #Update Sprites
+    #Update Tiles
+    #How should it be done???    
+    tiles.createTiles(app)
+        
     ## Update Palette
     oldColors = app.palette[app.drawColor]
     newColors = app.palette[newColor]
