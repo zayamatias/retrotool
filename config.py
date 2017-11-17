@@ -34,7 +34,7 @@ palettes = [("MSX",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette)]
 #Systems of choice, maybe beyond MSX one day?
-activeSystems = [0,1,3]
+activeSystems = [0,1,2,3]
 defaultSystem = 1
 systems = ["MSX - Screen 2",
            "MSX - Screen 3",

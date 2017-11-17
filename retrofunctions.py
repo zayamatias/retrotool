@@ -140,6 +140,8 @@ def exportMSXScreen(app):
     # First write the tiles themselves
     if extension.upper() == ".SC2":
         imageexport.Screen2(app,f,outfile)
+    if extension.upper() == ".SC4":
+        imageexport.Screen4(app,f,outfile)
     if extension.upper() == ".SC5":
         imageexport.Screen2(app,f,outfile)
     if extension.upper() == ".SC3":
