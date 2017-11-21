@@ -34,7 +34,7 @@ palettes = [("MSX",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette)]
 #Systems of choice, maybe beyond MSX one day?
-activeSystems = [0,1,2,3]
+activeSystems = [0,1,2,3,4]
 defaultSystem = 1
 systems = ["MSX - Screen 2",
            "MSX - Screen 3",
@@ -59,12 +59,15 @@ syslimits = [("MSX",1,256,False,False,0,0),
              ("MSX",1,256,False,True,2,2),
              ("MSX2",3,256,False,True,0,0),
              ("MSX2",3,256,False,True,0,0),
-             ("MSX2",3,256,True,True,0,0),
+             ("MSX2",3,4,True,True,4,1),
              ("MSX2",3,256,True,True,0,0),
              ("MSX2",3,256,True,True,0,0),
              ("MSX2+",3,256,True,True,0,0),
              ("MSX2+",3,256,True,True,0,0),
              ("MSX2+",3,256,True,True,0,0)]
+             
+extensions = ["SC2","SC3","SC4","SC5","SC6","SC7"]
+             
 preferencesWxSize = 400
 preferencesWySize = 400
 animWxSize = 400

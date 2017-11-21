@@ -134,7 +134,7 @@ def exportMSXScreen(app):
     if not app.Tiles:
         messagebox.showinfo("Error","Please create some tiles first")
         return 1        
-    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files","*.sc2;*.sc3;*.sc5")])
+    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files",config.extensions[app.targetSystem.get()])])
     extension = outfile[outfile.index('.'):]
     f = open(outfile, 'wb')
     # First write the tiles themselves
@@ -143,9 +143,11 @@ def exportMSXScreen(app):
     if extension.upper() == ".SC4":
         imageexport.Screen4(app,f,outfile)
     if extension.upper() == ".SC5":
-        imageexport.Screen2(app,f,outfile)
+        imageexport.Screen5(app,f,outfile)
     if extension.upper() == ".SC3":
         imageexport.Screen3(app,f,outfile)
+    if extension.upper() == ".SC6":
+        imageexport.Screen6(app,f,outfile)
     
 
 def exportASMFile(app):
@@ -267,7 +269,7 @@ def checkColors(app):
     if (app.colors==None):
         app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
-    if numcolors > (config.syslimits[app.targetSystem.get()][2] -1) :
+    if numcolors > app.maxcolors :
         messagebox.showinfo("Error","Max number of colors exceeded ("+str(numcolors)+" instead of "+str(app.maxcolors)+")")
         return False
     else:

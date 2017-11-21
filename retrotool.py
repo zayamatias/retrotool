@@ -64,7 +64,7 @@ class App:
         self.paletteColorBoxes = []
         self.opfile = ""
         self.colors = []
-        self.maxcolors = 16
+        self.maxcolors = config.syslimits[self.targetSystem.get()][2]
         self.bgcolor = (-1,-1,-1)
         self.root =tk.Toplevel()
         self.root.title (config.tooltitle)
@@ -138,6 +138,8 @@ class App:
         else:
             self.tileysize = config.syslimits[self.targetSystem.get()][6]
         self.pixelsize =32/self.tileysize
+
+        self.maxcolors = config.syslimits[self.targetSystem.get()][2]
         
     def click (self,event):
         # need to consider scale!
