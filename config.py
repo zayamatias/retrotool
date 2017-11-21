@@ -27,7 +27,7 @@ palettes = [("MSX",msxcolordivider,msxpalette),
             ("MSX",msxcolordivider,msxpalette),
             ("MSX2",msxcolordivider,msxpalette),
             ("MSX2",msxcolordivider,msxpalette),
-            ("MSX2",msxcolordivider,msxpalette),
+            ("MSX2",msxcolordivider,[(-1,-1,-1),(0,0,0),(0,0,0),(0,0,0)]),
             ("MSX2",msxcolordivider,msxpalette),
             ("MSX2",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette),
@@ -35,7 +35,7 @@ palettes = [("MSX",msxcolordivider,msxpalette),
             ("MSX2+",msxcolordivider,msxpalette)]
 #Systems of choice, maybe beyond MSX one day?
 activeSystems = [0,1,2,3,4]
-defaultSystem = 1
+defaultSystem = 4
 systems = ["MSX - Screen 2",
            "MSX - Screen 3",
            "MSX2 - Screen 4",
@@ -59,7 +59,7 @@ syslimits = [("MSX",1,256,False,False,0,0),
              ("MSX",1,256,False,True,2,2),
              ("MSX2",3,256,False,True,0,0),
              ("MSX2",3,256,False,True,0,0),
-             ("MSX2",3,4,True,True,4,1),
+             ("MSX2",3,4,False,True,4,1),
              ("MSX2",3,256,True,True,0,0),
              ("MSX2",3,256,True,True,0,0),
              ("MSX2+",3,256,True,True,0,0),

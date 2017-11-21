@@ -127,6 +127,7 @@ class App:
     def updateTargetSystem(self,value):
         self.targetSystem.set(value)
         self.palette=config.palettes[value][2]
+        print (self.palette)
         #Use config or overriding tile size
         if config.syslimits[self.targetSystem.get()][5]==0:
             self.tilexsize = config.tilexsize

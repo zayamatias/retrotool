@@ -286,6 +286,11 @@ def checkSize(app):
 def getColors(app):
     #get the system colors (needs to be generic, not yet done I believe)
     #app.palette =[app.bgcolor]
+    #TODO -> The code below will update (if possible) the palette,
+    #it should be modified to run 2 times:
+    #1st time get colors without modification (to stick to the original system palette)
+    #2nd time, only if possible to modifiy colors, take into account used colors and modify/add when possible
+    #Then all this logic should be outside the "getPixels" function!!!!!
     for color in app.colors:
         rgb = color[1]
         if not (isinstance( rgb, int )):
@@ -295,13 +300,14 @@ def getColors(app):
             # make sure we do not add bgcolor
             if set((r,g,b)) != set (app.bgcolor):
                 # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
-               if not isColorInPalette (app,(r,g,b),not config.syslimits[app.targetSystem.get()][4]):
-                   if app.paletteIndex>(len(app.palette)-1):
+                if not isColorInPalette (app,(r,g,b),not config.syslimits[app.targetSystem.get()][4]):
+                   if config.syslimits[app.targetSystem.get()][3]:
                        app.palette.append((r,g,b))
-                   else:
+                   elif config.syslimits[app.targetSystem.get()][4]:
                        app.palette[app.paletteIndex]=(r,g,b)
-            app.paletteIndex = app.paletteIndex + 1
-    app.paletteIndex = 0
+                   else:
+                       messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
+                app.paletteIndex = app.paletteIndex + 1
 
 def getPixels (app,pixelArray):
     #Read all the pixels and colors in the image
