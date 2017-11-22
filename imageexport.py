@@ -304,3 +304,62 @@ def Screen6 (app,file,filename):
     filename = filesplit[len(filesplit)-1]
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
+
+def Screen7 (app,file,filename):
+    header = [254,0,0,255,211,0,0]  
+    filebytes = bytearray(header)
+    cols = 64
+    rows = 27
+    nibbc = 0
+    for trow in range (0,rows):
+        for row in range (0,app.tileysize):
+            for tcol in range (0,cols):
+                tileidx =(trow*cols)+tcol
+                try:
+                    tile = app.ColorTiles[tileidx]
+                except:
+                    tile = ['0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0']
+                cpattern = tile[row].split("%")
+                if cpattern [0] == "":
+                    del cpattern[0]
+                for col in range (0,app.tilexsize):
+                    bit =  cpattern[col]
+                    if bit !="":
+                        bit =  int(cpattern[col]) & 15
+                        msbcolor = bit << 4
+                        lsbcolor = bit 
+                        if nibbc == 0:
+                            byte = msbcolor
+                        else:
+                            byte = byte | lsbcolor
+                        nibbc = nibbc +1 
+                        if nibbc == 2:
+                            filebytes.append(byte)
+                            nibbc = 0
+    file.write(filebytes)
+    ## Output palette to console in BASIC mode for testing purposes
+    bgcolor = str(retrofunctions.findColor (app.bgcolor,app.palette,config.syslimits[app.targetSystem.get()][4]))
+    if bgcolor == "-1":
+        bgcolor = "0"
+    print ("10 SCREEN 7:COLOR 15,"+bgcolor+","+bgcolor)
+    line1 = "20 DATA 0,0,0"
+    line2 = "\n30 DATA "
+    idx = 0
+    for color in app.palette:
+        if idx == 0:
+            print (line1, end="")
+        if idx == 8:
+            print (line2, end="")
+        if idx > 0:
+            if idx == 8:
+                print (str(color[0])+","+str(color[1])+","+str(color[2]), end="")
+            else:
+                print (","+str(color[0])+","+str(color[1])+","+str(color[2]), end="")
+
+        idx = idx +1
+    print ("\n40 FOR C=0 TO ",len(app.palette)-1,":READ R,G,B:COLOR=(C,R,G,B):NEXT")
+    filesplit = filename.split("/")
+    filename = filesplit[len(filesplit)-1]
+    print ("50 BLOAD \""+filename+"\",S")
+    print ("60 GOTO 60")
+ 

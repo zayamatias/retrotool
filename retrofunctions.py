@@ -148,6 +148,8 @@ def exportMSXScreen(app):
         imageexport.Screen3(app,f,outfile)
     if extension.upper() == ".SC6":
         imageexport.Screen6(app,f,outfile)
+    if extension.upper() == ".SC7":
+        imageexport.Screen7(app,f,outfile)
     
 
 def exportASMFile(app):
@@ -291,6 +293,24 @@ def getColors(app):
     #1st time get colors without modification (to stick to the original system palette)
     #2nd time, only if possible to modifiy colors, take into account used colors and modify/add when possible
     #Then all this logic should be outside the "getPixels" function!!!!!
+    
+    usedColors = [0]
+    
+    #first run : Check existing colors
+    for color in app.colors:
+        print ("-------------------------------------------------")
+        rgb = color[1]
+        if not (isinstance( rgb, int )):
+            r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1])
+            g=int(int(rgb[1])/config.palettes[app.targetSystem.get()][1])
+            b=int(int(rgb[2])/config.palettes[app.targetSystem.get()][1])
+            # make sure we do not add bgcolor
+            if set((r,g,b)) != set (app.bgcolor):
+                # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
+                idx = findColor((r,g,b),app.palette,False)
+                if idx != -1:
+                    usedColors.append(idx)
+    print (usedColors)
     for color in app.colors:
         rgb = color[1]
         if not (isinstance( rgb, int )):
@@ -300,14 +320,22 @@ def getColors(app):
             # make sure we do not add bgcolor
             if set((r,g,b)) != set (app.bgcolor):
                 # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
-                if not isColorInPalette (app,(r,g,b),not config.syslimits[app.targetSystem.get()][4]):
-                   if config.syslimits[app.targetSystem.get()][3]:
-                       app.palette.append((r,g,b))
-                   elif config.syslimits[app.targetSystem.get()][4]:
-                       app.palette[app.paletteIndex]=(r,g,b)
-                   else:
-                       messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
-                app.paletteIndex = app.paletteIndex + 1
+                if findColor((r,g,b),app.palette,False) == -1:
+                    found = False
+                    print (usedColors,)
+                    for idx in range(len(app.palette)):
+                        print (idx,)
+                        if (idx not in usedColors) and not found:
+                            if config.syslimits[app.targetSystem.get()][3]:
+                                app.palette.append((r,g,b))
+                                found = True
+                                usedColors.append(idx)
+                            elif config.syslimits[app.targetSystem.get()][4]:
+                                app.palette[idx]=(r,g,b)
+                                found = True
+                                usedColors.append(idx)
+                            else:
+                                messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
 
 def getPixels (app,pixelArray):
     #Read all the pixels and colors in the image
@@ -337,8 +365,15 @@ def getPixels (app,pixelArray):
             g = pixel[1]
             b = pixel[2]
             color = (int(r/config.palettes[app.targetSystem.get()][1]),int(g/config.palettes[app.targetSystem.get()][1]),int(b/config.palettes[app.targetSystem.get()][1]))
+            error = False
             if set(color) != set(app.bgcolor): # color chosen by user
-                #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
+                index = findColor (color,app.palette,True) # Color must be found rpecisely now the palette is done
+                if index != -1:
+                    pixelArray.append(index)
+                else:
+                    pixelArray.append(0) # Cannot find color, then add background
+                    error = True
+                """    #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
                 index = findColor(color,app.palette,not config.syslimits[app.targetSystem.get()][4])
                 if index >= 0:
                     pixelArray.append(index)
@@ -362,10 +397,14 @@ def getPixels (app,pixelArray):
                             print (index)
                         else:
                             pixelArray.append('0')
+            
+                """
             else:
-                    pixelArray.append('0')
+                pixelArray.append('0')
         for x in range (0,extracols):
                 pixelArray.append('0')
+    """
+    #We should be not needing a all this now.
     idx = 0
     swpidx = 1
     if (config.syslimits[app.targetSystem.get()][4]):
@@ -386,8 +425,11 @@ def getPixels (app,pixelArray):
                     pixelArray[pxidx]=swpidx
                 pxidx = pxidx + 1
             idx = idx+1
+    """
 
-            
+    if error:
+        messagebox.showinfo ("Warning","Some colors have been discarded due to target system limtations (usually number of colors)")
+
                     
                 
     app.imgwidth= app.imgwidth+extracols
@@ -643,38 +685,43 @@ def colorCompare(colora,colorb,extended):
     rb=int(colorb[0])
     gb=int(colorb[1])
     bb=int(colorb[2])
+    weight = 0
     if (ra==rb) and (ga==gb) and (ba==bb):
-        return 7
+        weight = weight + 30
     if extended:
         if (abs(ra-rb)==1) and (ga==gb) and (ba==bb):
-            return 6
+            weight = weight + 10
         if (ra==rb) and (abs(ga-gb)==1) and (ba==bb):
-            return 6
+            weight = weight + 10
         if (ra==rb) and (abs(ba-bb)==1) and (ga==gb):
-            return 6
+            weight = weight + 10
         if abs(ra-rb)==1 and abs(ga-gb)==1 and abs(ba-bb)==1:
-            return 4
+            weight = weight+ 20
         if abs(ra-rb)==1 and abs(ga-gb)==1 and (ba==bb):
-            return 5
+            weight = weight+ 5
         if abs(ra-rb)==1 and abs(ba-bb)==1 and (ga==gb):
-            return 5
+            weight = weight+ 5
         if abs(ga-gb)==1 and abs(ba-bb)==1 and (ra==rb):
-            return 5
+            weight = weight+ 2
         if (abs(ra-rb)==2) and (ga==gb) and (ba==bb):
-            return 3
+            weight = weight+ 4
         if (ra==rb) and (abs(ga-gb)==2) and (ba==bb):
-            return 3
+            weight = weight+ 4
         if (ra==rb) and (abs(ba-bb)==2) and (ga==gb):
-            return 3
+            weight = weight+ 4
         if abs(ra-rb)==2 and abs(ga-gb)==2 and abs(ba-bb)==2:
-            return 1
+            weight = weight+ 1
         if abs(ra-rb)==2 and abs(ga-gb)==2 and (ba==bb):
-            return 2
+            weight = weight+ 1
         if abs(ra-rb)==2 and abs(ba-bb)==2 and (ga==gb):
-            return 2
+            weight = weight+ 1
         if abs(ga-gb)==2 and abs(ba-bb)==2 and (ra==rb):
-            return 2
-    return 0
+            weight = weight+ 1
+        # Special case, if 3 colors are equal to each other then add extra points
+        if (rb==gb) and (gb==bb) and (ra==ga) and (ga==ba):
+            weight = weight +1 
+            
+    return weight
 
 def findColor(color,palette,extended):
     idx = 0
