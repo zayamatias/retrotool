@@ -288,7 +288,7 @@ def checkSize(app):
 def getColors(app):
     #get the system colors (needs to be generic, not yet done I believe)
     #app.palette =[app.bgcolor]
-    #TODO -> The code below will update (if possible) the palette,
+    #The code below will update (if possible) the palette,
     #it should be modified to run 2 times:
     #1st time get colors without modification (to stick to the original system palette)
     #2nd time, only if possible to modifiy colors, take into account used colors and modify/add when possible
@@ -298,7 +298,6 @@ def getColors(app):
     
     #first run : Check existing colors
     for color in app.colors:
-        print ("-------------------------------------------------")
         rgb = color[1]
         if not (isinstance( rgb, int )):
             r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1])
@@ -310,7 +309,6 @@ def getColors(app):
                 idx = findColor((r,g,b),app.palette,False)
                 if idx != -1:
                     usedColors.append(idx)
-    print (usedColors)
     for color in app.colors:
         rgb = color[1]
         if not (isinstance( rgb, int )):
@@ -322,9 +320,7 @@ def getColors(app):
                 # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
                 if findColor((r,g,b),app.palette,False) == -1:
                     found = False
-                    print (usedColors,)
                     for idx in range(len(app.palette)):
-                        print (idx,)
                         if (idx not in usedColors) and not found:
                             if config.syslimits[app.targetSystem.get()][3]:
                                 app.palette.append((r,g,b))
@@ -342,9 +338,6 @@ def getPixels (app,pixelArray):
     #scan each pixel (Width) in each row (height)
     pixelScale = int(app.imgwidth* app.imgheight/100)
     pixelCount = 1
-    newColors = []
-    newColorsidx = []
-    usedColors = []
     if (app.imgwidth/app.spritexsize != int(app.imgwidth/app.spritexsize)):
         extracols = ((math.ceil(app.imgwidth/app.spritexsize))*app.spritexsize)-app.imgwidth
     else:
@@ -373,60 +366,10 @@ def getPixels (app,pixelArray):
                 else:
                     pixelArray.append(0) # Cannot find color, then add background
                     error = True
-                """    #pattern is created either with a ZERO or the index of the color in the palette (1,2,3,4....max colors of the system)
-                index = findColor(color,app.palette,not config.syslimits[app.targetSystem.get()][4])
-                if index >= 0:
-                    pixelArray.append(index)
-                    try:
-                        a = usedColors.index(index)
-                    except:
-                       usedColors.append(index) 
-                else:
-                    if (index == -1) and (config.syslimits[app.targetSystem.get()][4]): #Add color to palette if we can
-                        newcolindex = findColor(color,newColors,not config.syslimits[app.targetSystem.get()][4])
-                        if newcolindex == -1:#app.palette.append(color)
-                            index = len(app.palette)+len(newColors)
-                            newColorsidx.append(index)
-                            newColors.append(color)
-                        else:
-                            index = newcolindex + len(app.palette)
-                        pixelArray.append(index)
-                    else:
-                        if config.syslimits[app.targetSystem.get()][4]:
-                            index = findColor(color,app.palette,True)
-                            print (index)
-                        else:
-                            pixelArray.append('0')
-            
-                """
             else:
                 pixelArray.append('0')
         for x in range (0,extracols):
                 pixelArray.append('0')
-    """
-    #We should be not needing a all this now.
-    idx = 0
-    swpidx = 1
-    if (config.syslimits[app.targetSystem.get()][4]):
-        for ncolor in newColors:
-            while swpidx in usedColors:
-                swpidx = swpidx + 1
-            if (swpidx<len(app.palette)):
-                app.palette[swpidx]=newColors[idx]
-                usedColors.append(swpidx)
-            else:
-                if (config.syslimits[app.targetSystem.get()][3]):
-                    app.palette.append(newColors[idx])
-                    usedColors.append(swpidx)
-                    
-            pxidx = 0
-            for pixel in pixelArray:
-                if int(pixel) == int(newColorsidx[idx]):
-                    pixelArray[pxidx]=swpidx
-                pxidx = pxidx + 1
-            idx = idx+1
-    """
-
     if error:
         messagebox.showinfo ("Warning","Some colors have been discarded due to target system limtations (usually number of colors)")
 
