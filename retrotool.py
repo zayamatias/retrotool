@@ -159,9 +159,9 @@ class App:
                 if isinstance(color,int):
                     tk.messagebox.showinfo("Warning","Could not retrieve color properly, please chose another image or convert to another format")
                     return 1
-                r=int(int(color[0])/config.msxcolordivider)
-                g=int(int(color[1])/config.msxcolordivider)
-                b=int(int(color[2])/config.msxcolordivider)
+                r=int(int(color[0])/config.palettes[self.targetSystem.get()][1][0])
+                g=int(int(color[1])/config.palettes[self.targetSystem.get()][1][1])
+                b=int(int(color[2])/config.palettes[self.targetSystem.get()][1][2])
                 self.bgcolor = (r,g,b)
                 retrofunctions.getColors(self)
 

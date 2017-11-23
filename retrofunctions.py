@@ -150,6 +150,8 @@ def exportMSXScreen(app):
         imageexport.Screen6(app,f,outfile)
     if extension.upper() == ".SC7":
         imageexport.Screen7(app,f,outfile)
+    if extension.upper() == ".SC8":
+        imageexport.Screen8(app,f,outfile)
     
 
 def exportASMFile(app):
@@ -267,7 +269,7 @@ def zoomimage(app):
 
 def checkColors(app):
     #check if the colors of the image are within the limits of the system
-    app.colors = app.img.getcolors()
+    app.colors = app.img.getcolors(10000000)
     if (app.colors==None):
         app.colors = [(0,0,0)]*255
     numcolors = len(app.colors)
@@ -300,9 +302,9 @@ def getColors(app):
     for color in app.colors:
         rgb = color[1]
         if not (isinstance( rgb, int )):
-            r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1])
-            g=int(int(rgb[1])/config.palettes[app.targetSystem.get()][1])
-            b=int(int(rgb[2])/config.palettes[app.targetSystem.get()][1])
+            r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1][0])
+            g=int(int(rgb[1])/config.palettes[app.targetSystem.get()][1][1])
+            b=int(int(rgb[2])/config.palettes[app.targetSystem.get()][1][2])
             # make sure we do not add bgcolor
             if set((r,g,b)) != set (app.bgcolor):
                 # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
@@ -312,9 +314,9 @@ def getColors(app):
     for color in app.colors:
         rgb = color[1]
         if not (isinstance( rgb, int )):
-            r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1])
-            g=int(int(rgb[1])/config.palettes[app.targetSystem.get()][1])
-            b=int(int(rgb[2])/config.palettes[app.targetSystem.get()][1])
+            r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1][0])
+            g=int(int(rgb[1])/config.palettes[app.targetSystem.get()][1][1])
+            b=int(int(rgb[2])/config.palettes[app.targetSystem.get()][1][2])
             # make sure we do not add bgcolor
             if set((r,g,b)) != set (app.bgcolor):
                 # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
@@ -323,15 +325,15 @@ def getColors(app):
                     for idx in range(len(app.palette)):
                         if (idx not in usedColors) and not found:
                             if config.syslimits[app.targetSystem.get()][3]:
-                                app.palette.append((r,g,b))
-                                found = True
-                                usedColors.append(idx)
-                            elif config.syslimits[app.targetSystem.get()][4]:
                                 app.palette[idx]=(r,g,b)
                                 found = True
                                 usedColors.append(idx)
-                            else:
-                                messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
+                    if config.syslimits[app.targetSystem.get()][4] and not found:
+                        app.palette.append((r,g,b))
+                        found = True
+                        usedColors.append(len(app.palette)-1)
+                    else:
+                        messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
 
 def getPixels (app,pixelArray):
     #Read all the pixels and colors in the image
@@ -357,7 +359,7 @@ def getPixels (app,pixelArray):
             r = pixel[0]
             g = pixel[1]
             b = pixel[2]
-            color = (int(r/config.palettes[app.targetSystem.get()][1]),int(g/config.palettes[app.targetSystem.get()][1]),int(b/config.palettes[app.targetSystem.get()][1]))
+            color = (int(r/config.palettes[app.targetSystem.get()][1][0]),int(g/config.palettes[app.targetSystem.get()][1][1]),int(b/config.palettes[app.targetSystem.get()][1][2]))
             error = False
             if set(color) != set(app.bgcolor): # color chosen by user
                 index = findColor (color,app.palette,True) # Color must be found rpecisely now the palette is done
@@ -498,12 +500,14 @@ def transformColor (app,paletteIndex):
     r = palettecolor[0]
     g = palettecolor[1]
     b = palettecolor[2]
+   # print (r,g,b)
     if r<0: r = 0        
     if g<0: g = 0        
     if b<0: b = 0        
-    rgb = (r*config.msxcolordivider,
-           g*config.msxcolordivider,
-           b*config.msxcolordivider)
+    rgb = (r*config.palettes[app.targetSystem.get()][1][0],
+           g*config.palettes[app.targetSystem.get()][1][1],
+           b*config.palettes[app.targetSystem.get()][1][2])
+    #print (rgb)
     color = "#%02x%02x%02x" % rgb
     return color
 

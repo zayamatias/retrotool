@@ -362,4 +362,42 @@ def Screen7 (app,file,filename):
     filename = filesplit[len(filesplit)-1]
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
+
+def Screen8 (app,file,filename):
+    header = [254,0,0,255,211,0,0]  
+    filebytes = bytearray(header)
+    cols = 32
+    rows = 27
+    for trow in range (0,rows):
+        for row in range (0,app.tileysize):
+            for tcol in range (0,cols):
+                tileidx =(trow*cols)+tcol
+                try:
+                    tile = app.ColorTiles[tileidx]
+                except:
+                    tile = ['0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0']
+                cpattern = tile[row].split("%")
+                if cpattern [0] == "":
+                    del cpattern[0]
+                for col in range (0,app.tilexsize):
+                    bit =  cpattern[col]
+                    if bit !="":
+                        color = app.palette[int(bit)]
+                        if set(color)==set((-1,-1,-1)):
+                            color = app.bgcolor
+                        byte = color[1]<<5 | color[0]<<2 | color[2]
+                        if (byte != 0 and byte != 255):
+                            print (color,byte)                        
+                        filebytes.append(byte)
+                            
+    file.write(filebytes)
+    ## Output palette to console in BASIC mode for testing purposes
+    bgcolor = str(retrofunctions.findColor (app.bgcolor,app.palette,config.syslimits[app.targetSystem.get()][4]))
+    if bgcolor == "-1":
+        bgcolor = "0"
+    filesplit = filename.split("/")
+    filename = filesplit[len(filesplit)-1]
+    print ("10 SCREEN 8:COLOR 15,"+bgcolor+","+bgcolor)
+    print ("20 BLOAD \""+filename+"\",S")
+    print ("30 GOTO 30")
  
