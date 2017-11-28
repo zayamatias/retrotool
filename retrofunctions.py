@@ -152,6 +152,8 @@ def exportMSXScreen(app):
         imageexport.Screen7(app,f,outfile)
     if extension.upper() == ".SC8":
         imageexport.Screen8(app,f,outfile)
+    if (extension.upper() == ".S10") or (extension.upper() == ".S11") or (extension.upper() == ".S12"):
+        imageexport.Screen10plus(app,f,outfile)
     
 
 def exportASMFile(app):
@@ -332,8 +334,8 @@ def getColors(app):
                         app.palette.append((r,g,b))
                         found = True
                         usedColors.append(len(app.palette)-1)
-                    else:
-                        messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
+                    elif not found:
+                            messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
 
 def getPixels (app,pixelArray):
     #Read all the pixels and colors in the image

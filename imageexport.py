@@ -400,4 +400,82 @@ def Screen8 (app,file,filename):
     print ("10 SCREEN 8:COLOR 15,"+bgcolor+","+bgcolor)
     print ("20 BLOAD \""+filename+"\",S")
     print ("30 GOTO 30")
+
+def Screen10plus (app,file,filename):
+    header = [254,0,0,255,211,0,0]  
+    filebytes = bytearray(header)
+    cols = 32
+    rows = 27
+    for trow in range (0,rows):
+        for row in range (0,app.tileysize):
+            for tcol in range (0,cols):
+                tileidx =(trow*cols)+tcol
+                try:
+                    tile = app.ColorTiles[tileidx]
+                except:
+                    tile = ['0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0','0%0%0%0%0%0%0%0']
+                cpattern = tile[row].split("%")
+                if cpattern [0] == "":
+                    del cpattern[0]
+                # SPecial case for MSX screens, we take the two bytes of the tile and calculate colors
+                # according to 4bits
+                for byte in range (2): # Take two bytes at a time
+                    bits = [cpattern[(byte*4)+0],cpattern[(byte*4)+1],cpattern[(byte*4)+2],cpattern[(byte*4)+3]] 
+                    colors = []
+                    for idx in range (4):
+                        bit =  bits[idx]
+                        if bit !="":
+                            color = app.palette[int(bit)]
+                            if set(color)==set((-1,-1,-1)):
+                                color = app.bgcolor
+                            colors.append(color)   
+                    print (colors)    
+                    r = int((colors[0][0]+colors[1][0]+colors[2][0]+colors[3][0])/4)
+                    g = int((colors[0][1]+colors[1][1]+colors[2][1]+colors[3][1])/4)
+                    b = int((colors[0][2]+colors[1][2]+colors[2][2]+colors[3][2])/4)
+                    y =int( b/2 + r/4 + g/8)
+                    j = int( r - y)
+                    k = int(g - y)
+                    y1 = int(colors[0][2]/2 + colors[0][0]/4 + colors[0][1]/8)
+                    y2 = int(colors[1][2]/2 + colors[1][0]/4 + colors[1][1]/8)
+                    y3 = int(colors[2][2]/2 + colors[2][0]/4 + colors[2][1]/8)
+                    y4 = int(colors[3][2]/2 + colors[3][0]/4 + colors[3][1]/8)
+                    k = k & 63
+                    kh = k >> 3
+                    kl = k & 7
+                    j = j & 63
+                    jh = j >> 3
+                    jl = j & 7
+                    byte1 = y1 << 4 | kl 
+                    byte2 = y2 << 4 | kh 
+                    byte3 = y3 << 4 | jl 
+                    byte4 = y4 << 4 | jh 
+                    """#FOr some reason sometimes the calculations go below 0
+                    if byte1 < 0:
+                        byte1 = 0
+                    if byte2 < 0:
+                        byte2 = 0
+                    if byte3 < 0:
+                        byte3 = 0
+                    if byte4 < 0:
+                        byte4 = 0
+                    """
+                    try:
+                        filebytes.append(byte1)
+                        filebytes.append(byte2)
+                        filebytes.append(byte3)
+                        filebytes.append(byte4)
+                    except:
+                        print (byte1,byte2,byte3,byte4)
+                        exit
+    file.write(filebytes)
+    ## Output palette to console in BASIC mode for testing purposes
+    bgcolor = str(retrofunctions.findColor (app.bgcolor,app.palette,config.syslimits[app.targetSystem.get()][4]))
+    if bgcolor == "-1":
+        bgcolor = "0"
+    filesplit = filename.split("/")
+    filename = filesplit[len(filesplit)-1]
+    print ("10 SCREEN 8:COLOR 15,"+bgcolor+","+bgcolor)
+    print ("20 BLOAD \""+filename+"\",S")
+    print ("30 GOTO 30")
  
