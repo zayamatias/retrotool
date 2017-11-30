@@ -322,7 +322,7 @@ def getColors(app):
             # make sure we do not add bgcolor
             if set((r,g,b)) != set (app.bgcolor):
                 # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
-                if findColor((r,g,b),app.palette,False) == -1:
+                if findColor((r,g,b),app.palette,not config.syslimits[app.targetSystem.get()][4]) == -1:
                     found = False
                     for idx in range(len(app.palette)):
                         if (idx not in usedColors) and not found:
@@ -330,7 +330,7 @@ def getColors(app):
                                 app.palette[idx]=(r,g,b)
                                 found = True
                                 usedColors.append(idx)
-                    if config.syslimits[app.targetSystem.get()][4] and not found:
+                    if config.syslimits[app.targetSystem.get()][5] and not found:
                         app.palette.append((r,g,b))
                         found = True
                         usedColors.append(len(app.palette)-1)
