@@ -483,7 +483,7 @@ def drawboxel (app,canvas,sprite,x,y,index,width,bgcolor):
             else:
                 color = transformColor (app,pxColor)
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
-            canvas.create_rectangle (x,y,ex,ey,fill=color,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)
+            canvas.create_rectangle (x,y,ex,ey,fill=color,width=border)
             #else:
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
             #    canvas.create_rectangle (x,y,ex,ey,fill=app.spriteeditorbgcolor,tag=str(index)+"/"+str(px)+"/"+str(py),width=border)

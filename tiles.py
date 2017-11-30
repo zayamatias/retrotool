@@ -232,3 +232,14 @@ def createTilesMapWindow(app):
 def closeTilesMapWindow(app):
     #Destroy sprite window so next time it is open it is reinitialized
     app.tilmwindow.destroy()
+    
+def selectTile(canvas,app):
+    tags = canvas.gettags(tk.CURRENT)
+    for rectangle in canvas.find_all():
+       compare = canvas.itemcget(rectangle,"tags")
+       if "current" not in compare :
+            canvas.itemconfig (rectangle, outline="black")
+       else:
+            canvas.itemconfig (rectangle, outline="white")
+    canvas.update_idletasks()
+    canvas.focus_set()
