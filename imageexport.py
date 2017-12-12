@@ -2,12 +2,13 @@ import retrofunctions
 import config
 import tkinter as tk
 
-def Screen2 (app,file,filename):
-    header = [254,0,0,255,55,0,0]
-    #header = header + ([0]*249)
-    headerbytes = bytearray(header)
-    errors = False
-    file.write(headerbytes)
+def Screen2 (app,file,filename,wHeader=True):
+    if wHeader:
+        header = [254,0,0,255,55,0,0]
+        #header = header + ([0]*249)
+        headerbytes = bytearray(header)
+        errors = False
+        file.write(headerbytes)
     filebytes = bytearray()
     writtenbytes = 0
     colorbytes = bytearray()
@@ -62,8 +63,11 @@ def Screen2 (app,file,filename):
         return 1        
 
  
-def Screen5 (app,file,filename):
-    header = [254,0,0,255,105,0,0]  
+def Screen5 (app,file,filename,wHeader=True):
+    if wHeader:
+        header = [254,0,0,255,105,0,0]  
+    else:
+        header = []
     filebytes = bytearray(header)
     cols = 32
     rows = 27
@@ -120,12 +124,15 @@ def Screen5 (app,file,filename):
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
     
-def Screen3 (app,file,filename):
+def Screen3 (app,file,filename,wHeader=True):
     # In this case we know taht the tiles are 2 by 2, each tile will end up being something like:
     # 4bits-> Color A + 4bits -> Color B
     # 4bits-> Color C + 4bits -> Color D
     
-    header = [254,0,0,255,7,0,0]  
+    if wHeader:
+        header = [254,0,0,255,7,0,0]  
+    else:
+        header = []
     filebytes = bytearray(header)
     memorypos = 0
     offset = 0
@@ -189,8 +196,11 @@ def Screen3 (app,file,filename):
     print ("60 GOTO 60")
     
     
-def Screen4 (app,file,filename):
-    header = [254,0,0,255,55,0,0]
+def Screen4 (app,file,filename,wHeader=True):
+    if wHeader:
+        header = [254,0,0,255,55,0,0]
+    else:
+        header = []
     #header = header + ([0]*249)
     headerbytes = bytearray(header)
     errors = False
@@ -262,8 +272,11 @@ def Screen4 (app,file,filename):
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
     
-def Screen6 (app,file,filename):
-    header = [254,0,0,255,105,0,0]
+def Screen6 (app,file,filename,wHeader=True):
+    if wHeader:
+        header = [254,0,0,255,105,0,0]
+    else:
+        header = []
     #header = header + ([0]*249)
     headerbytes = bytearray(header)
     file.write(headerbytes)
@@ -305,8 +318,11 @@ def Screen6 (app,file,filename):
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
 
-def Screen7 (app,file,filename):
-    header = [254,0,0,255,211,0,0]  
+def Screen7 (app,file,filename,wHeader=True):
+    if wHeader:
+        header = [254,0,0,255,211,0,0]
+    else:
+        header=[]
     filebytes = bytearray(header)
     cols = 64
     rows = 27
@@ -363,8 +379,11 @@ def Screen7 (app,file,filename):
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
 
-def Screen8 (app,file,filename):
-    header = [254,0,0,255,211,0,0]  
+def Screen8 (app,file,filename,wHeader=True):
+    if wHeader:
+        header = [254,0,0,255,211,0,0]
+    else:
+        header =[]
     filebytes = bytearray(header)
     cols = 32
     rows = 27
@@ -401,8 +420,11 @@ def Screen8 (app,file,filename):
     print ("20 BLOAD \""+filename+"\",S")
     print ("30 GOTO 30")
 
-def Screen10plus (app,file,filename):
-    header = [254,0,0,255,211,0,0]  
+def Screen10plus (app,file,filename,wHeader=True):
+    if wHeader:
+        header = [254,0,0,255,211,0,0]  
+    else:
+        header = []
     filebytes = bytearray(header)
     cols = 32
     rows = 27

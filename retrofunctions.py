@@ -155,6 +155,31 @@ def exportMSXScreen(app):
     if (extension.upper() == ".S10") or (extension.upper() == ".S11") or (extension.upper() == ".S12"):
         imageexport.Screen10plus(app,f,outfile)
     
+def exportBinary(app):
+    if not app.Tiles:
+        messagebox.showinfo("Error","Please create some tiles first")
+        return 1        
+    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Binary Files","*.bin;*.raw")])
+    f = open(outfile, 'wb')
+    extension = "."+config.extensions[app.targetSystem.get()]
+    print (extension)
+    # First write the tiles themselves
+    if extension.upper() == ".SC2":
+        imageexport.Screen2(app,f,outfile,False)
+    if extension.upper() == ".SC4":
+        imageexport.Screen4(app,f,outfile,False)
+    if extension.upper() == ".SC5":
+        imageexport.Screen5(app,f,outfile,False)
+    if extension.upper() == ".SC3":
+        imageexport.Screen3(app,f,outfile,False)
+    if extension.upper() == ".SC6":
+        imageexport.Screen6(app,f,outfile,False)
+    if extension.upper() == ".SC7":
+        imageexport.Screen7(app,f,outfile,False)
+    if extension.upper() == ".SC8":
+        imageexport.Screen8(app,f,outfile,False)
+    if (extension.upper() == ".S10") or (extension.upper() == ".S11") or (extension.upper() == ".S12"):
+        imageexport.Screen10plus(app,f,outfile,False)
 
 def exportASMFile(app):
 
