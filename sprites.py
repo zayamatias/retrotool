@@ -200,11 +200,12 @@ def showSprites (app):
     for row in range (0,numSprites):
         destX = currX + (xsize)
         destY = currY + (ysize)
-        app.spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="sprite,spr"+str(currentSprite)+"canvas")
+        tags = "sprite,spr"+str(currentSprite)+"canvas"
+        app.spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags=tags)
         #draw each "boxel" of the sprite
         
         
-        retrofunctions.drawboxel (app,app.spritesCanvas,app.usprites[currentSprite],currX,currY,currentSprite,app.spritexsize,config.spriteeditorbgcolor)
+        retrofunctions.drawboxel (app,app.spritesCanvas,app.usprites[currentSprite],currX,currY,currentSprite,app.spritexsize,config.spriteeditorbgcolor,tags)
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1
         shownSprites = shownSprites + 1
@@ -379,7 +380,7 @@ def animateSprite (event,app):
             destY = currY + (ysize)
             app.animCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2))
             #draw each "boxel" of the sprite
-            retrofunctions.drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY,config.spriteeditorbgcolor)
+            retrofunctions.drawboxel (app,app.animCanvas,app.animation.characters[app.frame].sprites[row][col],currX,currY,config.spriteeditorbgcolor,"")
             currX = currX+(xsize+spacing)
         currX = 1
         currY = currY + (ysize+spacing)

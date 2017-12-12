@@ -40,9 +40,10 @@ def showTilesMap (app):
     for tile in app.TileMap:
         destX = currX + (xsize)
         destY = currY + (ysize)
-        app.tilesMapCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="tile,til"+str(currentTile)+"canvas")
+        tags=tags 
+        app.tilesMapCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags=tags)
         #draw each "boxel" of the sprite
-        retrofunctions.drawboxel (app,app.tilesMapCanvas,app.Tiles[tile],currX,currY,currentTile,app.tilexsize,retrofunctions.transformColor(app,0))
+        retrofunctions.drawboxel (app,app.tilesMapCanvas,app.Tiles[tile],currX,currY,currentTile,app.tilexsize,retrofunctions.transformColor(app,0),tags)
         currX = currX+(xsize+spacing)
         currentTile = currentTile + 1
         shownTiles = shownTiles + 1
@@ -62,6 +63,9 @@ def showTiles (app):
         return 1
     retrofunctions.getPixels(app,app.tpixels)
     createTiles(app)
+    drawTiles(app)
+
+def drawTiles(app):
     if (app.tilwindow!=None):
         if (app.tilesCanvas != None) and (app.tilwindow.winfo_exists()!=0):    
             for child in app.tilwindow.winfo_children():
@@ -86,7 +90,7 @@ def showTiles (app):
     shownTiles = 0
     app.tilesCanvas = tk.Canvas (app.tilwindow,width=canvasWidth,height=canvasHeight,scrollregion=(0, 0, canvasWidth, canvasHeight))
     # Mous click actions left-> Put pixel, Right-> Remove pixel
-    app.tilesCanvas.bind('<Button-1>', lambda x:updateTilePixel(app.tilesCanvas,True,app))
+    app.tilesCanvas.bind('<Button-1>', lambda x:switchTile(app.tilesCanvas,app))
     #app.spritesCanvas.bind("<B1-Motion>",lambda event: moveSpriteCanvas(app.spritesCanvas,x = event.x,y = event.y))
     app.tilesCanvas.bind('<Button-3>', lambda x:selectTile(app.tilesCanvas,app))
     # Canvas by default does not get focus, so this means that if this is not set
@@ -116,9 +120,10 @@ def showTiles (app):
     for row in range (0,numTiles):
         destX = currX + (xsize)
         destY = currY + (ysize)
-        app.tilesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags="tile,til"+str(currentTile)+"canvas")
-        #draw each "boxel" of the sprite
-        retrofunctions.drawboxel (app,app.tilesCanvas,app.Tiles[currentTile],currX,currY,currentTile,app.tilexsize,retrofunctions.transformColor(app,0))
+        tags="tile,til"+str(currentTile)+"canvas"
+        app.tilesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags=tags)
+        #draw each "boxel" of the tile
+        retrofunctions.drawboxel (app,app.tilesCanvas,app.Tiles[currentTile],currX,currY,currentTile,app.tilexsize,retrofunctions.transformColor(app,0),tags)
         currX = currX+(xsize+spacing)
         currentTile = currentTile + 1
         shownTiles = shownTiles + 1
@@ -235,11 +240,43 @@ def closeTilesMapWindow(app):
     
 def selectTile(canvas,app):
     tags = canvas.gettags(tk.CURRENT)
+    parenttags = tags[0].split("/")
+    parenttag = parenttags[0]
+    app.switchtiletag = parenttag
     for rectangle in canvas.find_all():
        compare = canvas.itemcget(rectangle,"tags")
-       if "current" not in compare :
+       if parenttag != compare :
             canvas.itemconfig (rectangle, outline="black")
        else:
             canvas.itemconfig (rectangle, outline="white")
     canvas.update_idletasks()
     canvas.focus_set()
+    
+def switchTile(canvas,app):
+    tags = canvas.gettags(tk.CURRENT)
+    parenttags = tags[0].split("/")
+    parenttag = parenttags[0]
+    origintag = app.switchtiletag
+    if origintag == "":
+        tk.messagebox.showinfo("Error","Please select origin Tile with RMB first, then destination with LMB")
+        return 1    
+    oid = origintag.replace("tile,til","")
+    oid = oid.replace("canvas","")
+    originid=int(oid)
+    did = parenttag.replace("tile,til","")
+    did = did.replace("canvas","")
+    destid = int(did)
+    swapTiles (originid,destid,app)
+    
+def swapTiles (original,destination,app):
+    orTile = app.Tiles[original]
+    deTile = app.Tiles[destination]
+    app.Tiles[original]=deTile
+    app.Tiles[destination]=orTile
+    drawTiles(app)
+    app.switchtiletag=""
+    
+    
+    
+    
+    

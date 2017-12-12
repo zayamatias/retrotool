@@ -33,6 +33,7 @@ class App:
         self.spriteeditorbgcolor = config.spriteeditorbgcolor
         self.spritexsize = config.spritexsize
         self.spriteysize = config.spriteysize
+        self.switchtiletag = ""
         #Use config or overriding tile size
         if config.syslimits[self.targetSystem.get()][5]==0:
             self.tilexsize = config.tilexsize
