@@ -338,6 +338,7 @@ def getColors(app):
                 idx = findColor((r,g,b),app.palette,False)
                 if idx != -1:
                     usedColors.append(idx)
+    gfound = True
     for color in app.colors:
         rgb = color[1]
         if not (isinstance( rgb, int )):
@@ -359,8 +360,10 @@ def getColors(app):
                         app.palette.append((r,g,b))
                         found = True
                         usedColors.append(len(app.palette)-1)
-                    elif not found:
-                            messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
+                    if gfound and not found:
+                        gfound = False
+    if not gfound:
+        messagebox.showinfo ("Warning","Cannot match / add some of the colors of the image, results may not be as expected")
 
 def getPixels (app,pixelArray):
     #Read all the pixels and colors in the image
