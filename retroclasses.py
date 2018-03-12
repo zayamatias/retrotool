@@ -56,7 +56,19 @@ class sprite:
         if width > 8:
             line = line + pat2
         return line
+    
+    def getBasicPattern (self,width):
+        #get the pattern of a sprite in ASM mode (db %xxxxxxxxxxxxxxxx)
+        #attention: for 16bit sprites, msx splits into 2 8x16 patterns
+        linel = []
+        liner = []
+        rows = self.pattern
+        for row in rows:
+            linel.append(" DATA "+str(row)[:8]+"\n")
+            liner.append(" DATA "+str(row)[8:]+"\n")
+        return linel+liner
 
+        
     def getAsmColors (self,ysize):
         #get the colors of a sprite in ASM mode (db 1,2,3....) each byte represents the # of the color in the palette
         #for ored colors, bit #7 should be set, thus the +64

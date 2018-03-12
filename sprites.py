@@ -203,8 +203,6 @@ def showSprites (app):
         tags = "sprite,spr"+str(currentSprite)+"canvas"
         app.spritesCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags=tags)
         #draw each "boxel" of the sprite
-        
-        
         retrofunctions.drawboxel (app,app.spritesCanvas,app.usprites[currentSprite],currX,currY,currentSprite,app.spritexsize,config.spriteeditorbgcolor,tags)
         currX = currX+(xsize+spacing)
         currentSprite = currentSprite + 1

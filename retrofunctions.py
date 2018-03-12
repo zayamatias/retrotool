@@ -18,6 +18,73 @@ def newProject(app):
     app.img.filename=""
     sprites.createTempSprites (app)
 
+def writeBASICFile(app):
+    #crete the aoutput .asm file with the sprite data, colors & palette
+    if app.usprites != []:
+        sprites.createFinalSprites(app)
+    f = open(app.outfile, 'w')
+    f.write ("10 REM Retrotool BASIC Export - Inspired by MSX Programming - Graham Bland\n")
+    f.write ("50 COLOR 1,15,15\n")
+    f.write ("60 SCREEN 2,2\n")
+    f.write ("70 FOR I=1 TO 32\n")
+    f.write ("80 READ A$:S$=S$+CHR$(VAL(\"&B\"+A$))\n")
+    f.write ("90 NEXT\n")
+    f.write ("100 SPRITE$(0)=S$\n")
+    f.write ("110 LINE (124,92)-(183,131),15,B\n")
+    f.write ("120 PUT SPRITE 0,(112,80),1,0\n")
+    f.write ("130 GOTO 130\n")
+    f.write ("140 REM SPRITE DATA GOES BELOW\n")
+    basicline = 150
+    maxsprites = 32
+    currsprite = 1
+    if len (app.finalsprites)>0:
+        for fsprite in app.finalsprites:
+            lines = fsprite.getBasicPattern(app.spritexsize)
+            if currsprite < maxsprites:
+                currsprite = currsprite + 1
+                for line in lines:
+                    f.write (str(basicline)+line)
+                    basicline = basicline + 10
+    '''
+        f.write("SPRITE_COLORS:\n")
+        idx = 0
+        for fsprite in app.finalsprites:
+            line = fsprite.getAsmColors(app.spriteysize)
+            f.write (";Sprite"+str(idx)+"\n")
+            f.write (line)
+        idx = idx +1
+    f.write ("PALETTE:\n")
+    cindex =0;
+    for color in app.palette:
+        if set(color)==set((-1,-1,-1)):
+            color = (0,0,0)
+        f.write ("\tdb $"+str(hex(int(color[1]))[2:])+str(hex(int(color[2]))[2:])+",$"+str(color[0])+"\n")
+        cindex = cindex+1
+        # fill in dummy colors
+    '''
+    cindex = 0
+    if (len(app.FinalTiles)>0):
+        for dindex in range (cindex,16):
+            f.write ("\tdb $77,$7\n")
+        f.write ("TILE_DATA:\n")
+        for tile in app.FinalTiles:
+            f.write(tile.getAsmPattern(app.tilexsize)+"\n")
+        f.write ("TILE_COLORS:\n")
+        for tile in app.FinalTiles:
+            f.write(tile.getAsmColors(app.tilexsize)+"\n")
+        f.write ("TILE_MAP:\n\tdb ")
+        ntiles= 0
+        ttiles = 0
+        for idx in app.TileMap:
+            f.write("$"+"{0:02x}".format(idx))
+            ntiles = ntiles +1 #These are the tiles per line (just to keep it tidy)
+            ttiles = ttiles + 1 #These are the total tiles
+            if (ntiles ==32) and (ttiles < len(app.TileMap)):
+                f.write("\n\tdb ")
+                ntiles = 0
+            elif (ntiles != 32):
+                f.write(",")
+        f.write ("\n")
 
 def writeASMFile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
@@ -191,6 +258,11 @@ def exportASMFile(app):
     app.outfile = filedialog.asksaveasfilename(parent=app.root)
     writeASMFile(app)
 
+def exportBASICFile(app):
+
+    #do the actual saving of the file
+    app.outfile = filedialog.asksaveasfilename(parent=app.root)
+    writeBASICFile(app)
 
 def resetProject(app):
         app.projfile =""
