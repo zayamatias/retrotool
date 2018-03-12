@@ -41,7 +41,7 @@ def writeBASICFile(app):
                 f.write  (","+str(color[0])+","+str(color[1])+","+str(color[2]))
         idx = idx +1
     f.write ("\n60 FOR C=0 TO "+str(len(app.palette)-1)+":READ R,G,B:COLOR=(C,R,G,B):NEXT\n")
-    f.write ("70 FOR N=0 to "+str(len(app.finalsprites))+":S$=\"\":FOR I=1 TO 32\n")
+    f.write ("70 FOR N=0 to "+str(len(app.finalsprites)-1)+":S$=\"\":FOR I=1 TO 32\n")
     f.write ("80 READ A$:S$=S$+CHR$(VAL(\"&B\"+A$))\n")
     f.write ("90 NEXT I\n")
     f.write ("100 SPRITE$(N)=S$:NEXT N\n")
@@ -63,7 +63,7 @@ def writeBASICFile(app):
     numline = numline + 10
     f.write (str(numline)+" REM SPRITE DATA GOES BELOW\n")
     numline = numline + 10
-    maxsprites = len (app.finalsprites)
+    maxsprites = len (app.finalsprites)+1
     currsprite = 0
     if len (app.finalsprites)>0:
         for fsprite in app.finalsprites:
