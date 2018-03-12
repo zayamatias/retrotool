@@ -97,6 +97,7 @@ def createTempSprites (app):
                     
                 thissprite.append(srow)
                 thisspritecolors.append(thiscolors)
+            app.spritescoords.append ([spx,spy])
             app.usprites.append  (thissprite)
             app.csprites.append (thisspritecolors)
 
@@ -130,7 +131,7 @@ def createFinalSprites(app):
                 else:
                     tcolor.append (pc[numsprites])
             if not emptySprite:
-                mysprite = retroclasses.sprite (tsprite,tcolor,ored)
+                mysprite = retroclasses.sprite (tsprite,tcolor,ored,app.spritescoords[myindex][0],app.spritescoords[myindex][1]) ## X,Y Candidate (for BASIC EXPORT)
                 app.finalsprites.append(mysprite)
             if needtoor:
                 ored = not ored

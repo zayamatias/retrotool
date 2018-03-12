@@ -41,14 +41,16 @@ def writeBASICFile(app):
                 f.write  (","+str(color[0])+","+str(color[1])+","+str(color[2]))
         idx = idx +1
     f.write ("\n60 FOR C=0 TO "+str(len(app.palette)-1)+":READ R,G,B:COLOR=(C,R,G,B):NEXT\n")
-    f.write ("70 FOR N=0 to 8:S$=\"\":FOR I=1 TO 32\n")
+    f.write ("70 FOR N=0 to "+str(len(app.finalsprites))+":S$=\"\":FOR I=1 TO 32\n")
     f.write ("80 READ A$:S$=S$+CHR$(VAL(\"&B\"+A$))\n")
     f.write ("90 NEXT I\n")
     f.write ("100 SPRITE$(N)=S$:NEXT N\n")
     numline = 110
-    positions = [[100,100],[100,100],[116,100],[116,100],[100,116],[100,116],[116,100],[116,100]]
-    for n in range (0,8):
-        f.write (str(numline)+" PUT SPRITE "+str(n)+",("+str(positions[n][0])+","+str(positions[n][1])+"),1\n")
+   # positions = [[100,100],[100,100],[132,100],[132,100],[100,132],[100,132],[132,132],[132,132]]
+    for n in range (0,len(app.finalsprites)):
+        coordx = 100+(app.finalsprites[n].x*32)
+        coordy = 100+(app.finalsprites[n].y*32)
+        f.write (str(numline)+" PUT SPRITE "+str(n)+",("+str(coordx)+","+str(coordy)+"),1\n")
         numline = numline + 10
     nsprite = 0
     for fsprite in app.finalsprites:
@@ -61,13 +63,15 @@ def writeBASICFile(app):
     numline = numline + 10
     f.write (str(numline)+" REM SPRITE DATA GOES BELOW\n")
     numline = numline + 10
-    maxsprites = 32
-    currsprite = 1
+    maxsprites = len (app.finalsprites)
+    currsprite = 0
     if len (app.finalsprites)>0:
         for fsprite in app.finalsprites:
             lines = fsprite.getBasicPattern(app.spritexsize)
-            if currsprite < maxsprites:
+            if currsprite < (maxsprites-1):
+                f.write (str(numline)+" REM ------SPRITE "+str(currsprite)+" -------------\n")
                 currsprite = currsprite + 1
+                numline = numline + 10
                 for line in lines:
                     f.write (str(numline)+line)
                     numline = numline + 10

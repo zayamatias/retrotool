@@ -27,6 +27,7 @@ class App:
         self.FinalTiles = []
         self.usprites = []
         self.csprites = []
+        self.spritescoords=[]
         self.imgwidth = 0
         self.imgheight = 0
         self.pixelsize = config.pixelsize

@@ -2,12 +2,14 @@ class sprite:
     # Sprite class, to make it easier to manipulate afterwards
     spriteCount = 0
 
-    def __init__ (self,pattern,colors,ored):
+    def __init__ (self,pattern,colors,ored,x,y):
 
         self.pattern=pattern   #binary pattern of the sprite
         self.colors=colors     #colors of the sprite
         self.ored = ored       #does this sprite come from an ored sprite (for palette purposes)
         self.number = sprite.spriteCount   #Sprite index
+        self.x = x          #X location of the sprite according to the original image
+        self.y = y          #y location of the sprite according to the original image
         sprite.spriteCount = sprite.spriteCount+1 #add one to the index for next sprite
 
     def displayPattern (self):
