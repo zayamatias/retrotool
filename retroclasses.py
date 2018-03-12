@@ -86,6 +86,23 @@ class sprite:
         line = line + "\n"
         return line
 
+    def getBASICColors (self,ysize):
+        #get the colors of a sprite in ASM mode (db 1,2,3....) each byte represents the # of the color in the palette
+        #for ored colors, bit #7 should be set, thus the +64
+        line = ""
+        rows = self.colors
+        count = 1
+        for row in rows:
+            if self.ored :
+                if (row!=0):
+                   row = row + 64
+            line = line + "CHR$("+str(row)+")"
+            if count < ysize :
+                count = count + 1
+                line = line + "+"
+        line = line + "\n"
+        return line
+
 class character:
     # defines a character that wil contains a matrix of sprites
     def __init__ (self,rows,cols):
