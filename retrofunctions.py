@@ -23,10 +23,11 @@ def writeBASICFile(app):
     if app.usprites != []:
         sprites.createFinalSprites(app)
     f = open(app.outfile, 'w')
-    f.write ("1 COLOR 1,15,15\n")
-    f.write ("2 SCREEN 5,0\n")
-    line1 = "10 DATA 0,0,0"
-    line2 = "\n20 DATA "
+    f.write ("10 REM Retrotool BASIC Export - (Code Inspired by MSX Programming - Graham Bland)\n")
+    f.write ("20 COLOR 1,2,2\n")
+    f.write ("30 SCREEN 5,3\n") # Screen 5 16x16 Magnifies sprites
+    line1 = "40 DATA 0,0,0"
+    line2 = "\n50 DATA "
     idx = 0
     for color in app.palette:
         if idx == 0:
@@ -39,8 +40,7 @@ def writeBASICFile(app):
             else:
                 f.write  (","+str(color[0])+","+str(color[1])+","+str(color[2]))
         idx = idx +1
-    f.write ("\n30 FOR C=0 TO "+str(len(app.palette)-1)+":READ R,G,B:COLOR=(C,R,G,B):NEXT\n")
-    f.write ("40 REM Retrotool BASIC Export - Inspired by MSX Programming - Graham Bland\n")
+    f.write ("\n60 FOR C=0 TO "+str(len(app.palette)-1)+":READ R,G,B:COLOR=(C,R,G,B):NEXT\n")
     f.write ("70 FOR N=0 to 8:S$=\"\":FOR I=1 TO 32\n")
     f.write ("80 READ A$:S$=S$+CHR$(VAL(\"&B\"+A$))\n")
     f.write ("90 NEXT I\n")
