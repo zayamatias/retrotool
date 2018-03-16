@@ -25,7 +25,7 @@ def writeBASICFile(app):
     f = open(app.outfile, 'w')
     f.write ("10 REM Retrotool BASIC Export - (Code Inspired by MSX Programming - Graham Bland)\n")
     f.write ("20 COLOR 1,2,2\n")
-    f.write ("30 SCREEN 5,3\n") # Screen 5 16x16 Magnifies sprites
+    f.write ("30 SCREEN 5,2\n") # Screen 5 16x16 sprites
     line1 = "40 DATA 0,0,0"
     line2 = "\n50 DATA "
     idx = 0
@@ -48,14 +48,14 @@ def writeBASICFile(app):
     numline = 110
    # positions = [[100,100],[100,100],[132,100],[132,100],[100,132],[100,132],[132,132],[132,132]]
     for n in range (0,len(app.finalsprites)):
-        coordx = 100+(app.finalsprites[n].x*32)
-        coordy = 100+(app.finalsprites[n].y*32)
+        coordx = (app.finalsprites[n].x*app.spritexsize)
+        coordy = (app.finalsprites[n].y*app.spriteysize)
         f.write (str(numline)+" PUT SPRITE "+str(n)+",("+str(coordx)+","+str(coordy)+"),1\n")
         numline = numline + 10
     nsprite = 0
     for fsprite in app.finalsprites:
         line = fsprite.getBASICColors(app.spriteysize)
-        if (nsprite<8):
+        if (nsprite<len(app.finalsprites)):
             f.write (str(numline)+" COLOR SPRITE$("+str(nsprite)+")="+line)
             numline = numline + 10
         nsprite = nsprite + 1

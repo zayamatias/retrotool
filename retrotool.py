@@ -28,6 +28,7 @@ class App:
         self.usprites = []
         self.csprites = []
         self.spritescoords=[]
+        self.oredcolors = ['3','5','6','7','9','11','12','13','15']
         self.imgwidth = 0
         self.imgheight = 0
         self.pixelsize = config.pixelsize

@@ -4,20 +4,38 @@ import config
 import retroclasses
 import math
 
-def findOrColor (csprites):
+def findOrColor (csprites,app):
     # This function finds which is the best pixel to or according to the palette colors
     # This is used on MSX2 -> See https://www.msx.org/wiki/The_OR_Color
     numcols = len(csprites)
     c=[-1,-1,-1]
     pc=[-1,-1,-1,False]
+    finalcolors = csprites[:]
+    print ("INITIAL -> ",csprites)
+
+    #Swap colors if orde color is in the list    
+    if numcols > 2:
+        if csprites[0] in app.oredcolors:
+            finalcolors[2]= csprites[0]
+            finalcolors[1]= csprites[1]
+            finalcolors[0]= csprites[2]
+            print ("changed",finalcolors[0],csprites[2])
+        elif csprites[1] in app.oredcolors:
+            finalcolors[2] = csprites[1]
+            finalcolors[0] = csprites[0]
+            finalcolors[1] = csprites[2]
+            print ("rechanged")
+        if not int(finalcolors[0])|int(finalcolors[1])==int(finalcolors[2]):
+            # I need to swap colors
+            swapColors (app,int(finalcolors[1]),(int(finalcolors[0]))^int(finalcolors[1]))
     if  numcols < 5:
         # We need to split the sprite
         if numcols > 0:
-            c[0]= int(csprites[0])
+            c[0]= int(finalcolors[0])
         if numcols > 1:
-            c[1]= int(csprites[1])
+            c[1]= int(finalcolors[1])
         if numcols > 2:
-            c[2]= int(csprites[2])
+            c[2]= int(finalcolors[2])
             pc[3] = True
         pc[0] = c[0]
         pc[1] = c[1]
@@ -33,12 +51,13 @@ def findOrColor (csprites):
             pc[0] = c[1]
             pc[1] = c[2]
     return pc
-
-def needToOr(csprites):
+def swapColors (app,origin, dest):
+        print ("SWAP ->", origin, dest)
+def needToOr(csprites,app):
     #retruns if there is a need to or the colors or not
     toor = False;
     for cols in csprites:
-        pc=findOrColor (cols)
+        pc=findOrColor (cols,app)
         if pc[3]:
            toor = True
     return toor
@@ -107,14 +126,14 @@ def createFinalSprites(app):
     myindex = 0
     for usprite in app.usprites:
         ored = False
-        needtoor = needToOr(app.csprites[myindex])
+        needtoor = needToOr(app.csprites[myindex],app)
         spritesplit = getSplits (app.csprites[myindex])
         for numsprites in range (0,spritesplit):
             tsprite =[]
             tcolor = []
             emptySprite = True
             for y in range (0,app.spriteysize):
-                pc=findOrColor(app.csprites[myindex][y])
+                pc=findOrColor(app.csprites[myindex][y],app)
                 oc=pc[2]
                 trow = "";
                 row = usprite[y]
