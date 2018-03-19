@@ -11,23 +11,19 @@ def findOrColor (csprites,app):
     c=[-1,-1,-1]
     pc=[-1,-1,-1,False]
     finalcolors = csprites[:]
-    print ("INITIAL -> ",csprites)
-
     #Swap colors if orde color is in the list    
     if numcols > 2:
         if csprites[0] in app.oredcolors:
             finalcolors[2]= csprites[0]
             finalcolors[1]= csprites[1]
             finalcolors[0]= csprites[2]
-            print ("changed",finalcolors[0],csprites[2])
         elif csprites[1] in app.oredcolors:
             finalcolors[2] = csprites[1]
             finalcolors[0] = csprites[0]
             finalcolors[1] = csprites[2]
-            print ("rechanged")
         if not int(finalcolors[0])|int(finalcolors[1])==int(finalcolors[2]):
             # I need to swap colors
-            swapColors (app,int(finalcolors[1]),(int(finalcolors[0]))^int(finalcolors[1]))
+            finalcolors = swapColors (app,finalcolors)
     if  numcols < 5:
         # We need to split the sprite
         if numcols > 0:
@@ -51,8 +47,16 @@ def findOrColor (csprites,app):
             pc[0] = c[1]
             pc[1] = c[2]
     return pc
-def swapColors (app,origin, dest):
-        print ("SWAP ->", origin, dest)
+
+def swapColors (app,colors):
+        newcolor = int(colors[0])|int(colors[1])
+        changeSpriteColors (colors[2],str(newcolor))
+        colors[2]= str(newcolor)
+        return colors
+
+def changeSpriteColors (original,target):
+    print ("swapping ",original," with ",target)
+        
 def needToOr(csprites,app):
     #retruns if there is a need to or the colors or not
     toor = False;

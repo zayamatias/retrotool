@@ -541,10 +541,19 @@ def swapColor (canvas,app):
             app.tpixels[idx]=str(app.drawColor)
         idx = idx + 1
     
+    idx= 0
+    for pixel in app.spixels:
+        if str(pixel)== str(app.drawColor):
+            app.spixels[idx]=str(newColor)
+        elif str(pixel) == str(newColor):
+            app.spixels[idx]=str(app.drawColor)
+        idx = idx + 1
+    
     #TODO
     #Update Sprites
     #Update Tiles
     #How should it be done???    
+    sprites.createTempSprites(app)
     tiles.createTiles(app)
         
     ## Update Palette
