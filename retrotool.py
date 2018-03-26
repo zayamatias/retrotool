@@ -55,6 +55,7 @@ class App:
         self.sprImgOffset = 0
         self.tileImgOffset = 0
         self.TileMap = []
+        self.swappedTuples = []
         self.spritesCanvas = None
         self.tilesCanvas = None
         self.paletteCanvas = None

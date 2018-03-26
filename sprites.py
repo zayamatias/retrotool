@@ -7,6 +7,7 @@ import math
 def findOrColor (csprites,app):
     # This function finds which is the best pixel to or according to the palette colors
     # This is used on MSX2 -> See https://www.msx.org/wiki/The_OR_Color
+    print ("inside find or color")
     numcols = len(csprites)
     c=[-1,-1,-1]
     pc=[-1,-1,-1,False]
@@ -23,7 +24,10 @@ def findOrColor (csprites,app):
             finalcolors[1] = csprites[2]
         if not int(finalcolors[0])|int(finalcolors[1])==int(finalcolors[2]):
             # I need to swap colors
+            print ("calling swap colors")
             finalcolors = swapColors (app,finalcolors)
+            if finalcolors == -1:
+                return finalcolors
     if  numcols < 5:
         # We need to split the sprite
         if numcols > 0:
@@ -49,19 +53,33 @@ def findOrColor (csprites,app):
     return pc
 
 def swapColors (app,colors):
-        newcolor = int(colors[0])|int(colors[1])
-        changeSpriteColors (colors[2],str(newcolor))
+    print ("inside swap colors")
+    newcolor = int(colors[0])|int(colors[1])
+    oldcolor = int(colors[2])
+    if [oldcolor,newcolor] not in app.swappedTuples:
+        changeSpriteColors (app,oldcolor,newcolor)
         colors[2]= str(newcolor)
-        return colors
+        app.swappedTuples.append([oldcolor,newcolor])
+        app.swappedTuples.append([newcolor,oldcolor])
+        print ("---------------------REBOOT-------------------")
+        print (len(app.finalsprites))
+        createTempSprites(app)
+        createFinalSprites(app)
+        return -1
+    return colors
 
-def changeSpriteColors (original,target):
-    print ("swapping ",original," with ",target)
+def changeSpriteColors (app,original,target):
+    retrofunctions.exchangeColors (app,original,target)
         
 def needToOr(csprites,app):
     #retruns if there is a need to or the colors or not
+    print ("in need to or")
     toor = False;
     for cols in csprites:
+        print ("calling find or color")
         pc=findOrColor (cols,app)
+        if pc == -1:
+            return pc
         if pc[3]:
            toor = True
     return toor
@@ -89,6 +107,8 @@ def createTempSprites (app):
         retrofunctions.getPixels(app,app.spixels)
     app.usprites = []
     app.csprites = []
+    app.spritescoords = []
+
     app.spritesPerRow = int(app.imgwidth/app.spritexsize)
     app.spritesPerCol = int(app.imgheight/app.spriteysize)
     for spy in range (0,app.spritesPerCol):
@@ -128,9 +148,16 @@ def createFinalSprites(app):
     #create the deifnitive sprite patterns (0,1), and splits sprites that need to be ored
     app.finalsprites=[]    
     myindex = 0
-    for usprite in app.usprites:
+    print ("--FINALSPRITES--")
+    print (len(app.usprites))
+    print (len(app.csprites))
+    tusprites = app.usprites[:]
+    for usprite in tusprites:
+        print ("inside upsrites loop")
         ored = False
         needtoor = needToOr(app.csprites[myindex],app)
+        if needtoor == -1:
+            break
         spritesplit = getSplits (app.csprites[myindex])
         for numsprites in range (0,spritesplit):
             tsprite =[]
@@ -138,6 +165,7 @@ def createFinalSprites(app):
             emptySprite = True
             for y in range (0,app.spriteysize):
                 pc=findOrColor(app.csprites[myindex][y],app)
+                print ("returning from findorcolor")
                 oc=pc[2]
                 trow = "";
                 row = usprite[y]
@@ -156,6 +184,8 @@ def createFinalSprites(app):
             if not emptySprite:
                 mysprite = retroclasses.sprite (tsprite,tcolor,ored,app.spritescoords[myindex][0],app.spritescoords[myindex][1]) ## X,Y Candidate (for BASIC EXPORT)
                 app.finalsprites.append(mysprite)
+                print ("ADDDDDDDDDDDDDDDDDDDDDDD")
+                #print (len(app.finalsprites))
             if needtoor:
                 ored = not ored
         myindex = myindex+1
@@ -180,7 +210,8 @@ def showSprites (app):
         createSpritesWindow(app)
             
     createTempSprites(app)
-    
+    if app.usprites != []:
+        createFinalSprites(app)
     app.spwindow.deiconify()
     numSprites = len(app.usprites)
     if (app.imgwidth!=0):

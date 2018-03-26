@@ -20,8 +20,6 @@ def newProject(app):
 
 def writeBASICFile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
-    if app.usprites != []:
-        sprites.createFinalSprites(app)
     f = open(app.outfile, 'w')
     f.write ("10 REM Retrotool BASIC Export - (Code Inspired by MSX Programming - Graham Bland)\n")
     f.write ("20 COLOR 1,2,2\n")
@@ -41,24 +39,15 @@ def writeBASICFile(app):
                 f.write  (","+str(color[0])+","+str(color[1])+","+str(color[2]))
         idx = idx +1
     f.write ("\n60 FOR C=0 TO "+str(len(app.palette)-1)+":READ R,G,B:COLOR=(C,R,G,B):NEXT\n")
-    f.write ("70 FOR N=0 to "+str(len(app.finalsprites)-1)+":S$=\"\":FOR I=1 TO 32\n")
-    f.write ("80 READ A$:S$=S$+CHR$(VAL(\"&B\"+A$))\n")
-    f.write ("90 NEXT I\n")
-    f.write ("100 SPRITE$(N)=S$:NEXT N\n")
-    numline = 110
+    f.write ("70 FOR N=0 to "+str(len(app.finalsprites)-1)+":S$=\"\":FOR I=1 TO 32:READ A$:S$=S$+CHR$(VAL(\"&B\"+A$)):NEXT I:SPRITE$(N)=S$:NEXT N\n")
+    numline = 80
    # positions = [[100,100],[100,100],[132,100],[132,100],[100,132],[100,132],[132,132],[132,132]]
-    for n in range (0,len(app.finalsprites)):
-        coordx = (app.finalsprites[n].x*app.spritexsize)
-        coordy = (app.finalsprites[n].y*app.spriteysize)
-        f.write (str(numline)+" PUT SPRITE "+str(n)+",("+str(coordx)+","+str(coordy)+"),1\n")
-        numline = numline + 10
     nsprite = 0
-    for fsprite in app.finalsprites:
-        line = fsprite.getBASICColors(app.spriteysize)
-        if (nsprite<len(app.finalsprites)):
-            f.write (str(numline)+" COLOR SPRITE$("+str(nsprite)+")="+line)
-            numline = numline + 10
-        nsprite = nsprite + 1
+    numline = numline + 10
+    f.write (str(numline)+" FOR N=0 to "+str(len(app.finalsprites)-1)+":READ S,X,Y:PUT SPRITE S,(X*"+str(app.spritexsize)+",Y*"+str(app.spriteysize)+"):NEXT N\n")
+    numline = numline + 10
+    f.write (str(numline)+" FOR N=0 to "+str(len(app.finalsprites)-1)+":S$=\"\":FOR I=1 TO 16:READ A$:S$=S$+CHR$(VAL(A$)):NEXT I:COLOR SPRITE$(N)=S$:NEXT N\n")
+    numline = numline + 10
     f.write (str(numline)+" GOTO "+str(numline)+"\n")
     numline = numline + 10
     f.write (str(numline)+" REM SPRITE DATA GOES BELOW\n")
@@ -75,7 +64,22 @@ def writeBASICFile(app):
                 for line in lines:
                     f.write (str(numline)+line)
                     numline = numline + 10
-
+    f.write (str(numline)+" REM -------- SPRITE SEQUENCE \n")
+    numline = numline + 10
+    for n in range (0,len(app.finalsprites)):
+        coordx = (app.finalsprites[n].x)
+        coordy = (app.finalsprites[n].y)
+        f.write (str(numline)+" DATA "+str(n*4)+","+str(coordx)+","+str(coordy)+"\n")
+        numline = numline + 10
+    f.write (str(numline)+" REM -------- SPRITE COLORS\n")
+    numline = numline + 10
+    for fsprite in app.finalsprites:
+        line = fsprite.getBASICColors(app.spriteysize)
+        if (nsprite<len(app.finalsprites)):
+            f.write (str(numline)+" DATA "+line)
+            numline = numline + 10
+        nsprite = nsprite + 1
+ 
 def writeASMFile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
     if app.usprites != []:
@@ -533,37 +537,35 @@ def swapColor (canvas,app):
         messagebox.showinfo ("Error","Cannot swap color with itself")
         return 1
     ## Update Pixels
+    exchangeColors (app,app.drawColor,newColor)
+    canvas.update_idletasks()
+    canvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,app.drawColor))
+    canvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,newColor))
+    
+def exchangeColors (app,oldColor,newColor):
     idx= 0
     for pixel in app.tpixels:
-        if str(pixel)== str(app.drawColor):
+        if str(pixel)== str(oldColor):
             app.tpixels[idx]=str(newColor)
         elif str(pixel) == str(newColor):
-            app.tpixels[idx]=str(app.drawColor)
+            app.tpixels[idx]=str(oldColor)
         idx = idx + 1
     
     idx= 0
     for pixel in app.spixels:
-        if str(pixel)== str(app.drawColor):
+        if str(pixel)== str(oldColor):
             app.spixels[idx]=str(newColor)
         elif str(pixel) == str(newColor):
-            app.spixels[idx]=str(app.drawColor)
+            app.spixels[idx]=str(oldColor)
         idx = idx + 1
-    
-    #TODO
-    #Update Sprites
-    #Update Tiles
-    #How should it be done???    
     sprites.createTempSprites(app)
     tiles.createTiles(app)
         
     ## Update Palette
-    oldColors = app.palette[app.drawColor]
+    oldColors = app.palette[oldColor]
     newColors = app.palette[newColor]
-    app.palette[app.drawColor]=newColors
+    app.palette[oldColor]=newColors
     app.palette[newColor]=oldColors
-    canvas.update_idletasks()
-    canvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,app.drawColor))
-    canvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,newColor))
 
 def drawboxel (app,canvas,sprite,x,y,index,width,bgcolor,parenttags):
     border = 1

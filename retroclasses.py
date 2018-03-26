@@ -98,10 +98,10 @@ class sprite:
             if self.ored :
                 if (row!=0):
                    row = row + 64
-            line = line + "CHR$("+str(row)+")"
+            line = line + str(row)
             if count < ysize :
                 count = count + 1
-                line = line + "+"
+                line = line + ","
         line = line + "\n"
         return line
 
