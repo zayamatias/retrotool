@@ -105,7 +105,7 @@ def writeASMFile(app):
     for color in app.palette:
         if set(color)==set((-1,-1,-1)):
             color = (0,0,0)
-        f.write ("\tdb $"+str(hex(int(color[1]))[2:])+str(hex(int(color[2]))[2:])+",$"+str(color[0])+"\n")
+        f.write ("\tdb $"+str(hex(int(color[0]))[2:])+str(hex(int(color[2]))[2:])+",$"+str(color[1])+"\n")
         cindex = cindex+1
         # fill in dummy colors
     if (len(app.FinalTiles)>0):
