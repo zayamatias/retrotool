@@ -95,6 +95,7 @@ class App:
         self.filemenu.add_command(label="Export to BASIC", command=lambda:retrofunctions.exportBASICFile(self))
         self.filemenu.add_command(label="Export to Tiled", command=lambda:retrofunctions.exportToTiled(self))
         self.filemenu.add_command(label="Export MSX screen", command=lambda:retrofunctions.exportMSXScreen(self))
+        self.filemenu.add_command(label="Export NeoGeo Fixed Tiles (S ROM)", command=lambda:retrofunctions.exportNeoFixed(self))
         self.filemenu.add_command(label="Export to Binary/Raw", command=lambda:retrofunctions.exportBinary(self))
         self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
         
@@ -133,7 +134,7 @@ class App:
     def updateTargetSystem(self,value):
         self.targetSystem.set(value)
         self.palette=config.palettes[value][2]
-        print (self.palette)
+        #print (self.palette)
         #Use config or overriding tile size
         if config.syslimits[self.targetSystem.get()][5]==0:
             self.tilexsize = config.tilexsize

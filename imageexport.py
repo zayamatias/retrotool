@@ -2,6 +2,40 @@ import retrofunctions
 import config
 import tkinter as tk
 
+
+def NeoFixed (app,file,filename):
+    tilebytes =[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    bytecount = 0;
+    for tile in app.Tiles:
+        pixpos = 0;
+        pixmap = 0;
+        for row in range(0,app.tileysize):
+            pixpattern = tile[row].split("%")
+            pixpattern.remove('')
+            #So logic here:
+            #if the pixel we're checking is even > 2 then we have to store the byte
+            #otherwise we just shift to the proper position
+            pixpos = 0 # The pixle in te row
+            for col in range(0,app.tilexsize):
+                if pixpos % 2 == 0:
+                    #even number
+                    byte = int(pixpattern[pixpos])<<4
+                else:
+                    #odd number
+                    byte = byte | int(pixpattern[pixpos])
+                    tilebytes[pixmap]=byte
+                    pixmap = pixmap +1
+                    byte = 0
+                bytecount = bytecount + 1
+                pixpos = pixpos + 1
+            #In tilebytes we now have the complete tyle, we can now save it to the binaryfile
+            filebytes =bytearray()
+            for n in range (0,len(tilebytes)):
+                filebytes.append(tilebytes[n])
+            
+            #colorbytes.append(colorbyte)
+        file.write(filebytes)
+
 def Screen2 (app,file,filename,wHeader=True):
     if wHeader:
         header = [254,0,0,255,55,0,0]

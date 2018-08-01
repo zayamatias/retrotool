@@ -44,7 +44,7 @@ def writeBASICFile(app):
    # positions = [[100,100],[100,100],[132,100],[132,100],[100,132],[100,132],[132,132],[132,132]]
     nsprite = 0
     numline = numline + 10
-    f.write (str(numline)+" FOR N=0 to "+str(len(app.finalsprites)-1)+":READ S,X,Y:PUT SPRITE S,(X*"+str(app.spritexsize)+",Y*"+str(app.spriteysize)+"):NEXT N\n")
+    f.write (str(numline)+" FOR N=0 to "+str(len(app.finalsprites)-1)+":READ S,X,Y:PUT SPRITE N,(X*"+str(app.spritexsize)+",Y*"+str(app.spriteysize)+"),,S:NEXT N\n")
     numline = numline + 10
     f.write (str(numline)+" FOR N=0 to "+str(len(app.finalsprites)-1)+":S$=\"\":FOR I=1 TO 16:READ A$:S$=S$+CHR$(VAL(A$)):NEXT I:COLOR SPRITE$(N)=S$:NEXT N\n")
     numline = numline + 10
@@ -69,7 +69,7 @@ def writeBASICFile(app):
     for n in range (0,len(app.finalsprites)):
         coordx = (app.finalsprites[n].x)
         coordy = (app.finalsprites[n].y)
-        f.write (str(numline)+" DATA "+str(n*4)+","+str(coordx)+","+str(coordy)+"\n")
+        f.write (str(numline)+" DATA "+str(n)+","+str(coordx)+","+str(coordy)+"\n")
         numline = numline + 10
     f.write (str(numline)+" REM -------- SPRITE COLORS\n")
     numline = numline + 10
@@ -190,6 +190,13 @@ def exportToTiled(app):
     output = output.replace("__FILENAME__",imgfile)
     f.write(output)
 
+def exportNeoFixed(app):
+    if not app.Tiles:
+        messagebox.showinfo("Error","Please create some tiles first")
+        return 1        
+    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("S Rom",".rom")])
+    f = open(outfile, 'wb')
+    imageexport.NeoFixed(app,f,outfile)
                         
 def exportMSXScreen(app):
     if not app.Tiles:
@@ -223,7 +230,7 @@ def exportBinary(app):
     outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Binary Files","*.bin;*.raw")])
     f = open(outfile, 'wb')
     extension = "."+config.extensions[app.targetSystem.get()]
-    print (extension)
+    #print (extension)
     # First write the tiles themselves
     if extension.upper() == ".SC2":
         imageexport.Screen2(app,f,outfile,False)
@@ -398,6 +405,7 @@ def getColors(app):
             r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1][0])
             g=int(int(rgb[1])/config.palettes[app.targetSystem.get()][1][1])
             b=int(int(rgb[2])/config.palettes[app.targetSystem.get()][1][2])
+            print (r,g,b)
             # make sure we do not add bgcolor
             if set((r,g,b)) != set (app.bgcolor):
                 # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
@@ -450,6 +458,7 @@ def getPixels (app,pixelArray):
                 app.root.update_idletasks()
             try:
                 pixel = app.img.getpixel((x,y))
+#                print (pixel)
             except:
                 pixel = (0,0,0)
             r = pixel[0]
@@ -502,10 +511,10 @@ def updateTempColor (row,position,color):
 
 def udpateTargetSystem(app,chgsystem):
     #Will be used when changing the target system
-    print (app.targetSystem.get())
-    print (chgsystem)
+#    print (app.targetSystem.get())
+#    print (chgsystem)
     app.targetSystem=config.systems.index(chgsystem)
-    print (app.targetSystem)
+#    print (app.targetSystem)
 
 
 def updateDrawColor (canvas,app):

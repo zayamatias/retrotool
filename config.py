@@ -22,6 +22,8 @@ msxpalette = [(-1,-1,-1),
 (int(204/msxcolordivider[0]),int(204/msxcolordivider[1]),int(204/msxcolordivider[2])),
 (int(255/msxcolordivider[0]),int(255/msxcolordivider[1]),int(255/msxcolordivider[2]))
 ] # Msx palette in MSX values
+#Neo Geo Palette 
+neopalette = msxpalette
 #Below will hold palettes for different systems
 palettes = [("MSX",msxcolordivider,msxpalette),
             ("MSX",msxcolordivider,msxpalette),
@@ -32,10 +34,11 @@ palettes = [("MSX",msxcolordivider,msxpalette),
             ("MSX2",[32,32,64],[(-1,-1,-1)]),
             ("MSX2+",[16,16,16],msxpalette),
             ("MSX2+",[2.72,2.72,2.18],msxpalette),
-            ("MSX2+",[1,1,1],msxpalette)]
+            ("MSX2+",[1,1,1],msxpalette),
+            ("NeoGeo",[1,1,1],neopalette)]
 #Systems of choice, maybe beyond MSX one day?
-activeSystems = [0,1,2,3,4,5,6,7,8,9]
-defaultSystem = 3
+activeSystems = [0,1,2,3,4,5,6,7,8,9,10]
+defaultSystem = 10
 systems = ["MSX - Screen 2",
            "MSX - Screen 3",
            "MSX2 - Screen 4",
@@ -45,7 +48,8 @@ systems = ["MSX - Screen 2",
            "MSX2 - Screen 8",
            "MSX2+ - Screen 10",
            "MSX2+ - Screen 11",
-           "MSX2+ - Screen 12"]
+           "MSX2+ - Screen 12",
+           "NeoGeo"]
 #System Limits => 
 #[0]System name
 #[1]max colors per sprite
@@ -64,7 +68,8 @@ syslimits = [("MSX",1,256,False,False,0,0),
              ("MSX2",3,1000000,True,True,0,0),
              ("MSX2+",3,1000000,True,True,0,0),
              ("MSX2+",3,1000000,True,True,0,0),
-             ("MSX2+",3,1000000,True,True,0,0)]
+             ("MSX2+",3,1000000,True,True,0,0),
+             ("NeoGeo",15,65536,True,True,8,8)]
              
 extensions = ["SC2","SC3","SC4","SC5","SC6","SC7","SC8","S10","S11","S12"]
              
@@ -95,3 +100,6 @@ animArray = [14,15,16]  # "character" list to show in animation
 
 ROMWidth = 256
 tiled_xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><map version=\"1.0\" orientation=\"orthogonal\" renderorder=\"right-down\" width=\"__TILESX__\" height=\"__TILESY__\" tilewidth=\"__TILEXSIZE__\" tileheight=\"__TILEYSIZE__\" nextobjectid=\"__NUMTILES__\" backgroundcolor=\"#000000\"> <tileset firstgid=\"1\" name=\"map00_1\" tilewidth=\"__TILEXSIZE__\" tileheight=\"__TILEYSIZE__\" tilecount=\"__NUMTILES__\">  <image source=\"__FILENAME__\" width=\"__IMGWIDTH__\" height=\"__IMGHEIGHT__\"/></tileset> <layer name=\"background\" width=\"__TILESX__\" height=\"__TILESY__\"><data encoding=\"csv\">__TILEMAP__</data></layer></map>"
+
+#NeoGeo Specifics
+neoFixedMapping = [16,24,0,8,17,25,1,9,18,26,2,10,19,27,3,11,20,28,4,12,21,29,5,13,22,30,6,14,23,31,7,15]
