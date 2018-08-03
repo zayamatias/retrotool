@@ -96,6 +96,7 @@ class App:
         self.filemenu.add_command(label="Export to Tiled", command=lambda:retrofunctions.exportToTiled(self))
         self.filemenu.add_command(label="Export MSX screen", command=lambda:retrofunctions.exportMSXScreen(self))
         self.filemenu.add_command(label="Export NeoGeo Fixed Tiles (S ROM)", command=lambda:retrofunctions.exportNeoFixed(self))
+        self.filemenu.add_command(label="Export NeoGeo Sprites (C ROM)", command=lambda:retrofunctions.exportNeoSprites(self))
         self.filemenu.add_command(label="Export to Binary/Raw", command=lambda:retrofunctions.exportBinary(self))
         self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
         

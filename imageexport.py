@@ -3,6 +3,60 @@ import config
 import tkinter as tk
 
 
+def NeoSprites (app,filename):
+    # the NeoGeo sprites have 4 8x8 pixel blocks, each pixel has 4 bits
+    evenbytes = []
+    oddbytes = []
+    for sprite in app.usprites:
+        tiles = [[],[],[],[]]
+        # Create Tiles for sprites [3-1 && 4-2]
+        ypos = 0;
+        for row in sprite:
+            pixpattern = row.split("%")
+            pixpattern.remove('')
+            xpos = 0
+            for col in range (0,app.spritexsize):
+                if xpos < 8 and ypos <8:
+                    tiles[2].append(pixpattern[col])
+                if xpos < 8 and ypos >7:
+                    tiles[0].append(pixpattern[col])
+                if xpos < 8 and ypos >7:
+                    tiles[3].append(pixpattern[col])
+                if xpos >7 and ypos >7:
+                    tiles[1].append(pixpattern[col])
+                xpos = xpos + 1
+            xpos = 0
+            ypos = ypos + 1
+        for tile in tiles:
+            tpos = 0
+            for row in range (0,8):
+                bitplane0 = 0
+                bitplane1 = 0
+                bitplane2 = 0
+                bitplane3 = 0
+                for col in range (0,8):
+                    bitplane0 = bitplane0 << 1
+                    bitplane1 = bitplane1 << 1
+                    bitplane2 = bitplane2 << 1
+                    bitplane3 = bitplane3 << 1
+                    color = int(tile[col+tpos])
+                    bp0 = color & 1
+                    bp1 = (color & 2) >> 1
+                    bp2 = (color & 4) >> 2
+                    bp3 = (color & 8) >> 3
+                    bitplane0 = bitplane0 | bp0
+                    bitplane1 = bitplane1 | bp1
+                    bitplane2 = bitplane2 | bp2
+                    bitplane3 = bitplane3 | bp3
+                tpos = tpos + 8 
+                evenbytes.append(bitplane0)
+                evenbytes.append(bitplane1)
+                oddbytes.append(bitplane2)
+                oddbytes.append(bitplane3)
+        print (len(evenbytes))
+        f = open(filename, 'wb')
+
+    
 def NeoFixed (app,file,filename):
     tilebytes =[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     bytecount = 0;

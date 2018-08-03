@@ -103,3 +103,5 @@ tiled_xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><map version=\"1.0\" orie
 
 #NeoGeo Specifics
 neoFixedMapping = [16,24,0,8,17,25,1,9,18,26,2,10,19,27,3,11,20,28,4,12,21,29,5,13,22,30,6,14,23,31,7,15]
+#Neo geo C ROM max size (in MB)
+neoCROMMaxSize = 8

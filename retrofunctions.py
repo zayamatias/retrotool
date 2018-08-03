@@ -197,7 +197,14 @@ def exportNeoFixed(app):
     outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("S Rom",".rom")])
     f = open(outfile, 'wb')
     imageexport.NeoFixed(app,f,outfile)
-                        
+
+def exportNeoSprites(app):
+    if not app.usprites:
+        messagebox.showinfo("Error","Please create some sprites first")
+        return 1        
+    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("C Rom",".rom")])
+    imageexport.NeoSprites(app,outfile)
+                       
 def exportMSXScreen(app):
     if not app.Tiles:
         messagebox.showinfo("Error","Please create some tiles first")
@@ -405,7 +412,7 @@ def getColors(app):
             r=int(int(rgb[0])/config.palettes[app.targetSystem.get()][1][0])
             g=int(int(rgb[1])/config.palettes[app.targetSystem.get()][1][1])
             b=int(int(rgb[2])/config.palettes[app.targetSystem.get()][1][2])
-            print (r,g,b)
+            #print (r,g,b)
             # make sure we do not add bgcolor
             if set((r,g,b)) != set (app.bgcolor):
                 # Iscolorin palette last parameters tells if it it must do a strict (FALSE) searrch or an extended (TRUE) search
