@@ -46,7 +46,6 @@ def NeoSprites (app,filename):
         # 1 byte CCCCCCCC corresponding to bitplane 2
         # 1 byte DDDDDDDD corresponding to bitplane 3
         for tile in tiles:
-            print (tile)
             for row in range (0,8):
                 # Initialize bitplanes for each row
                 bitplane0 = 0
@@ -82,10 +81,10 @@ def NeoSprites (app,filename):
                     # And in next loop it will be shifted by one positon to the left 
                     # so we make place for the upcoming bit
                 #once the row has been converted into bitplanes (1 byte) we store it where it belongs
-                evenbytes.append(bitplane0)
-                evenbytes.append(bitplane1)
-                oddbytes.append(bitplane2)
-                oddbytes.append(bitplane3)
+                oddbytes.append(bitplane0)
+                oddbytes.append(bitplane1)
+                evenbytes.append(bitplane2)
+                evenbytes.append(bitplane3)
                 #Check maximum file size and create new set if needed
                 if len(evenbytes) >= config.neoCROMMaxSize * 1024:
                     WriteNeoCRom (filename,fileCounter,evenbytes,oddbytes)
