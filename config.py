@@ -1,8 +1,8 @@
 iconfile = "MSX.ICO"   # File that while show in the window icon
-logoimage = "MSX-Logo.png"  #Image to show after opening the app
+logoimage = "Tool_Logo.png"  #Image to show after opening the app
 appxsize = 800   #Width of the main window
 appysize = 600   #Height of the main window
-tooltitle = "MSX Retro Tool"  #title of the app
+tooltitle = "Retro Tool"  #title of the app
 transcolor = ('0','0','0') #RGB for color to consider transparent
 msxcolordivider = [32,32,32] # Number to use as divider to go from 16bit palette to 7bit msx palette [R,G,B]
 msxpalette = [(-1,-1,-1),
