@@ -22,18 +22,18 @@ def NeoSprites (app,filename):
             # First value in the arary is always empty, there is surely a way to improve this.
             pixpattern.remove('')
             for col in range (0,app.spritexsize):
+                if col > 7 and ypos <8:
+                    #This is in the tile #1
+                    tiles[0].append(pixpattern[col])
+                if col > 7 and ypos > 7:
+                    #This is in the tile #2
+                    tiles[1].append(pixpattern[col])
                 if col < 8 and ypos <8:
                     #This is in the tile #3
                     tiles[2].append(pixpattern[col])
-                if col < 8 and ypos >7:
-                    #This is in the tile #1
-                    tiles[0].append(pixpattern[col])
-                if col < 8 and ypos >7:
+                if col <8 and ypos >7:
                     #This is in the tile #4
                     tiles[3].append(pixpattern[col])
-                if col >7 and ypos >7:
-                    #This is in the tile #2
-                    tiles[1].append(pixpattern[col])
             ypos = ypos + 1
         #Now we run through each tile.
         #Sprites are saved as follows:
@@ -46,6 +46,7 @@ def NeoSprites (app,filename):
         # 1 byte CCCCCCCC corresponding to bitplane 2
         # 1 byte DDDDDDDD corresponding to bitplane 3
         for tile in tiles:
+            print (tile)
             for row in range (0,8):
                 # Initialize bitplanes for each row
                 bitplane0 = 0
@@ -94,8 +95,8 @@ def NeoSprites (app,filename):
             #the tile has been done
         #the complete tileset has been done
         sprcount = sprcount + 1
-    #All the sprites have been done
-    print (sprcount)
+    #All the sprites have been done save file
+    WriteNeoCRom (filename,fileCounter,evenbytes,oddbytes)
 
 def WriteNeoCRom(filename,count,evenbytes,oddbytes):
     c1=str(count)
