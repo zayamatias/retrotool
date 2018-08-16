@@ -1,6 +1,6 @@
 # retrotool
 
-Tool to facilitate sprites/graphics manipulation and creation for retro-progarmming on several systems (MSX for now).
+Tool to facilitate sprites/graphics manipulation and creation for retro-progarmming on several systems (MSX & NeoGeo now!).
 
 Tool should be "runnable" under python in any system supporting "tkinter" library (Win/Linux/MacOS)
 
