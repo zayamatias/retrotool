@@ -58,11 +58,15 @@ def NeoSprites (app,filename):
 
     
 def NeoFixed (app,file,filename):
-    tilebytes =[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+    # Below the order in which the columns should be stored
+    # Check https://wiki.neogeodev.org/index.php?title=Fix_graphics_format
+    colSwap = [2,3,0,1]
     bytecount = 0;
+    filebytes =bytearray()
     for tile in app.Tiles:
+        tileInBytes =[[],[],[],[]]
         pixpos = 0;
-        pixmap = 0;
         for row in range(0,app.tileysize):
             pixpattern = tile[row].split("%")
             pixpattern.remove('')
@@ -70,25 +74,25 @@ def NeoFixed (app,file,filename):
             #if the pixel we're checking is even > 2 then we have to store the byte
             #otherwise we just shift to the proper position
             pixpos = 0 # The pixle in te row
+            currentCol = 0
+            byte = 0
             for col in range(0,app.tilexsize):
                 if pixpos % 2 == 0:
                     #even number
-                    byte = int(pixpattern[pixpos])<<4
+                    byte = int(pixpattern[pixpos])
                 else:
                     #odd number
-                    byte = byte | int(pixpattern[pixpos])
-                    tilebytes[pixmap]=byte
-                    pixmap = pixmap +1
+                    byte = byte | (int(pixpattern[pixpos]) <<4)
+                    tileInBytes[colSwap[currentCol]].append(byte)
                     byte = 0
-                bytecount = bytecount + 1
+                    bytecount = bytecount + 1
+                    currentCol = currentCol + 1
                 pixpos = pixpos + 1
-            #In tilebytes we now have the complete tyle, we can now save it to the binaryfile
-            filebytes =bytearray()
-            for n in range (0,len(tilebytes)):
-                filebytes.append(tilebytes[n])
-            
-            #colorbytes.append(colorbyte)
-        file.write(filebytes)
+        #In tilebytes we now have the complete tyle, we can now save it to the binaryfile, splitted in 4 columns
+        for n in range (0,len(tileInBytes)):
+            for byte in tileInBytes[n]:
+                filebytes.append(byte)
+    file.write(filebytes)
 
 def Screen2 (app,file,filename,wHeader=True):
     if wHeader:
