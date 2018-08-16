@@ -99,8 +99,6 @@ class App:
         self.filemenu.add_command(label="Export NeoGeo Sprites (C ROM)", command=lambda:retrofunctions.exportNeoSprites(self))
         self.filemenu.add_command(label="Export to Binary/Raw", command=lambda:retrofunctions.exportBinary(self))
         self.filemenu.add_command(label="Save Project", command=lambda:retrofunctions.saveProject(self))
-        
-
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=self.exit)
         self.menubar.add_cascade(label="File", menu=self.filemenu)

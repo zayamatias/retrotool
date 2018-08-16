@@ -5,6 +5,7 @@ import tkinter as tk
 
 def NeoSprites (app,filename):
     # the NeoGeo sprites have 4 8x8 pixel blocks, each pixel has 4 bits
+    fileCounter = 1
     evenbytes = bytearray()
     oddbytes = bytearray()
     sprcount = 0
@@ -84,13 +85,23 @@ def NeoSprites (app,filename):
                 evenbytes.append(bitplane1)
                 oddbytes.append(bitplane2)
                 oddbytes.append(bitplane3)
+                #Check maximum file size and create new set if needed
+                if len(evenbytes) >= config.neoCROMMaxSize * 1024:
+                    WriteNeoCRom (filename,fileCounter,evenbytes,oddbytes)
+                    evenbytes = bytearray ()
+                    oddbytes = bytearray()
+                    fileCounter = fileCounter + 2
             #the tile has been done
         #the complete tileset has been done
         sprcount = sprcount + 1
     #All the sprites have been done
     print (sprcount)
-    oddfilename = filename.replace(".","-c1.")
-    evenfilename = filename.replace(".","-c2.")
+
+def WriteNeoCRom(filename,count,evenbytes,oddbytes):
+    c1=str(count)
+    c2=str(count+1)
+    oddfilename = filename.replace(".","-"+c1+".")
+    evenfilename = filename.replace(".","-"+c2+".")
     f = open(oddfilename, 'wb')
     f.write(oddbytes)
     f.close   
