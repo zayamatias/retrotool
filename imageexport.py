@@ -5,58 +5,99 @@ import tkinter as tk
 
 def NeoSprites (app,filename):
     # the NeoGeo sprites have 4 8x8 pixel blocks, each pixel has 4 bits
-    evenbytes = []
-    oddbytes = []
+    evenbytes = bytearray()
+    oddbytes = bytearray()
+    sprcount = 0
     for sprite in app.usprites:
         tiles = [[],[],[],[]]
         # Create Tiles for sprites [3-1 && 4-2]
+        # A sprite 16x16 is divided in 4 tiles:
+        #   T3|T1
+        #   -----
+        #   T4|T2
         ypos = 0;
         for row in sprite:
             pixpattern = row.split("%")
+            # First value in the arary is always empty, there is surely a way to improve this.
             pixpattern.remove('')
-            xpos = 0
             for col in range (0,app.spritexsize):
-                if xpos < 8 and ypos <8:
+                if col < 8 and ypos <8:
+                    #This is in the tile #3
                     tiles[2].append(pixpattern[col])
-                if xpos < 8 and ypos >7:
+                if col < 8 and ypos >7:
+                    #This is in the tile #1
                     tiles[0].append(pixpattern[col])
-                if xpos < 8 and ypos >7:
+                if col < 8 and ypos >7:
+                    #This is in the tile #4
                     tiles[3].append(pixpattern[col])
-                if xpos >7 and ypos >7:
+                if col >7 and ypos >7:
+                    #This is in the tile #2
                     tiles[1].append(pixpattern[col])
-                xpos = xpos + 1
-            xpos = 0
             ypos = ypos + 1
+        #Now we run through each tile.
+        #Sprites are saved as follows:
+        #bitplanes 0 & 1 are in the even file
+        #bitplanes 2 & 3 are in the odd file
+        #Each color is 4 bits and if you read bits as ABCD, A will go to bitplane 0, B to 1, C to 2 and D to 3
+        # so at the end, for each "row" in your tile (1 row 8 pixels) you will have 4 bytes:
+        # 1 byte AAAAAAAA corresponding to bitplane 0
+        # 1 byte BBBBBBBB corresponding to bitplane 1
+        # 1 byte CCCCCCCC corresponding to bitplane 2
+        # 1 byte DDDDDDDD corresponding to bitplane 3
         for tile in tiles:
-            tpos = 0
             for row in range (0,8):
+                # Initialize bitplanes for each row
                 bitplane0 = 0
                 bitplane1 = 0
                 bitplane2 = 0
                 bitplane3 = 0
                 for col in range (0,8):
+                    # So we shift the previous state of each bitplane (initial is 0 so no problem)
                     bitplane0 = bitplane0 << 1
                     bitplane1 = bitplane1 << 1
                     bitplane2 = bitplane2 << 1
                     bitplane3 = bitplane3 << 1
-                    color = int(tile[col+tpos])
-                    bp0 = color & 1
+                    # We get the color that needs to be treated, 8 pixels wide by 8 high
+                    color = int(tile[col+(row*8)]) 
+                    # we get the first bit, remember that first bit of the color must be the MSb of the byte
+                    # so for example an index 2 (0010 in binary) will be: bp0->0, bp1->1, bp2->0, bp3->0 (0100) 
+                    # Remove not needed bits (X remove N keep)
+                    # remove 3 upper bits (XXXN)
+                    bp0 = color & 1 
+                    # keep 2nd Bit (XXNX)
                     bp1 = (color & 2) >> 1
+                    # keep 2rd bit (XNXX)
                     bp2 = (color & 4) >> 2
+                    # remove 3 lower bits (NXXX)
                     bp3 = (color & 8) >> 3
+                    # as a result each bp variable holds the value that needs to be inserted in the bitplane
+                    # whch is either 1 or 0
+                    # the values are ored in each biplane
                     bitplane0 = bitplane0 | bp0
                     bitplane1 = bitplane1 | bp1
                     bitplane2 = bitplane2 | bp2
                     bitplane3 = bitplane3 | bp3
-                tpos = tpos + 8 
+                    # And in next loop it will be shifted by one positon to the left 
+                    # so we make place for the upcoming bit
+                #once the row has been converted into bitplanes (1 byte) we store it where it belongs
                 evenbytes.append(bitplane0)
                 evenbytes.append(bitplane1)
                 oddbytes.append(bitplane2)
                 oddbytes.append(bitplane3)
-        print (len(evenbytes))
-        f = open(filename, 'wb')
+            #the tile has been done
+        #the complete tileset has been done
+        sprcount = sprcount + 1
+    #All the sprites have been done
+    print (sprcount)
+    oddfilename = filename.replace(".","-c1.")
+    evenfilename = filename.replace(".","-c2.")
+    f = open(oddfilename, 'wb')
+    f.write(oddbytes)
+    f.close   
+    f = open(evenfilename, 'wb')
+    f.write(evenbytes)
+    f.close
 
-    
 def NeoFixed (app,file,filename):
 
     # Below the order in which the columns should be stored

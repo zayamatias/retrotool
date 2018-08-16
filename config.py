@@ -101,7 +101,5 @@ animArray = [14,15,16]  # "character" list to show in animation
 ROMWidth = 256
 tiled_xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><map version=\"1.0\" orientation=\"orthogonal\" renderorder=\"right-down\" width=\"__TILESX__\" height=\"__TILESY__\" tilewidth=\"__TILEXSIZE__\" tileheight=\"__TILEYSIZE__\" nextobjectid=\"__NUMTILES__\" backgroundcolor=\"#000000\"> <tileset firstgid=\"1\" name=\"map00_1\" tilewidth=\"__TILEXSIZE__\" tileheight=\"__TILEYSIZE__\" tilecount=\"__NUMTILES__\">  <image source=\"__FILENAME__\" width=\"__IMGWIDTH__\" height=\"__IMGHEIGHT__\"/></tileset> <layer name=\"background\" width=\"__TILESX__\" height=\"__TILESY__\"><data encoding=\"csv\">__TILEMAP__</data></layer></map>"
 
-#NeoGeo Specifics
-neoFixedMapping = [16,24,0,8,17,25,1,9,18,26,2,10,19,27,3,11,20,28,4,12,21,29,5,13,22,30,6,14,23,31,7,15]
 #Neo geo C ROM max size (in MB)
 neoCROMMaxSize = 8
