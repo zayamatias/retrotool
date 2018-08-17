@@ -23,7 +23,7 @@ class App:
         self.tpixels = []
         self.finalsprites = []
         self.Tiles=[]
-        self.ColorTiles = []    
+        self.ColorTiles = []
         self.FinalTiles = []
         self.usprites = []
         self.csprites = []
@@ -41,12 +41,12 @@ class App:
             self.tilexsize = config.tilexsize
         else:
             self.tilexsize = config.syslimits[self.targetSystem.get()][5]
-        
+
         if config.syslimits[self.targetSystem.get()][6]==0:
             self.tileysize = config.tileysize
         else:
             self.tileysize = config.syslimits[self.targetSystem.get()][6]
-            
+
         self.newSprites = config.newSprites
         self.spritesPerRow = 0
         self.spritesPerCol = 0
@@ -103,8 +103,8 @@ class App:
         self.filemenu.add_command(label="Exit", command=self.exit)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
-        
-        
+
+
         idx = 0
         for system in config.systems:
             if idx in config.activeSystems:
@@ -139,7 +139,7 @@ class App:
             self.tilexsize = config.tilexsize
         else:
             self.tilexsize = config.syslimits[self.targetSystem.get()][5]
-        
+
         if config.syslimits[self.targetSystem.get()][6]==0:
             self.tileysize = config.tileysize
         else:
@@ -147,14 +147,14 @@ class App:
         self.pixelsize =32/self.tileysize
 
         self.maxcolors = config.syslimits[self.targetSystem.get()][2]
-        
+
     def click (self,event):
         # need to consider scale!
         if hasattr(self.img,'filename'):
             if self.img.filename == config.logoimage :
                 return 1 #do not allow BG selection on loading screen!
         if self.spritephoto != "":
-            zoom = self.scale.get() 
+            zoom = self.scale.get()
             width, height = self.img.size
             width = width * zoom
             height = height * zoom
@@ -175,8 +175,7 @@ class App:
         self.root.destroy()
         sys.exit()
 
-    
-            
+
+
 if __name__ == "__main__":
     myapp = App()
-    
