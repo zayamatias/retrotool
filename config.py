@@ -1,4 +1,4 @@
-iconfile = "MSX.ICO"   # File that while show in the window icon
+iconfile = ""   # File that while show in the window icon
 logoimage = "Tool_Logo.png"  #Image to show after opening the app
 appxsize = 800   #Width of the main window
 appysize = 600   #Height of the main window
@@ -22,7 +22,7 @@ msxpalette = [(-1,-1,-1),
 (int(204/msxcolordivider[0]),int(204/msxcolordivider[1]),int(204/msxcolordivider[2])),
 (int(255/msxcolordivider[0]),int(255/msxcolordivider[1]),int(255/msxcolordivider[2]))
 ] # Msx palette in MSX values
-#Neo Geo Palette 
+#Neo Geo Palette
 neopalette = msxpalette
 #Below will hold palettes for different systems
 palettes = [("MSX",msxcolordivider,msxpalette),
@@ -50,7 +50,7 @@ systems = ["MSX - Screen 2",
            "MSX2+ - Screen 11",
            "MSX2+ - Screen 12",
            "NeoGeo"]
-#System Limits => 
+#System Limits =>
 #[0]System name
 #[1]max colors per sprite
 #[2]max colors of image to load
@@ -70,9 +70,9 @@ syslimits = [("MSX",1,256,False,False,0,0),
              ("MSX2+",3,1000000,True,True,0,0),
              ("MSX2+",3,1000000,True,True,0,0),
              ("NeoGeo",15,65536,True,True,8,8)]
-             
+
 extensions = ["SC2","SC3","SC4","SC5","SC6","SC7","SC8","S10","S11","S12"]
-             
+
 preferencesWxSize = 400
 preferencesWySize = 400
 animWxSize = 400
