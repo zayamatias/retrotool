@@ -79,7 +79,7 @@ def writeBASICFile(app):
             f.write (str(numline)+" DATA "+line)
             numline = numline + 10
         nsprite = nsprite + 1
- 
+
 def writeASMFile(app):
     #crete the aoutput .asm file with the sprite data, colors & palette
     if app.usprites != []:
@@ -134,11 +134,11 @@ def writeASMFile(app):
 def exportToTiled(app):
     if not app.Tiles:
         messagebox.showinfo("Error","Please create some tiles first")
-        return 1        
+        return 1
     cols = config.tilesPerRow
     rows = math.ceil(len(app.FinalTiles)/cols)
     img = PIL.Image.new('RGB',(int(cols*app.tilexsize), int(rows*app.tileysize)))
-    pixels = img.load()    
+    pixels = img.load()
     y= 0
     tileidx = 0
     for trow in range (0,rows):
@@ -160,7 +160,7 @@ def exportToTiled(app):
                     del cpattern[0]
                 for col in range (0,app.tilexsize):
                     pcolor =  int(cpattern[col])
-                    
+
                     if pcolor !="":
                         coltuple = app.palette[pcolor]
                         if pcolor == 0:
@@ -193,7 +193,7 @@ def exportToTiled(app):
 def exportNeoFixed(app):
     if not app.Tiles:
         messagebox.showinfo("Error","Please create some tiles first")
-        return 1        
+        return 1
     outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("S Rom",".rom")])
     f = open(outfile, 'wb')
     imageexport.NeoFixed(app,f,outfile)
@@ -201,14 +201,14 @@ def exportNeoFixed(app):
 def exportNeoSprites(app):
     if not app.usprites:
         messagebox.showinfo("Error","Please create some sprites first")
-        return 1        
+        return 1
     outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("C Rom",".rom")])
     imageexport.NeoSprites(app,outfile)
-                       
+
 def exportMSXScreen(app):
     if not app.Tiles:
         messagebox.showinfo("Error","Please create some tiles first")
-        return 1        
+        return 1
     outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Screen Files",config.extensions[app.targetSystem.get()])])
     extension = outfile[outfile.index('.'):]
     f = open(outfile, 'wb')
@@ -229,12 +229,12 @@ def exportMSXScreen(app):
         imageexport.Screen8(app,f,outfile)
     if (extension.upper() == ".S10") or (extension.upper() == ".S11") or (extension.upper() == ".S12"):
         imageexport.Screen10plus(app,f,outfile)
-    
+
 def exportBinary(app):
     if not app.Tiles:
         messagebox.showinfo("Error","Please create some tiles first")
-        return 1        
-    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Binary Files","*.bin;*.raw")])
+        return 1
+    outfile = filedialog.asksaveasfilename(parent=app.root,filetypes=[("Binary Files","*.bin *.raw")])
     f = open(outfile, 'wb')
     extension = "."+config.extensions[app.targetSystem.get()]
     #print (extension)
@@ -289,7 +289,7 @@ def resetProject(app):
 
 
 def openROMFile(app):
-    app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom;*.nes;*.sms;*.sr5")])
+    app.romfile = filedialog.askopenfilename(parent=app.root,filetypes=[("ROM Files","*.rom *.nes *.sms *.sr5")])
     if (app.romfile==""):
         return 1
     resetProject(app)
@@ -317,7 +317,7 @@ def openImageFile(app):
     #ask for a file to open
     #to speed up testing, if a file is set in the config it will not ask to open but will open directly this one
     if config.default_filename == "":
-        app.opfile = filedialog.askopenfilename(parent=app.root,filetypes=[("Image Files","*.jpg;*.gif;*.png;*.bmp")])
+        app.opfile = filedialog.askopenfilename(parent=app.root,filetypes=[("Image Files","*.jpg *.gif *.png *.bmp")])
     else:
         app.opfile = config.default_filename
     if (app.opfile==""):
@@ -363,7 +363,7 @@ def loadProject (app):
         except:
             messagebox.showinfo("Error","The file you tried to open is not compatible")
 
-            
+
 def zoomimage(app):
     #function called to zoom the image loaded in or out (according to the selected scale)
     zoom = int(app.scale.get())
@@ -402,9 +402,9 @@ def getColors(app):
     #1st time get colors without modification (to stick to the original system palette)
     #2nd time, only if possible to modifiy colors, take into account used colors and modify/add when possible
     #Then all this logic should be outside the "getPixels" function!!!!!
-    
+
     usedColors = [0]
-    
+
     #first run : Check existing colors
     for color in app.colors:
         rgb = color[1]
@@ -487,8 +487,8 @@ def getPixels (app,pixelArray):
     if error:
         messagebox.showinfo ("Warning","Some colors have been discarded due to target system limtations (usually number of colors)")
 
-                    
-                
+
+
     app.imgwidth= app.imgwidth+extracols
     app.prcanvas.pack_forget()
     app.progress['value']=0
@@ -506,15 +506,15 @@ def getTempColor (row,position):
     return color
 
 def updateTempColor (row,position,color):
-    
+
     rowSplit = row.split ("%")
     rowSplit.pop (0)
     rowSplit[position]=color
-    returnRow = ""   
+    returnRow = ""
     for pixel in rowSplit:
         returnRow = returnRow + "%" + str(pixel)
     return returnRow
-    
+
 
 def udpateTargetSystem(app,chgsystem):
     #Will be used when changing the target system
@@ -541,7 +541,7 @@ def updateDrawColor (canvas,app):
 def swapColor (canvas,app):
     if not (config.syslimits[app.targetSystem.get()][4]):
         messagebox.showinfo ("Error","Your target system does not allow for palette changes")
-        return 1        
+        return 1
     tags = canvas.gettags(tk.CURRENT)
     if len(tags)<1:
         return
@@ -557,7 +557,7 @@ def swapColor (canvas,app):
     canvas.update_idletasks()
     canvas.itemconfig(app.paletteColorBoxes[app.drawColor], fill=transformColor(app,app.drawColor))
     canvas.itemconfig(app.paletteColorBoxes[newColor], fill=transformColor(app,newColor))
-    
+
 def exchangeColors (app,oldColor,newColor):
     idx= 0
     for pixel in app.tpixels:
@@ -566,7 +566,7 @@ def exchangeColors (app,oldColor,newColor):
         elif str(pixel) == str(newColor):
             app.tpixels[idx]=str(oldColor)
         idx = idx + 1
-    
+
     idx= 0
     for pixel in app.spixels:
         if str(pixel)== str(oldColor):
@@ -576,7 +576,7 @@ def exchangeColors (app,oldColor,newColor):
         idx = idx + 1
     sprites.createTempSprites(app)
     tiles.createTiles(app)
-        
+
     ## Update Palette
     oldColors = app.palette[oldColor]
     newColors = app.palette[newColor]
@@ -600,7 +600,7 @@ def drawboxel (app,canvas,sprite,x,y,index,width,bgcolor,parenttags):
             else:
                 color = transformColor (app,pxColor)
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
-            mytags = parenttags+"/"+str(px)+"/"+str(py) 
+            mytags = parenttags+"/"+str(px)+"/"+str(py)
             canvas.create_rectangle (x,y,ex,ey,fill=color,width=border,tags=mytags)
             #else:
                 # In the "tag" directive I save the sprite_index/x_coord/y_coord of the "boxel"
@@ -621,9 +621,9 @@ def transformColor (app,paletteIndex):
     g = palettecolor[1]
     b = palettecolor[2]
    # print (r,g,b)
-    if r<0: r = 0        
-    if g<0: g = 0        
-    if b<0: b = 0        
+    if r<0: r = 0
+    if g<0: g = 0
+    if b<0: b = 0
     rgb = (r*config.palettes[app.targetSystem.get()][1][0],
            g*config.palettes[app.targetSystem.get()][1][1],
            b*config.palettes[app.targetSystem.get()][1][2])
@@ -650,14 +650,14 @@ def createPreferencesWindow(app):
     app.prefwindow.iconbitmap(config.iconfile)
     app.prefwindow.geometry(str(config.preferencesWxSize)+"x"+str(config.preferencesWySize))
     app.prefwindow.protocol("WM_DELETE_WINDOW", lambda:closePreferencesWindow(app))
-    
+
     pixlabel = tk.Label(app.prefwindow, text="Pixel size in sprite editor")
     pixlabel.grid(row=0, sticky=tk.W)
     pixsizes = tk.StringVar(app.prefwindow)
     pixsizes.set(app.pixelsize) # default value
     pixelsize = tk.OptionMenu(app.prefwindow, pixsizes, 2,4,6,8,10,12,14,16,command= lambda x:chgPixelSize(pixsizes,app))
     pixelsize.grid(row=0, column=1, sticky=tk.W)
-  
+
     sprXSizelabel = tk.Label(app.prefwindow, text="Sprite width in pixels")
     sprXSizelabel.grid(row=1, sticky=tk.W)
     sprXSizes = tk.StringVar(app.prefwindow)
@@ -671,23 +671,23 @@ def createPreferencesWindow(app):
     sprYSizes.set(app.spriteysize) # default value
     sprYSize = tk.OptionMenu(app.prefwindow, sprYSizes, 8,16,command= lambda x:chgSprYSize(sprXSizes,app))
     sprYSize.grid(row=2, column=1, sticky=tk.W)
- 
+
     nbrSpriteslabel = tk.Label(app.prefwindow, text="Number of sprites for new project")
     nbrSpriteslabel.grid(row=3, sticky=tk.W)
     nbrSprites = tk.Entry(app.prefwindow)
     nbrSprites.grid(row=3, column=1, sticky=tk.W)
 
     #    applybutton = Button (app.prefwindow,"Apply",command= lambda:applyPrefs(app)).grid(row=10)
-    
+
     app.prefwindow.withdraw()
     #scrollbar = tk.Scrollbar(app.spwindow, command=closeSprites(app))
     #scrollbar.pack(side=tk.RIGHT, fill='y')
-    
+
 def showPreferences(app):
-    createPreferencesWindow(app)   
+    createPreferencesWindow(app)
     app.prefwindow.deiconify()
 
-    
+
 def closePreferencesWindow(app):
     #Destroy sprite window so next time it is open it is reinitialized
     app.prefwindow.destroy()
@@ -702,16 +702,16 @@ def closeAnimationWindow(app):
     app.animWindow.destroy()
 
 def isColorInPalette(app,color,extended):
-    
+
     iscolorinpalette = False
     idx = findColor (color,app.palette,extended)
     if idx != -1:
         iscolorinpalette = True
     return iscolorinpalette
 
-    
+
 def displayPalette(app):
-    
+
     skip = False
     if (app.paletteCanvas == None):
         skip = True
@@ -744,7 +744,7 @@ def displayPalette(app):
     app.paletteCanvas.pack()
     app.palwindow.deiconify()
 
-    
+
 def colorCompare(colora,colorb,extended):
     ra=int(colora[0])
     ga=int(colora[1])
@@ -786,8 +786,8 @@ def colorCompare(colora,colorb,extended):
             weight = weight+ 1
         # Special case, if 3 colors are equal to each other then add extra points
         if (rb==gb) and (gb==bb) and (ra==ga) and (ga==ba):
-            weight = weight +1 
-            
+            weight = weight +1
+
     return weight
 
 def findColor(color,palette,extended):
@@ -802,4 +802,3 @@ def findColor(color,palette,extended):
                 retcol = idx
             idx = idx + 1
     return retcol
-
