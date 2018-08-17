@@ -19,7 +19,7 @@ def newProject(app):
     sprites.createTempSprites (app)
 
 def writeBASICFile(app):
-    #crete the aoutput .asm file with the sprite data, colors & palette
+    #crete the aoutput .bas file with the sprite data, colors & palette
     f = open(app.outfile, 'w')
     f.write ("10 REM Retrotool BASIC Export - (Code Inspired by MSX Programming - Graham Bland)\n")
     f.write ("20 COLOR 1,2,2\n")
@@ -81,55 +81,67 @@ def writeBASICFile(app):
         nsprite = nsprite + 1
 
 def writeASMFile(app):
-    #crete the aoutput .asm file with the sprite data, colors & palette
-    if app.usprites != []:
-        sprites.createFinalSprites(app)
+
     f = open(app.outfile, 'w')
-    if len (app.finalsprites)>0:
-        f.write ("SPRITE_DATA:\n")
-        idx = 0
-        for fsprite in app.finalsprites:
-            line = fsprite.getAsmPattern(app.spritexsize)
-            f.write (";Sprite"+str(idx)+"\n")
-            f.write (line)
-            idx = idx + 1
-        f.write("SPRITE_COLORS:\n")
-        idx = 0
-        for fsprite in app.finalsprites:
-            line = fsprite.getAsmColors(app.spriteysize)
-            f.write (";Sprite"+str(idx)+"\n")
-            f.write (line)
-        idx = idx +1
+    #crete the aoutput .asm file with the sprite data, colors & palette
+    if config.systems[app.targetSystem.get()] != "NeoGeo":
+        if app.usprites != []:
+            sprites.createFinalSprites(app)
+        if len (app.finalsprites)>0:
+            f.write ("SPRITE_DATA:\n")
+            idx = 0
+            for fsprite in app.finalsprites:
+                line = fsprite.getAsmPattern(app.spritexsize)
+                f.write (";Sprite"+str(idx)+"\n")
+                f.write (line)
+                idx = idx + 1
+            f.write("SPRITE_COLORS:\n")
+            idx = 0
+            for fsprite in app.finalsprites:
+                line = fsprite.getAsmColors(app.spriteysize)
+                f.write (";Sprite"+str(idx)+"\n")
+                f.write (line)
+            idx = idx +1
     f.write ("PALETTE:\n")
     cindex =0;
     for color in app.palette:
         if set(color)==set((-1,-1,-1)):
             color = (0,0,0)
-        f.write ("\tdb $"+str(hex(int(color[0]))[2:])+str(hex(int(color[2]))[2:])+",$"+str(color[1])+"\n")
+        if config.systems[app.targetSystem.get()] != "NeoGeo":
+            f.write ("\tdb $"+str(hex(int(color[0]))[2:])+str(hex(int(color[2]))[2:])+",$"+str(color[1])+"\n")
+        else:
+            f.write ("\tdc.w $0"+str(hex(int(int(color[0])/16))[2:])+str(hex(int(int(color[1])/16))[2:])+str(hex(int(int(color[2])/16))[2:])+"\n")
         cindex = cindex+1
         # fill in dummy colors
-    if (len(app.FinalTiles)>0):
-        for dindex in range (cindex,16):
-            f.write ("\tdb $77,$7\n")
-        f.write ("TILE_DATA:\n")
-        for tile in app.FinalTiles:
-            f.write(tile.getAsmPattern(app.tilexsize)+"\n")
-        f.write ("TILE_COLORS:\n")
-        for tile in app.FinalTiles:
-            f.write(tile.getAsmColors(app.tilexsize)+"\n")
+    if config.systems[app.targetSystem.get()] != "NeoGeo":
+        if (len(app.FinalTiles)>0):
+            for dindex in range (cindex,16):
+                f.write ("\tdb $77,$7\n")
+            f.write ("TILE_DATA:\n")
+            for tile in app.FinalTiles:
+                f.write(tile.getAsmPattern(app.tilexsize)+"\n")
+            f.write ("TILE_COLORS:\n")
+            for tile in app.FinalTiles:
+                f.write(tile.getAsmColors(app.tilexsize)+"\n")
         f.write ("TILE_MAP:\n\tdb ")
-        ntiles= 0
-        ttiles = 0
-        for idx in app.TileMap:
-            f.write("$"+"{0:02x}".format(idx))
-            ntiles = ntiles +1 #These are the tiles per line (just to keep it tidy)
-            ttiles = ttiles + 1 #These are the total tiles
-            if (ntiles ==32) and (ttiles < len(app.TileMap)):
+    else:
+        f.write ("TILE_MAP:\n\tdc.b ")
+
+    ntiles= 0
+    ttiles = 0
+    for idx in app.TileMap:
+        f.write("$"+"{0:02x}".format(idx))
+        ntiles = ntiles +1 #These are the tiles per line (just to keep it tidy)
+        ttiles = ttiles + 1 #These are the total tiles
+        if (ntiles ==32) and (ttiles < len(app.TileMap)):
+            if config.systems[app.targetSystem.get()] != "NeoGeo":
                 f.write("\n\tdb ")
-                ntiles = 0
-            elif (ntiles != 32):
-                f.write(",")
-        f.write ("\n")
+            else:
+                f.write("\n\tdc.b ")
+            ntiles = 0
+        elif (ntiles != 32):
+            f.write(",")
+    f.write ("\n")
 
 def exportToTiled(app):
     if not app.Tiles:
