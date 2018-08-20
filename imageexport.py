@@ -59,12 +59,12 @@ def NeoSprites (app,filename):
                     bitplane2 = bitplane2 << 1
                     bitplane3 = bitplane3 << 1
                     # We get the color that needs to be treated, 8 pixels wide by 8 high
-                    color = int(tile[col+(row*8)]) 
+                    color = int(tile[col+(row*8)])
                     # we get the first bit, remember that first bit of the color must be the MSb of the byte
-                    # so for example an index 2 (0010 in binary) will be: bp0->0, bp1->1, bp2->0, bp3->0 (0100) 
+                    # so for example an index 2 (0010 in binary) will be: bp0->0, bp1->1, bp2->0, bp3->0 (0100)
                     # Remove not needed bits (X remove N keep)
                     # remove 3 upper bits (XXXN)
-                    bp0 = color & 1 
+                    bp0 = color & 1
                     # keep 2nd Bit (XXNX)
                     bp1 = (color & 2) >> 1
                     # keep 2rd bit (XNXX)
@@ -78,7 +78,7 @@ def NeoSprites (app,filename):
                     bitplane1 = bitplane1 | bp1
                     bitplane2 = bitplane2 | bp2
                     bitplane3 = bitplane3 | bp3
-                    # And in next loop it will be shifted by one positon to the left 
+                    # And in next loop it will be shifted by one positon to the left
                     # so we make place for the upcoming bit
                 #once the row has been converted into bitplanes (1 byte) we store it where it belongs
                 oddbytes.append(bitplane0)
@@ -104,7 +104,7 @@ def WriteNeoCRom(filename,count,evenbytes,oddbytes):
     evenfilename = filename.replace(".","-"+c2+".")
     f = open(oddfilename, 'wb')
     f.write(oddbytes)
-    f.close   
+    f.close
     f = open(evenfilename, 'wb')
     f.write(evenbytes)
     f.close
@@ -114,36 +114,19 @@ def NeoFixed (app,file,filename):
     # Below the order in which the columns should be stored
     # Check https://wiki.neogeodev.org/index.php?title=Fix_graphics_format
     colSwap = [2,3,0,1]
+    bytes = [0,0,0,0]
     bytecount = 0;
     filebytes =bytearray()
     for tile in app.Tiles:
-        tileInBytes =[[],[],[],[]]
-        pixpos = 0;
-        for row in range(0,app.tileysize):
-            pixpattern = tile[row].split("%")
-            pixpattern.remove('')
-            #So logic here:
-            #if the pixel we're checking is even > 2 then we have to store the byte
-            #otherwise we just shift to the proper position
-            pixpos = 0 # The pixle in te row
-            currentCol = 0
-            byte = 0
-            for col in range(0,app.tilexsize):
-                if pixpos % 2 == 0:
-                    #even number
-                    byte = int(pixpattern[pixpos])
-                else:
-                    #odd number
-                    byte = byte | (int(pixpattern[pixpos]) <<4)
-                    tileInBytes[colSwap[currentCol]].append(byte)
-                    byte = 0
-                    bytecount = bytecount + 1
-                    currentCol = currentCol + 1
-                pixpos = pixpos + 1
-        #In tilebytes we now have the complete tyle, we can now save it to the binaryfile, splitted in 4 columns
-        for n in range (0,len(tileInBytes)):
-            for byte in tileInBytes[n]:
+        for column in range(4):
+            for row in range(app.tileysize):
+                pixpattern = tile[row].split("%")
+                pixpattern.remove('')
+                byte = int(pixpattern[colSwap[column]+1]) << 4
+                byte = byte | int(pixpattern[colSwap[column]])
                 filebytes.append(byte)
+
+        #In tilebytes we now have the complete tyle, we can now save it to the binaryfile, splitted in 4 columns
     file.write(filebytes)
 
 def Screen2 (app,file,filename,wHeader=True):
@@ -170,7 +153,7 @@ def Screen2 (app,file,filename,wHeader=True):
             if len(tilecols)==0:
                 tilecols.append(0)
                 tilecols.append(0)
-            byte =""    
+            byte =""
             colorbyte = (int(tilecols[1])<<4) | int(tilecols[0])
             for col in range (0,app.tilexsize):
                 if int(cpattern[col])==int(tilecols[0]):
@@ -204,12 +187,12 @@ def Screen2 (app,file,filename,wHeader=True):
     print ("30 GOTO 30")
     if errors:
         tk.messagebox.showinfo("Warning","Some lines of patterns in your image contained more than 2 colors, results might not be what you expect!")
-        return 1        
+        return 1
 
- 
+
 def Screen5 (app,file,filename,wHeader=True):
     if wHeader:
-        header = [254,0,0,255,105,0,0]  
+        header = [254,0,0,255,105,0,0]
     else:
         header = []
     filebytes = bytearray(header)
@@ -232,12 +215,12 @@ def Screen5 (app,file,filename,wHeader=True):
                     if bit !="":
                         bit =  int(cpattern[col]) & 15
                         msbcolor = bit << 4
-                        lsbcolor = bit 
+                        lsbcolor = bit
                         if nibbc == 0:
                             byte = msbcolor
                         else:
                             byte = byte | lsbcolor
-                        nibbc = nibbc +1 
+                        nibbc = nibbc +1
                         if nibbc == 2:
                             filebytes.append(byte)
                             nibbc = 0
@@ -267,14 +250,14 @@ def Screen5 (app,file,filename,wHeader=True):
     filename = filesplit[len(filesplit)-1]
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
-    
+
 def Screen3 (app,file,filename,wHeader=True):
     # In this case we know taht the tiles are 2 by 2, each tile will end up being something like:
     # 4bits-> Color A + 4bits -> Color B
     # 4bits-> Color C + 4bits -> Color D
-    
+
     if wHeader:
-        header = [254,0,0,255,7,0,0]  
+        header = [254,0,0,255,7,0,0]
     else:
         header = []
     filebytes = bytearray(header)
@@ -338,8 +321,8 @@ def Screen3 (app,file,filename,wHeader=True):
     filename = filesplit[len(filesplit)-1]
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
-    
-    
+
+
 def Screen4 (app,file,filename,wHeader=True):
     if wHeader:
         header = [254,0,0,255,55,0,0]
@@ -366,7 +349,7 @@ def Screen4 (app,file,filename,wHeader=True):
             if len(tilecols)==0:
                 tilecols.append(0)
                 tilecols.append(0)
-            byte =""    
+            byte =""
             colorbyte = (int(tilecols[1])<<4) | int(tilecols[0])
             for col in range (0,app.tilexsize):
                 if int(cpattern[col])==int(tilecols[0]):
@@ -415,7 +398,7 @@ def Screen4 (app,file,filename,wHeader=True):
     filename = filesplit[len(filesplit)-1]
     print ("50 BLOAD \""+filename+"\",S")
     print ("60 GOTO 60")
-    
+
 def Screen6 (app,file,filename,wHeader=True):
     if wHeader:
         header = [254,0,0,255,105,0,0]
@@ -487,12 +470,12 @@ def Screen7 (app,file,filename,wHeader=True):
                     if bit !="":
                         bit =  int(cpattern[col]) & 15
                         msbcolor = bit << 4
-                        lsbcolor = bit 
+                        lsbcolor = bit
                         if nibbc == 0:
                             byte = msbcolor
                         else:
                             byte = byte | lsbcolor
-                        nibbc = nibbc +1 
+                        nibbc = nibbc +1
                         if nibbc == 2:
                             filebytes.append(byte)
                             nibbc = 0
@@ -550,9 +533,9 @@ def Screen8 (app,file,filename,wHeader=True):
                             color = app.bgcolor
                         byte = color[1]<<5 | color[0]<<2 | color[2]
                         if (byte != 0 and byte != 255):
-                            print (color,byte)                        
+                            print (color,byte)
                         filebytes.append(byte)
-                            
+
     file.write(filebytes)
     ## Output palette to console in BASIC mode for testing purposes
     bgcolor = str(retrofunctions.findColor (app.bgcolor,app.palette,config.syslimits[app.targetSystem.get()][4]))
@@ -566,7 +549,7 @@ def Screen8 (app,file,filename,wHeader=True):
 
 def Screen10plus (app,file,filename,wHeader=True):
     if wHeader:
-        header = [254,0,0,255,211,0,0]  
+        header = [254,0,0,255,211,0,0]
     else:
         header = []
     filebytes = bytearray(header)
@@ -586,7 +569,7 @@ def Screen10plus (app,file,filename,wHeader=True):
                 # SPecial case for MSX screens, we take the two bytes of the tile and calculate colors
                 # according to 4bits
                 for byte in range (2): # Take two bytes at a time
-                    bits = [cpattern[(byte*4)+0],cpattern[(byte*4)+1],cpattern[(byte*4)+2],cpattern[(byte*4)+3]] 
+                    bits = [cpattern[(byte*4)+0],cpattern[(byte*4)+1],cpattern[(byte*4)+2],cpattern[(byte*4)+3]]
                     colors = []
                     for idx in range (4):
                         bit =  bits[idx]
@@ -594,8 +577,8 @@ def Screen10plus (app,file,filename,wHeader=True):
                             color = app.palette[int(bit)]
                             if set(color)==set((-1,-1,-1)):
                                 color = app.bgcolor
-                            colors.append(color)   
-                    print (colors)    
+                            colors.append(color)
+                    print (colors)
                     r = int((colors[0][0]+colors[1][0]+colors[2][0]+colors[3][0])/4)
                     g = int((colors[0][1]+colors[1][1]+colors[2][1]+colors[3][1])/4)
                     b = int((colors[0][2]+colors[1][2]+colors[2][2]+colors[3][2])/4)
@@ -612,10 +595,10 @@ def Screen10plus (app,file,filename,wHeader=True):
                     j = j & 63
                     jh = j >> 3
                     jl = j & 7
-                    byte1 = y1 << 4 | kl 
-                    byte2 = y2 << 4 | kh 
-                    byte3 = y3 << 4 | jl 
-                    byte4 = y4 << 4 | jh 
+                    byte1 = y1 << 4 | kl
+                    byte2 = y2 << 4 | kh
+                    byte3 = y3 << 4 | jl
+                    byte4 = y4 << 4 | jh
                     """#FOr some reason sometimes the calculations go below 0
                     if byte1 < 0:
                         byte1 = 0
@@ -644,4 +627,3 @@ def Screen10plus (app,file,filename,wHeader=True):
     print ("10 SCREEN 8:COLOR 15,"+bgcolor+","+bgcolor)
     print ("20 BLOAD \""+filename+"\",S")
     print ("30 GOTO 30")
- 

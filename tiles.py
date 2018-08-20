@@ -40,7 +40,7 @@ def showTilesMap (app):
     for tile in app.TileMap:
         destX = currX + (xsize)
         destY = currY + (ysize)
-        tags=tags 
+        tags=tags
         app.tilesMapCanvas.create_rectangle(currX,currY,destX,destY,width=(spacing/2),tags=tags)
         #draw each "boxel" of the sprite
         retrofunctions.drawboxel (app,app.tilesMapCanvas,app.Tiles[tile],currX,currY,currentTile,app.tilexsize,retrofunctions.transformColor(app,0),tags)
@@ -67,7 +67,7 @@ def showTiles (app):
 
 def drawTiles(app):
     if (app.tilwindow!=None):
-        if (app.tilesCanvas != None) and (app.tilwindow.winfo_exists()!=0):    
+        if (app.tilesCanvas != None) and (app.tilwindow.winfo_exists()!=0):
             for child in app.tilwindow.winfo_children():
                 child.destroy()
                 app.tileCanvas = None
@@ -76,7 +76,7 @@ def drawTiles(app):
             #displayPalette(app)
     else:
         createTilesWindow(app)
-            
+
     app.tilwindow.deiconify()
     numTiles = len(app.Tiles)
     if (app.imgwidth!=0):
@@ -132,7 +132,7 @@ def drawTiles(app):
             currY = currY + (ysize+spacing)
             shownTiles=0
     retrofunctions.displayPalette(app)
-    
+
 def createTiles(app):
     #Goal is to go trhough pixels in tilex*tiley and extract tiles
     #find duplicate tiles and skip them so at the end you only have the minimum needed tiles
@@ -166,10 +166,10 @@ def createTiles(app):
                         thiscolors.append (color)
                     srow = srow + "%" + color
                 thistile.append(srow)
-            tileIndex = getTileIndex(thistile,app.Tiles,currentTile)
+            tileIndex = getTileIndex(thistile,app.Tiles,currentTile,app)
             app.TileMap.append(tileIndex)
             app.ColorTiles.append(thistile)
-            if int(tileIndex) == int(currentTile):
+            if (int(tileIndex) == int(currentTile)) :
                 currentTile = currentTile +1
                 tilepattern = []
                 colorpattern = []
@@ -196,14 +196,18 @@ def createTiles(app):
                     tilepattern.append(binpattern)
                 app.FinalTiles.append(retroclasses.tile(tilepattern,colorpattern))
                 app.Tiles.append(thistile)
-#    print ("Finsihed creating tiles, found a total of "+str(len(app.Tiles)))           
 
-def getTileIndex (tile,tiles,idx): # Check if te tile is already in the tileset
-    nidx = 0;
-    for tileb in tiles:
-        if compareTiles (tile,tileb):
-            return nidx
-        nidx = nidx + 1
+                #on the Neo Geo we allow duplicate tiles, but this needs to be generalized
+
+#    print ("Finsihed creating tiles, found a total of "+str(len(app.Tiles)))
+
+def getTileIndex (tile,tiles,idx,app): # Check if te tile is already in the tileset
+    if config.systems[app.targetSystem.get()] != "NeoGeo":
+        nidx = 0;
+        for tileb in tiles:
+            if compareTiles (tile,tileb):
+                return nidx
+            nidx = nidx + 1
     return idx
 
 def compareTiles(tilea,tileb): # check if tilea is the same as tileb
@@ -237,7 +241,7 @@ def createTilesMapWindow(app):
 def closeTilesMapWindow(app):
     #Destroy sprite window so next time it is open it is reinitialized
     app.tilmwindow.destroy()
-    
+
 def selectTile(canvas,app):
     tags = canvas.gettags(tk.CURRENT)
     parenttags = tags[0].split("/")
@@ -251,7 +255,7 @@ def selectTile(canvas,app):
             canvas.itemconfig (rectangle, outline="white")
     canvas.update_idletasks()
     canvas.focus_set()
-    
+
 def switchTile(canvas,app):
     tags = canvas.gettags(tk.CURRENT)
     parenttags = tags[0].split("/")
@@ -259,7 +263,7 @@ def switchTile(canvas,app):
     origintag = app.switchtiletag
     if origintag == "":
         tk.messagebox.showinfo("Error","Please select origin Tile with RMB first, then destination with LMB")
-        return 1    
+        return 1
     oid = origintag.replace("tile,til","")
     oid = oid.replace("canvas","")
     originid=int(oid)
@@ -267,7 +271,7 @@ def switchTile(canvas,app):
     did = did.replace("canvas","")
     destid = int(did)
     swapTiles (originid,destid,app)
-    
+
 def swapTiles (original,destination,app):
     orTile = app.Tiles[original]
     deTile = app.Tiles[destination]
@@ -275,8 +279,3 @@ def swapTiles (original,destination,app):
     app.Tiles[destination]=orTile
     drawTiles(app)
     app.switchtiletag=""
-    
-    
-    
-    
-    
